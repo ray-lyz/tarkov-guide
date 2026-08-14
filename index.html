@@ -1,0 +1,2120 @@
+<title>逃离塔科夫 · 赛季服任务引导</title>
+<style>
+/* Minimal-tech palette: deep blue-black ground, one cyan accent, cool neutrals.
+   Every colour is a token — components never hardcode. */
+:root{
+  --ground:#0A0C10; --panel:#12161C; --raise:#1A212A; --sunk:#06080B;
+  --line:#232B36; --line-soft:#161C24;
+  --ink:#D5DCE5; --ink-dim:#8892A0; --ink-mute:#5A6472;
+  --brass:#57C7E0; --brass-dim:#2F5F70; --brass-hi:#8EDDEE; --on-accent:#06080B;
+  --rust:#E2685F; --done:#5FBF8F; --steel:#7C9BC4;
+  --scrim:rgba(6,8,11,.86); --shadow:rgba(0,0,0,.55);
+  --t-Prapor:#8FB56A; --t-Therapist:#7FC7D9; --t-Fence:#9A93A8; --t-Skier:#D98F6B;
+  --t-Peacekeeper:#7EA6E0; --t-Mechanic:#A0AAB8; --t-Ragman:#D9B36B; --t-Jaeger:#86C49A;
+  --t-Lightkeeper:#E0D28A; --t-Arena:#D98BA8; --t-BTR:#8A9AAE;
+  --font-display:"Bahnschrift Condensed","Bahnschrift","Oswald","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --font-body:"Segoe UI Variable Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  --font-data:"Cascadia Mono","Consolas",ui-monospace,monospace;
+  --gap:clamp(12px,2vw,20px);
+  --r:3px;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --ground:#EDF1F5; --panel:#FFFFFF; --raise:#F5F8FA; --sunk:#E2E8EE;
+    --line:#C9D2DB; --line-soft:#E0E6EC;
+    --ink:#131A21; --ink-dim:#4D5866; --ink-mute:#7A8694;
+    --brass:#0F7D95; --brass-dim:#93C2CF; --brass-hi:#0B5F72; --on-accent:#FFFFFF;
+    --rust:#C0392B; --done:#1F8A5F; --steel:#3E6592;
+    --scrim:rgba(18,24,31,.6); --shadow:rgba(20,28,38,.18);
+    --t-Prapor:#5C7A34; --t-Therapist:#2E7C92; --t-Fence:#6B6478; --t-Skier:#B05F33;
+    --t-Peacekeeper:#3D69AE; --t-Mechanic:#5F6A78; --t-Ragman:#9A7420; --t-Jaeger:#3E8A5C;
+    --t-Lightkeeper:#8A7A1E; --t-Arena:#A8496B; --t-BTR:#556478;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0A0C10; --panel:#12161C; --raise:#1A212A; --sunk:#06080B;
+  --line:#232B36; --line-soft:#161C24;
+  --ink:#D5DCE5; --ink-dim:#8892A0; --ink-mute:#5A6472;
+  --brass:#57C7E0; --brass-dim:#2F5F70; --brass-hi:#8EDDEE; --on-accent:#06080B;
+  --rust:#E2685F; --done:#5FBF8F; --steel:#7C9BC4;
+  --scrim:rgba(6,8,11,.86); --shadow:rgba(0,0,0,.55);
+  --t-Prapor:#8FB56A; --t-Therapist:#7FC7D9; --t-Fence:#9A93A8; --t-Skier:#D98F6B;
+  --t-Peacekeeper:#7EA6E0; --t-Mechanic:#A0AAB8; --t-Ragman:#D9B36B; --t-Jaeger:#86C49A;
+  --t-Lightkeeper:#E0D28A; --t-Arena:#D98BA8; --t-BTR:#8A9AAE;
+}
+:root[data-theme="light"]{
+  --ground:#EDF1F5; --panel:#FFFFFF; --raise:#F5F8FA; --sunk:#E2E8EE;
+  --line:#C9D2DB; --line-soft:#E0E6EC;
+  --ink:#131A21; --ink-dim:#4D5866; --ink-mute:#7A8694;
+  --brass:#0F7D95; --brass-dim:#93C2CF; --brass-hi:#0B5F72; --on-accent:#FFFFFF;
+  --rust:#C0392B; --done:#1F8A5F; --steel:#3E6592;
+  --scrim:rgba(18,24,31,.6); --shadow:rgba(20,28,38,.18);
+  --t-Prapor:#5C7A34; --t-Therapist:#2E7C92; --t-Fence:#6B6478; --t-Skier:#B05F33;
+  --t-Peacekeeper:#3D69AE; --t-Mechanic:#5F6A78; --t-Ragman:#9A7420; --t-Jaeger:#3E8A5C;
+  --t-Lightkeeper:#8A7A1E; --t-Arena:#A8496B; --t-BTR:#556478;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0; font-weight:600; text-wrap:balance; line-height:1.25}
+p{margin:0}
+a{color:var(--brass)}
+::selection{background:var(--brass); color:var(--ground)}
+:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+.lat{font-family:var(--font-display); font-stretch:condensed; letter-spacing:.06em; text-transform:uppercase}
+.brk{position:relative}
+.brk::before,.brk::after{content:none}
+.brk::before{top:-1px; left:-1px; border-width:1px 0 0 1px}
+.brk::after{bottom:-1px; right:-1px; border-width:0 1px 1px 0}
+
+header.top{position:sticky; top:0; z-index:40; background:linear-gradient(180deg,var(--panel),color-mix(in srgb,var(--panel) 92%,var(--ground))); border-bottom:1px solid var(--line)}
+header.top::after{content:""; display:block; height:1px; background:linear-gradient(90deg,transparent,var(--brass-dim),transparent); opacity:.55}
+.top-in{max-width:1560px; margin:0 auto; padding:11px clamp(14px,2.5vw,28px); display:flex; align-items:center; gap:clamp(12px,2.5vw,26px); flex-wrap:wrap}
+.mark{display:flex; align-items:baseline; gap:10px; margin-right:auto}
+.mark h1{font-size:18px}
+.mark .sub{font-size:11px; color:var(--ink-dim)}
+.readout{display:flex; align-items:center; gap:14px}
+.readout .big{font-family:var(--font-data); font-size:24px; font-weight:600; color:var(--brass); font-variant-numeric:tabular-nums; line-height:1}
+.readout .lbl{font-size:10px; color:var(--ink-dim); display:block; margin-top:3px}
+.seg{width:clamp(120px,15vw,220px); height:14px; background:var(--sunk); border:1px solid var(--line); position:relative; overflow:hidden}
+.seg i{display:block; height:100%; background:var(--brass); transition:width .35s cubic-bezier(.4,0,.2,1)}
+.seg::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent 0 7px,var(--panel) 7px 9px)}
+.tbtn{background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:6px 11px; cursor:pointer; font-family:var(--font-display); font-stretch:condensed; letter-spacing:.08em; text-transform:uppercase; font-size:12px; border-radius:var(--r)}
+.tbtn:hover{border-color:var(--brass); color:var(--brass)}
+
+nav.tabs{position:sticky; top:0; z-index:30; background:var(--ground); border-bottom:1px solid var(--line); overflow-x:auto}
+.tabs-in{max-width:1560px; margin:0 auto; display:flex; padding:0 clamp(14px,2.5vw,28px)}
+.tab{flex:0 0 auto; background:none; border:0; border-bottom:2px solid transparent; color:var(--ink-dim); padding:12px 16px; cursor:pointer; font-family:var(--font-body); font-size:14px; white-space:nowrap; display:flex; align-items:center; gap:8px}
+.tab span.k{font-family:var(--font-display); font-stretch:condensed; font-size:11px; letter-spacing:.1em; color:var(--ink-mute)}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--brass); border-bottom-color:var(--brass)}
+.tab[aria-selected="true"] span.k{color:var(--brass-dim)}
+.tab .badge{font-family:var(--font-data); font-size:10.5px; background:var(--brass); color:var(--ground); padding:0 5px; min-width:17px; text-align:center}
+.tab .badge:empty,.tab .badge[data-n="0"]{display:none}
+
+.shell{max-width:1560px; margin:0 auto; padding:var(--gap) clamp(14px,2.5vw,28px) 80px; display:grid; grid-template-columns:240px 1fr; gap:var(--gap); align-items:start}
+@media(max-width:1000px){.shell{grid-template-columns:1fr}}
+aside.rail{position:sticky; top:50px; display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 66px); overflow-y:auto}
+@media(max-width:1000px){aside.rail{position:static; max-height:none}}
+.card{background:var(--panel); border:1px solid var(--line-soft)}
+.card>h3{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.11em; font-size:11px; color:var(--ink-dim); padding:9px 12px; border-bottom:1px solid var(--line-soft); background:var(--sunk); display:flex; justify-content:space-between; align-items:center; gap:8px}
+.card>h3 .n{font-family:var(--font-data); color:var(--brass)}
+.card>.bd{padding:12px}
+.tp{display:flex; flex-direction:column; gap:8px}
+.tp-row{display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px; font-size:12.5px; cursor:pointer; border:0; background:none; color:inherit; font-family:inherit; text-align:left; padding:0; width:100%}
+.tp-nm{font-family:var(--font-display); font-stretch:condensed; letter-spacing:.05em; text-transform:uppercase; font-size:12px; display:block; margin-bottom:3px; color:var(--tc)}
+.tp-bar{height:4px; background:var(--sunk); position:relative; display:block}
+.tp-bar i{position:absolute; inset:0 auto 0 0; background:var(--tc); transition:width .3s}
+.tp-n{font-family:var(--font-data); font-size:11px; color:var(--ink-dim); font-variant-numeric:tabular-nums}
+
+main{min-width:0; display:flex; flex-direction:column; gap:var(--gap)}
+.panel{display:none}
+.panel.on{display:flex; flex-direction:column; gap:var(--gap)}
+.note{border:1px solid var(--line-soft); border-left:3px solid var(--brass-dim); background:var(--panel); padding:11px 14px; font-size:13px; color:var(--ink-dim)}
+.note b{color:var(--ink)}
+
+.filters{background:var(--panel); border:1px solid var(--line-soft); padding:12px; display:flex; flex-direction:column; gap:10px}
+.frow{display:flex; gap:7px; flex-wrap:wrap; align-items:center}
+.search{flex:1; min-width:180px; background:var(--sunk); border:1px solid var(--line); color:var(--ink); padding:8px 11px; font-family:var(--font-body); font-size:14px}
+.search::placeholder{color:var(--ink-mute)}
+.chip{background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:4px 9px; font-size:12.5px; cursor:pointer; font-family:var(--font-body); display:inline-flex; align-items:center; gap:6px; border-radius:var(--r)}
+.chip:hover{border-color:var(--ink-dim); color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--tc,var(--brass)); color:var(--tc,var(--brass)); background:color-mix(in srgb,var(--tc,var(--brass)) 13%,transparent)}
+.chip .dot{width:7px; height:7px; background:var(--tc,var(--brass))}
+.flbl{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; color:var(--ink-mute); width:50px; flex:0 0 auto}
+
+.qlist{display:flex; flex-direction:column; gap:4px}
+.q{background:var(--panel); border:1px solid var(--line-soft); border-left:3px solid var(--tc)}
+.q.hide{display:none}
+.q.done{opacity:.45}
+.q.pick{background:color-mix(in srgb,var(--brass) 8%,var(--panel)); border-color:var(--brass-dim)}
+.qh{display:grid; grid-template-columns:auto auto 1fr auto; align-items:center; gap:10px; padding:8px 12px; cursor:pointer}
+.qh:hover{background:var(--raise)}
+.qcheck{width:18px; height:18px; accent-color:var(--done); cursor:pointer; flex:0 0 auto}
+.pin{width:24px; height:24px; flex:0 0 auto; border:1px solid var(--line); background:transparent; color:var(--ink-mute); cursor:pointer; display:grid; place-items:center; font-size:13px; line-height:1; padding:0}
+.pin:hover{border-color:var(--brass); color:var(--brass)}
+.q.pick .pin{background:var(--brass); border-color:var(--brass); color:var(--ground)}
+.qname{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; min-width:0}
+.qname b{font-weight:600; font-size:14.5px}
+.q.done .qname b{text-decoration:line-through}
+.qname em{font-style:normal; font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.05em; font-size:12px; color:var(--ink-mute)}
+.qtags{display:flex; gap:5px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+.tag{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; padding:2px 6px; border:1px solid var(--line); color:var(--ink-dim); white-space:nowrap}
+.tag.map{color:var(--steel); border-color:color-mix(in srgb,var(--steel) 45%,transparent)}
+.tag.ll{color:var(--brass); border-color:var(--brass-dim); font-family:var(--font-data); letter-spacing:0}
+.tag.tr{color:var(--tc); border-color:color-mix(in srgb,var(--tc) 50%,transparent)}
+.qb{display:none; padding:0 14px 15px 14px; border-top:1px solid var(--line-soft)}
+.q.open .qb{display:block}
+.qsec{margin-top:12px}
+.qsec>h4{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.12em; font-size:10.5px; color:var(--brass-dim); margin-bottom:6px}
+.qsec ol{margin:0; padding-left:19px; display:flex; flex-direction:column; gap:4px; font-size:13.5px}
+.qsec ol li::marker{color:var(--brass); font-family:var(--font-data); font-size:11px}
+.rw{display:flex; gap:6px; flex-wrap:wrap}
+.rw span{font-family:var(--font-data); font-size:11.5px; background:var(--sunk); border:1px solid var(--line-soft); padding:2px 7px; color:var(--ink-dim)}
+.rw span.xp{color:var(--done)}
+.rw span.money{color:var(--brass)}
+.src{margin-top:12px; font-size:12px; color:var(--ink-mute)}
+.empty{padding:40px 20px; text-align:center; color:var(--ink-mute); font-size:14px; border:1px dashed var(--line); background:var(--panel)}
+
+/* ---- selection tray ---- */
+.tray{display:flex; flex-direction:column; gap:6px; max-height:300px; overflow-y:auto}
+.tray-g{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.1em; font-size:10px; color:var(--steel); margin-top:4px}
+.tray-i{display:grid; grid-template-columns:1fr auto; gap:6px; align-items:center; font-size:12.5px; padding:3px 0; border-bottom:1px solid var(--line-soft)}
+.tray-i b{font-weight:500}
+.tray-x{border:0; background:none; color:var(--ink-mute); cursor:pointer; font-size:14px; line-height:1; padding:0 2px}
+.tray-x:hover{color:var(--rust)}
+.tray-empty{font-size:12px; color:var(--ink-mute); line-height:1.6}
+
+/* ---- planner workspace ---- */
+body.wide .shell{grid-template-columns:1fr}
+body.wide aside.rail{display:none}
+.mapsel{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+.mapsel .chip b{font-weight:600}
+.mapsel .chip .n{font-family:var(--font-data); font-size:10.5px; opacity:.75; margin-left:4px}
+.work{display:grid; grid-template-columns:minmax(0,1fr) 268px; border:1px solid var(--line-soft); background:var(--panel)}
+.work.has-global{grid-template-columns:minmax(0,1fr) 252px 214px}
+@media(max-width:1240px){.work.has-global{grid-template-columns:minmax(0,1fr) 252px}
+  .work.has-global .gcol{grid-column:1 / -1; border-left:0; border-top:1px solid var(--line-soft)}}
+@media(max-width:900px){.work,.work.has-global{grid-template-columns:1fr}}
+/* global (no-map) tasks column */
+.gcol .tasklist{gap:5px}
+.gk{border:1px solid var(--line-soft); border-left:3px solid var(--tc); background:var(--sunk); padding:6px 8px}
+.gk .hd{display:flex; align-items:center; gap:6px}
+.gk .nm{font-size:12.5px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.gk .meta2{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.06em;
+           font-size:10px; color:var(--tc); margin-top:2px}
+.gk ul{margin:4px 0 0; padding-left:14px; display:flex; flex-direction:column; gap:2px}
+.gk li{font-size:11px; line-height:1.45; color:var(--ink-dim)}
+.gk li::marker{color:var(--brass-dim)}
+.work .left{min-width:0; display:flex; flex-direction:column}
+.work .right{border-left:1px solid var(--line-soft); display:flex; flex-direction:column; min-width:0}
+@media(max-width:900px){.work .right{border-left:0; border-top:1px solid var(--line-soft)}}
+.work .stage{height:clamp(420px,calc(100vh - 196px),1600px)}
+/* Planner fills whatever height the container actually has.
+   Chained flex from html/body — `vh` is unreliable inside an embedding iframe. */
+html{height:100%}
+body{min-height:100%; display:flex; flex-direction:column}
+/* the title bar is dead weight on the planner — the tab strip is enough to get back */
+body.wide header.top{display:none}
+body.wide .shell{flex:1 1 auto; min-height:0; align-items:stretch}
+/* full-bleed on the planner: the centred 1560px column wastes the sides on wide screens.
+   `margin:0 auto` must go too — auto side margins on a flex item cancel the stretch
+   and shrink it to content width. */
+body.wide .shell,body.wide .top-in,body.wide .tabs-in{max-width:none}
+body.wide .shell{margin-left:0; margin-right:0; width:100%; padding-left:10px; padding-right:10px}
+body.wide main{flex:1; min-height:0; display:flex; flex-direction:column}
+body.wide #p-plan.on{flex:1; min-height:520px; display:flex; flex-direction:column; gap:6px}
+/* #planBody sits between the panel and .work — it has to carry the stretch too */
+body.wide #p-plan.on #planBody{flex:1; min-height:0; display:flex; flex-direction:column}
+body.wide #p-plan.on .work{flex:1; min-height:0}
+body.wide #p-plan.on .work .left,body.wide #p-plan.on .work .right{min-height:0}
+body.wide #p-plan.on .work .stage{flex:1; height:auto; min-height:360px}
+body.wide #p-plan.on .tasklist{min-height:0}
+.planbar{gap:8px; align-items:center; flex-wrap:nowrap; overflow-x:auto}
+.planbar .mapsel{flex:1; min-width:0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:1px}
+.planbar-r{display:flex; gap:6px; flex:0 0 auto}
+.bulkmsg{font-size:11.5px; color:var(--ink-mute)}
+.bulkmsg:empty{display:none}
+/* give the map as much of the page as possible */
+/* every pixel of chrome on the planner is one the map doesn't get */
+body.wide .shell{padding-top:5px; padding-bottom:5px; gap:5px}
+body.wide main{gap:5px}
+body.wide nav.tabs .tab{padding:7px 14px}
+body.wide #p-plan.on{gap:4px}
+body.wide .mtool{padding:5px 10px; gap:6px}
+body.wide .rhd{padding:6px 10px}
+body.wide .tasklist{padding:7px}
+body.wide .work .stage{min-height:300px}
+.howto{background:var(--panel); border:1px solid var(--line-soft); font-size:12.5px; color:var(--ink-dim)}
+.howto summary{cursor:pointer; padding:6px 12px; font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; color:var(--ink-mute); list-style:none}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary::before{content:"▸ "; color:var(--brass-dim)}
+.howto[open] summary::before{content:"▾ "}
+.howto>div{padding:2px 12px 10px; line-height:1.65}
+.howto b{color:var(--ink)}
+.rhd{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.11em; font-size:11px; color:var(--ink-dim); padding:9px 12px; border-bottom:1px solid var(--line-soft); background:var(--sunk); display:flex; align-items:center; gap:8px}
+.rhd .n{margin-left:auto; font-family:var(--font-data); color:var(--brass)}
+.tasklist{overflow-y:auto; padding:9px; display:flex; flex-direction:column; gap:6px; flex:1}
+.tk{border:1px solid var(--line-soft); border-left:3px solid var(--tc); background:var(--sunk); padding:7px 9px; cursor:pointer}
+.tk:hover{background:var(--raise)}
+.tk[aria-selected="true"]{background:color-mix(in srgb,var(--brass) 15%,var(--sunk)); border-color:var(--brass-dim); border-left-color:var(--brass)}
+.tk .hd{display:flex; align-items:center; gap:7px}
+.tk .nm{font-size:13.5px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tk .cnt{margin-left:auto; flex:0 0 auto; font-family:var(--font-data); font-size:10.5px; color:var(--brass); border:1px solid var(--brass-dim); padding:0 5px}
+.tk .cnt.zero{color:var(--ink-mute); border-color:var(--line)}
+.tk .en,.gk .en,.addres .en{display:block; font-family:var(--font-display); font-stretch:condensed;
+  text-transform:uppercase; letter-spacing:.04em; font-size:10.5px; color:var(--ink-mute);
+  margin-top:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tk .ob{font-size:11.5px; color:var(--ink-mute); margin-top:3px; line-height:1.45}
+.tk .chips{display:flex; gap:4px; flex-wrap:wrap; margin-top:5px}
+.tk .chips span{font-size:10.5px; border:1px solid var(--steel); color:var(--steel); padding:0 5px; opacity:.85}
+.tk .nums{display:flex; gap:4px; flex-wrap:wrap; margin-top:5px}
+.tk .nums span{font-family:var(--font-data); font-size:10px; background:var(--brass); color:var(--ground); width:15px; height:15px; display:grid; place-items:center}
+/* expanded detail: shown once the row is the active marker target */
+.tk .more{display:none}
+.tk[aria-selected="true"] .more{display:block; margin-top:6px; padding-top:6px; border-top:1px solid var(--line-soft)}
+.tk .more ul{margin:0 0 5px; padding-left:15px; display:flex; flex-direction:column; gap:2px}
+.tk .more li{font-size:11px; line-height:1.45; color:var(--ink-dim)}
+.tk .more li::marker{color:var(--brass-dim)}
+.mline{font-size:11px; color:var(--ink-dim); margin-bottom:4px}
+.mline b{color:var(--brass-dim); font-weight:600}
+.srclink{display:inline-block; font-size:11.5px; color:var(--brass); text-decoration:none;
+         border-bottom:1px dotted var(--brass-dim); margin-top:2px}
+.srclink:hover{color:var(--ink); border-bottom-color:var(--ink)}
+.gk .srclink{margin-top:5px}
+.rft{padding:9px 12px; border-top:1px solid var(--line-soft); font-size:11.5px; color:var(--ink-mute); line-height:1.55}
+.tgt{font-size:12px; color:var(--ink-dim); display:inline-flex; align-items:center; gap:5px}
+.tgt b{color:var(--brass); font-weight:600}
+.mapcard{background:var(--panel); border:1px solid var(--line-soft)}
+.mapcard>h3{display:flex; align-items:baseline; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line-soft); background:var(--sunk); font-size:15px}
+.mapcard>h3 .cnt{margin-left:auto; font-family:var(--font-data); font-size:12px; color:var(--brass)}
+.mapcard>h3 .nt{font-size:11.5px; color:var(--ink-mute); font-weight:400}
+.mapsvg{display:block; width:100%; height:auto; background:var(--sunk)}
+.mapsvg .bound{fill:none; stroke:var(--line); stroke-width:.6}
+.mapsvg .grid{stroke:var(--line-soft); stroke-width:.25}
+.mapsvg .lm{fill:var(--ink-mute); opacity:.45}
+.mapsvg .lmt{fill:var(--ink-mute); font-size:2.6px; font-family:var(--font-body); opacity:.5}
+.mapsvg .on .lm{fill:var(--brass); opacity:1}
+.mapsvg .on .lmt{fill:var(--ink); opacity:1; font-weight:600}
+.mapsvg .ring{fill:none; stroke:var(--brass); stroke-width:.5; opacity:.9}
+.mapsvg .num{fill:var(--ground); font-size:2.4px; font-family:var(--font-data); font-weight:700; text-anchor:middle}
+.mapsvg .compass{fill:var(--ink-mute); font-size:3px; font-family:var(--font-display); opacity:.6}
+.plist{padding:12px 14px; display:flex; flex-direction:column; gap:12px}
+.pspot{border-left:2px solid var(--brass-dim); padding-left:10px}
+.pspot h4{font-size:13.5px; display:flex; align-items:center; gap:7px; margin-bottom:4px}
+.pspot h4 i{font-style:normal; font-family:var(--font-data); font-size:10.5px; background:var(--brass); color:var(--ground); width:16px; height:16px; display:grid; place-items:center; flex:0 0 auto}
+.pspot ul{margin:0; padding-left:16px; display:flex; flex-direction:column; gap:3px; font-size:12.5px; color:var(--ink-dim)}
+.pspot ul li::marker{color:var(--brass-dim)}
+.pspot ul li b{color:var(--ink); font-weight:600}
+.punmatched{font-size:12.5px; color:var(--ink-mute); padding:10px 14px; border-top:1px solid var(--line-soft)}
+
+.phase{background:var(--panel); border:1px solid var(--line-soft); display:grid; grid-template-columns:60px 1fr}
+@media(max-width:640px){.phase{grid-template-columns:42px 1fr}}
+.ph-n{background:var(--sunk); border-right:1px solid var(--line-soft); display:flex; flex-direction:column; align-items:center; padding-top:14px; gap:6px}
+.ph-n b{font-family:var(--font-data); font-size:22px; color:var(--brass); line-height:1}
+.ph-n span{writing-mode:vertical-rl; font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.16em; font-size:10px; color:var(--ink-mute)}
+.ph-b{padding:15px 18px}
+.ph-b>h3{font-size:17px; margin-bottom:3px}
+.ph-b>.meta{font-family:var(--font-data); font-size:11.5px; color:var(--brass-dim); margin-bottom:11px}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; margin-top:12px}
+.blk>h4{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.12em; font-size:10.5px; color:var(--brass-dim); margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid var(--line-soft)}
+.blk ul{margin:0; padding-left:17px; display:flex; flex-direction:column; gap:5px; font-size:13.5px}
+.blk ul li::marker{color:var(--ink-mute)}
+.qref{color:var(--brass); cursor:pointer; border-bottom:1px dotted var(--brass-dim)}
+
+.tw{overflow-x:auto; border:1px solid var(--line-soft); background:var(--panel)}
+table{border-collapse:collapse; width:100%; min-width:520px; font-size:13.5px}
+th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line-soft)}
+th{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.1em; font-size:10.5px; color:var(--ink-dim); background:var(--sunk); position:sticky; top:0}
+td.n{font-family:var(--font-data); font-variant-numeric:tabular-nums; color:var(--brass)}
+tbody tr:hover{background:var(--raise)}
+tbody tr:last-child td{border-bottom:0}
+.pri{display:inline-block; width:52px; height:5px; background:var(--sunk); position:relative; vertical-align:middle}
+.pri i{position:absolute; inset:0 auto 0 0; background:var(--brass)}
+.sec-h{display:flex; align-items:baseline; gap:12px; padding-bottom:8px; border-bottom:1px solid var(--line)}
+.sec-h h2{font-size:17px}
+.sec-h span{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.14em; font-size:10.5px; color:var(--ink-mute)}
+/* ---- map stage: user image + user pins ---- */
+.mtool{display:flex; gap:7px; flex-wrap:wrap; align-items:center; padding:9px 14px; border-bottom:1px solid var(--line-soft); background:var(--sunk)}
+.mtool .sp{margin-left:auto}
+.mbtn{background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:4px 9px; font-size:12px; cursor:pointer; font-family:var(--font-body); border-radius:var(--r); transition:border-color .12s,color .12s}
+.mbtn:hover{border-color:var(--brass); color:var(--brass)}
+.mbtn[aria-pressed="true"]{background:var(--brass); border-color:var(--brass); color:var(--ground)}
+.mbtn.danger:hover{border-color:var(--rust); color:var(--rust)}
+.msel{background:var(--panel); border:1px solid var(--line); color:var(--ink); font-family:var(--font-body); font-size:12px; padding:4px 6px; max-width:230px}
+.stage{position:relative; background:var(--sunk); overflow:hidden; touch-action:none; user-select:none; cursor:grab}
+.stage.grabbing{cursor:grabbing}
+.stage.arm{cursor:crosshair}
+/* NOTE: no transform/will-change here on purpose — a promoted layer gets
+   rasterised once at 1x and then stretched, which destroys detail when zoomed.
+   We resize the element itself so the browser re-rasterises at full quality. */
+.mcanvas{position:absolute}
+.mapholder{width:100%; height:100%}
+.mapholder svg.mapsvg{width:100%; height:100%}
+.stage img.usermap{display:block; width:100%; height:100%; -webkit-user-drag:none}
+.zoomui{display:flex; gap:4px; align-items:center}
+.zoomui .zb{width:26px; height:24px; padding:0; font-size:14px; line-height:1}
+.zoomui .zl{font-family:var(--font-data); font-size:11px; color:var(--brass); min-width:42px; text-align:center}
+/* marker: the tail tip sits exactly on the recorded point */
+.mkr{position:absolute; z-index:3; cursor:pointer; transform:translate(-50%,-100%); padding-bottom:7px; line-height:0}
+.mkr .pdot{
+  position:relative; width:20px; height:20px; border-radius:50%;
+  background:var(--brass); color:var(--on-accent);
+  font:700 11.5px/1 var(--font-data); font-variant-numeric:tabular-nums;
+  display:grid; place-items:center;
+  box-shadow:0 0 0 2px var(--sunk), 0 0 0 3.5px color-mix(in srgb,var(--brass) 45%,transparent), 0 2px 6px var(--shadow);
+}
+.mkr .pdot::after{
+  content:""; position:absolute; top:19px; left:50%; margin-left:-4px;
+  border-left:4px solid transparent; border-right:4px solid transparent;
+  border-top:7px solid var(--brass);
+  filter:drop-shadow(0 1.5px 0 var(--sunk));
+}
+.mkr .ptxt{
+  position:absolute; left:27px; top:2px;
+  font:500 11px/1.5 var(--font-body); letter-spacing:.01em;
+  background:var(--scrim); color:var(--ink);
+  border:1px solid var(--brass-dim); border-left:2px solid var(--brass);
+  padding:1px 6px; white-space:nowrap; max-width:118px; overflow:hidden; text-overflow:ellipsis;
+  pointer-events:none; text-shadow:0 1px 2px var(--sunk);
+}
+.mkr:hover{z-index:5}
+.mkr:hover .ptxt{max-width:none}
+.mkr:hover .pdot{background:var(--brass-hi)}
+.mkr.dim{opacity:.32}
+.mkr.hasnote .pdot::before{
+  content:""; position:absolute; right:-4px; top:-4px; width:9px; height:9px;
+  background:var(--steel); border:1.5px solid var(--sunk); border-radius:2px;
+}
+.mkr.hot .pdot{background:var(--rust); color:var(--on-accent)}
+.mkr.hot .pdot::after{border-top-color:var(--rust)}
+.mkr.hot .ptxt{border-left-color:var(--rust); border-color:var(--rust)}
+/* task row quick actions */
+.tkb{width:20px; height:20px; flex:0 0 auto; padding:0; line-height:1; font-size:12px;
+     background:transparent; border:1px solid var(--line); color:var(--ink-mute); cursor:pointer}
+.tkb:hover{border-color:var(--brass); color:var(--brass)}
+.tkb.ok:hover{border-color:var(--done); color:var(--done)}
+.tkb.no:hover{border-color:var(--rust); color:var(--rust)}
+/* marker popover */
+.pop{position:absolute; z-index:6; width:270px; background:var(--panel); border:1px solid var(--brass-dim); box-shadow:0 8px 26px var(--shadow)}
+.pop h5{margin:0; font-size:12.5px; padding:8px 10px; border-bottom:1px solid var(--line-soft); background:var(--sunk); display:flex; gap:7px; align-items:center}
+.pop h5 i{font-style:normal; font-family:var(--font-data); font-size:10.5px; background:var(--brass); color:var(--ground); width:17px; height:17px; display:grid; place-items:center; flex:0 0 auto}
+.pop .body{padding:9px 10px; display:flex; flex-direction:column; gap:5px}
+.pop .acts{display:flex; gap:6px; align-items:center; margin-top:3px}
+.plab{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.11em;
+      font-size:9.5px; color:var(--brass-dim); margin-top:3px}
+.pinput,.pnote{background:var(--sunk); border:1px solid var(--line); color:var(--ink);
+      font-family:var(--font-body); font-size:12.5px; padding:5px 7px; width:100%}
+.pinput:focus,.pnote:focus{border-color:var(--brass); outline:none}
+.pnote{min-height:74px; resize:vertical; line-height:1.55}
+.psaved{font-size:11px; color:var(--done)}
+.qmatch{background:var(--panel); border:1px solid var(--line); color:var(--ink); font-family:var(--font-body); font-size:12px; padding:4px 7px; width:150px}
+.qmatch::placeholder{color:var(--ink-mute)}
+/* search-and-add box */
+.addwrap{position:relative; display:inline-block}
+.addwrap .qmatch{width:230px}
+.addres{position:absolute; z-index:25; left:0; top:calc(100% + 2px); width:340px; max-height:300px; overflow-y:auto;
+        background:var(--panel); border:1px solid var(--brass-dim); box-shadow:0 8px 24px var(--shadow); display:none}
+.addres.on{display:block}
+.addres button{display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; width:100%; text-align:left;
+        background:none; border:0; border-bottom:1px solid var(--line-soft); color:inherit; font-family:inherit;
+        font-size:13px; padding:6px 9px; cursor:pointer}
+.addres button:last-child{border-bottom:0}
+.addres button:hover{background:var(--raise)}
+.addres .tr{font-family:var(--font-display); font-stretch:condensed; font-size:10.5px; letter-spacing:.06em; color:var(--tc)}
+.addres .none{padding:10px; font-size:12px; color:var(--ink-mute)}
+/* map viewer: same workspace shell as the planner, view only */
+body.wide #p-maps.on{flex:1; min-height:520px; display:flex; flex-direction:column; gap:4px}
+body.wide #p-maps.on #mapsBody{flex:1; min-height:0; display:flex; flex-direction:column}
+body.wide #p-maps.on .vwork{flex:1; min-height:0}
+.vwork{border:1px solid var(--line-soft); background:var(--panel); display:flex; flex-direction:column}
+.vstage{position:relative; flex:1; min-height:360px; background:var(--sunk); overflow:hidden;
+        touch-action:none; user-select:none; cursor:grab}
+.vstage.grabbing{cursor:grabbing}
+.vcanvas{position:absolute}
+.vcanvas img{display:block; width:100%; height:100%; -webkit-user-drag:none}
+.vnone{position:absolute; inset:0; display:grid; place-items:center; text-align:center;
+       color:var(--ink-mute); font-size:13px; line-height:1.9; padding:20px}
+.mapsel .chip.noimg{opacity:.5}
+.mapsel .chip .dotimg{width:6px; height:6px; border-radius:50%; background:var(--done); flex:0 0 auto}
+/* import dialog */
+.modal{position:fixed; inset:0; z-index:70; background:var(--scrim); display:grid; place-items:center; padding:20px}
+.modal .box{background:var(--panel); border:1px solid var(--brass-dim); width:min(680px,100%); max-height:88vh; display:flex; flex-direction:column}
+.modal h4{padding:11px 14px; border-bottom:1px solid var(--line-soft); background:var(--sunk); font-size:14px; display:flex; align-items:center; gap:8px}
+.modal h4 .x{margin-left:auto}
+.modal .bd2{padding:12px 14px; overflow-y:auto; display:flex; flex-direction:column; gap:10px}
+.modal textarea{width:100%; min-height:120px; background:var(--sunk); border:1px solid var(--line); color:var(--ink); font-family:var(--font-body); font-size:13px; padding:8px; resize:vertical}
+.modal .ft{padding:10px 14px; border-top:1px solid var(--line-soft); display:flex; gap:8px; align-items:center}
+.modal .ft .sp2{margin-left:auto}
+.imp-r{display:grid; grid-template-columns:auto 1fr auto auto; gap:9px; align-items:center; font-size:13px; padding:5px 0; border-bottom:1px solid var(--line-soft)}
+.imp-r:last-child{border-bottom:0}
+.imp-r .tr{font-family:var(--font-display); font-stretch:condensed; font-size:10.5px; letter-spacing:.06em; color:var(--tc)}
+.imp-bad{font-size:12.5px; color:var(--rust); line-height:1.7}
+.imp-h{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.11em; font-size:10.5px; color:var(--brass-dim); margin-top:4px}
+.stage .noimg{padding:10px}
+.mhint{font-size:11.5px; color:var(--ink-mute); padding:8px 14px; border-top:1px solid var(--line-soft)}
+
+/* ---- checklist ---- */
+.cl-grp{background:var(--panel); border:1px solid var(--line-soft); margin-bottom:var(--gap)}
+.cl-grp>h3{display:flex; align-items:center; gap:10px; padding:9px 14px; background:var(--sunk); border-bottom:1px solid var(--line-soft); font-size:14px}
+.cl-grp>h3 .cnt{margin-left:auto; font-family:var(--font-data); font-size:12px; color:var(--brass)}
+.cl-row{display:grid; grid-template-columns:auto auto 1fr auto; gap:10px; align-items:center; padding:7px 14px; border-bottom:1px solid var(--line-soft); font-size:13.5px}
+.cl-row:last-child{border-bottom:0}
+.cl-row:hover{background:var(--raise)}
+.cl-row .tr{font-family:var(--font-display); font-stretch:condensed; font-size:10.5px; letter-spacing:.06em; color:var(--tc)}
+.cl-row .obj{font-size:12px; color:var(--ink-mute); grid-column:3/5; margin-top:-4px}
+.cl-row.done b{text-decoration:line-through; opacity:.6}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="mark">
+      <h1>逃离塔科夫 · 赛季服任务引导</h1>
+      <span class="sub lat">Wipe Progression Console</span>
+    </div>
+    <div class="readout">
+      <div><div class="big" id="pct">0%</div><span class="lbl lat">Done</span></div>
+      <div><div class="seg brk"><i id="segbar" style="width:0"></i></div><span class="lbl" id="counts">0 / 0</span></div>
+    </div>
+    <button class="tbtn" id="reset">清空进度</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-in" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-p="quests"><span class="k">01</span>任务库</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="plan"><span class="k">02</span>跑图规划<span class="badge" id="planBadge" data-n="0"></span></button>
+    <button class="tab" role="tab" aria-selected="false" data-p="maps"><span class="k">03</span>地图<span class="badge" id="mapsBadge" data-n="0"></span></button>
+    <button class="tab" role="tab" aria-selected="false" data-p="list"><span class="k">04</span>我的清单<span class="badge" id="listBadge" data-n="0"></span></button>
+  </div>
+</nav>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="card brk">
+      <h3>已选任务 <span class="n" id="pickN">0</span></h3>
+      <div class="bd">
+        <div class="tray" id="tray"></div>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <button class="tbtn" style="flex:1;font-size:11px;padding:5px" id="goPlan">看跑图</button>
+          <button class="tbtn" style="flex:1;font-size:11px;padding:5px" id="clearPick">清空</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>商人进度</h3>
+      <div class="bd"><div class="tp" id="tprog"></div></div>
+    </div>
+    <div class="card">
+      <h3>视图</h3>
+      <div class="bd" style="display:flex;flex-direction:column;gap:7px">
+        <label style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="fHide" style="accent-color:var(--brass)">隐藏已完成</label>
+        <label style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="fPick" style="accent-color:var(--brass)">只看已选</label>
+        <label style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="fOpen" style="accent-color:var(--brass)">展开全部目标</label>
+      </div>
+    </div>
+    <div class="card">
+      <h3>数据来源</h3>
+      <div class="bd" style="font-size:12px;color:var(--ink-mute);line-height:1.6">
+        任务名、信任度等级、任务目标与奖励取自
+        <a href="https://www.eftarkov.com/" target="_blank" rel="noopener">eftarkov.com</a>，
+        英文名取自游戏本体语言文件。每条任务可点「原页面」看该站完整攻略。
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <section class="panel on" id="p-quests">
+      <div class="note">
+        共 <b id="qtotal">0</b> 条任务，覆盖 11 位商人。点每行左侧的 <b>◈</b> 把任务<b>加入跑图规划</b>，勾选框则表示<b>已完成</b>。<b>LL</b> 是接取所需的商人信任度等级，不是 PMC 等级。
+      </div>
+      <div class="filters">
+        <div class="frow"><input class="search" id="q" type="search" placeholder="搜索任务名（中/英）、目标、物品、地图…"></div>
+        <div class="frow"><span class="flbl">商人</span><div class="frow" id="tchips" style="gap:6px"></div></div>
+        <div class="frow"><span class="flbl">地图</span><div class="frow" id="mchips" style="gap:6px"></div></div>
+        <div class="frow"><span class="flbl">信任度</span><div class="frow" id="lchips" style="gap:6px"></div></div>
+      </div>
+      <div class="qlist" id="qlist"></div>
+      <div class="empty" id="empty" style="display:none">没有符合当前筛选条件的任务。</div>
+    </section>
+
+    <section class="panel" id="p-plan">
+      <div class="frow planbar">
+        <span class="addwrap">
+          <input class="qmatch" id="planAdd" type="search" autocomplete="off" placeholder="搜索任务并加入规划…">
+          <div class="addres" id="planAddRes"></div>
+        </span>
+        <div class="mapsel" id="mapsel"></div>
+        <span class="planbar-r">
+          <button class="mbtn" id="openImport" title="把游戏任务列表整段贴进来批量匹配">导入任务</button>
+          <button class="mbtn" id="bulkMaps" title="一次全选所有地图图片，按文件名自动对号入座">载入地图</button>
+          <input type="file" id="bulkMapsFile" accept="image/*" multiple style="display:none">
+          <button class="mbtn" id="openBackup" title="导出/导入进度、标记与地图图片">备份</button>
+          <button class="mbtn" id="openHelp" title="使用说明">?</button>
+        </span>
+      </div>
+      <div id="bulkMsg" class="bulkmsg"></div>
+      <div id="planBody"></div>
+    </section>
+
+    <section class="panel" id="p-maps">
+      <div class="frow planbar">
+        <div class="mapsel" id="mapsSel"></div>
+        <span class="planbar-r">
+          <span class="zoomui">
+            <button class="mbtn zb" data-v="out" title="缩小">−</button>
+            <span class="zl" data-v="lbl">100%</span>
+            <button class="mbtn zb" data-v="in" title="放大">+</button>
+            <button class="mbtn" data-v="fit">适应</button>
+          </span>
+          <button class="mbtn" id="mapsBulk" title="一次全选所有地图图片，按文件名自动对号入座">载入地图</button>
+          <input type="file" id="mapsBulkFile" accept="image/*" multiple style="display:none">
+        </span>
+      </div>
+      <div id="mapsMsg" class="bulkmsg"></div>
+      <div id="mapsBody"></div>
+    </section>
+
+    <section class="panel" id="p-list">
+      <div class="note">
+        这里汇总你<b>勾选过的所有任务</b>：上半部分是加入规划清单的（◈），下半部分是已标记完成的（☑）。点任务名可跳回任务库。
+      </div>
+      <div class="frow" style="justify-content:flex-end;gap:8px">
+        <button class="mbtn" id="clCopy">复制为文本</button>
+        <button class="mbtn danger" id="clClearPick">清空规划清单</button>
+      </div>
+      <div id="listBody"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const RAW = [{"t":"Prapor","c":"首秀","l":"1","o":["在森林、中心区、立交桥或海关消灭 Scav 5 名"],"r":["XP 3000","Rub 98000"],"u":"1"},{"t":"Prapor","c":"搜索任务","l":"1","o":["在森林找到 Prapor","的失踪车队","找到USEC临时营地"],"r":["XP 2800","Rub 22000"],"u":"2"},{"t":"Prapor","c":"背景调查","l":"1","o":["在海关取得青铜怀表","上交青铜怀表"],"r":["XP 3000","Rub 98000"],"u":"3"},{"t":"Prapor","c":"硝烟野餐","l":"1","o":["在森林、中心区、海关或立交桥消灭任意敌对目标 15 名"],"r":["XP 3000","Rub 98000"],"u":"4"},{"t":"Prapor","c":"油料快车","l":"1","o":["在海关使用 MS2000 指示器标记任意一辆油罐车"],"r":["XP 3000","Rub 95000","解锁 Prapor"],"u":"6"},{"t":"Prapor","c":"罪证","l":"1","o":["在海关工棚中取得0031号机密文件夹","上交机密文件夹0031","以幸存状态撤离海关"],"r":["XP 3000","Rub 98000"],"u":"9"},{"t":"Prapor","c":"探囊取物","l":"1","o":["在海关宿舍203房间取得高价值物品","上交高价值物品"],"r":["XP 3000","Rub 98000","解锁 Prapor"],"u":"17"},{"t":"Prapor","c":"武力说服","l":"1","o":["在森林、中心区、立交桥或海关使用 MP5SD 消灭 PMC 行动人员 15 名"],"r":["XP 3000","Rub 98000"],"u":"30"},{"t":"Prapor","c":"打靶训练","l":"1","o":["在中心区找到 KORD Utyos 机枪","在中心区找到 AGS 榴弹发射器","在中心区消灭任意敌对目标 5 个"],"r":["XP 3000","Rub 98000"],"u":"47"},{"t":"Prapor","c":"奢靡人生","l":"1","o":["在中心区找到酒商店","在商店中找到并获取酒瓶","上交酒瓶"],"r":["XP 3000","Rub 98000"],"u":"48"},{"t":"Prapor","c":"引路先驱","l":"1","o":["在海关以幸存状态通过“铁路通道”信号弹撤离点撤离"],"r":["XP 3000","Rub 98000"],"u":"59"},{"t":"Prapor","c":"往事速递","l":"2","o":["在位于海关关口的Tarcone公司主管办公室内找到一个保险盒","将包裹藏匿在工厂 3 号门旁的二层铁皮休息室内"],"r":["XP 10000","Rub 200000"],"u":"5"},{"t":"Prapor","c":"蛋卷冰淇淋","l":"2","o":["上交在战局中找到的： 6L31 5.45x39 AK-74 60发弹匣","3 个"],"r":["XP 10000","Rub 200000"],"u":"10"},{"t":"Prapor","c":"邮递员派特 - 1","l":"2","o":["在工厂找到死去的信使，并获取信件","以幸存状态撤离工厂","把信交给 Therapist"],"r":["XP 10000","Rub 200000"],"u":"13"},{"t":"Prapor","c":"绿色通道","l":"2","o":["在塔科夫街区找到运送货物的车队","找到偷袭位置","以幸存状态撤离该区域"],"r":["XP 10000","Rub 6000"],"u":"26"},{"t":"Prapor","c":"一信之缘","l":"2","o":["在塔科夫街区取得挂号信","上交信件"],"r":["XP 10000","Rub 200000"],"u":"14"},{"t":"Prapor","c":"苏共之辉","l":"2","o":["在塔科夫街区找到 Prapor","朋友的工作地点","收集任何与 Prapor","朋友下落有关的信息","上交数据"],"r":["XP 10000","Rub 200000"],"u":"15"},{"t":"Prapor","c":"屋顶战神","l":"2","o":["在塔科夫街区消灭狙击 Scav 8 名"],"r":["XP 10000","Rub 200000","解锁 Prapor"],"u":"24"},{"t":"Prapor","c":"掷弹兵","l":"2","o":["使用手榴弹或者榴弹发射器消灭任意目标 5 名"],"r":["XP 10000","Rub 200000"],"u":"28"},{"t":"Prapor","c":"麻醉","l":"2","o":["在海岸线找到第一处交易现场，并使用MS2000指示器标记","在海岸线找到第二处交易现场，并使用MS2000指示器标记","在海岸线找到第三处交易现场，并使用MS2000指示器标记"],"r":["XP 10000","Rub 200000"],"u":"27"},{"t":"Prapor","c":"爱国者的使命","l":"2","o":["在塔科夫街区、海岸线或中心区使用装有PS-320瞄准镜与专用快拆消音器的AK-12消灭PMC行动人员 20 名"],"r":["XP 10000","Rub 200000","解锁 工作台 2级 制作 VOG-25 Khattabka 简易手榴弹"],"u":"31"},{"t":"Prapor","c":"掠地攻城","l":"2","o":["在海关、海岸线或森林的指定 Scav 营地内消灭 PMC 行动人员 12 名"],"r":["XP 10000","Rub 200000"],"u":"37"},{"t":"Prapor","c":"地区巡逻","l":"2","o":["在塔科夫街区使用突击步枪或突击卡宾枪消灭任意敌对目标 20 名"],"r":["XP 10000","Rub 200000"],"u":"46"},{"t":"Prapor","c":"财不外露","l":"2","o":["在塔科夫街区找到不动产管理处","找到并获取塔科夫地区的不动产交易记录","上交找到的信息"],"r":["XP 10000","Rub 200000"],"u":"49"},{"t":"Prapor","c":"占有者","l":"2","o":["在工厂找到直升机飞行日志","上交找到的信息"],"r":["XP 10000","Rub 200000"],"u":"56"},{"t":"Prapor","c":"地堡","l":"3","o":["在储备站找到地堡","在储备站的地堡内找到控制室","在储备站找到通往军医院的密闭门（白主教）","在储备站找到通往学院大楼（黑主教）两扇密闭门中的任意一扇","在储备站找到通往 1 号军营（黑兵楼）两扇密闭门中的任意一扇","在储备站找到通往 2 号军营（白兵楼）两扇密闭门中的任意一扇","在储备站找到通往空中管制中心大楼（白王楼）的密闭门"],"r":["XP 28000","Rub 20000"],"u":"7"},{"t":"Prapor","c":"叛无所依","l":"3","o":["消灭储备站地堡控制室中的 掠夺者","5 名"],"r":["XP 28000","Rub 300000"],"u":"11"},{"t":"Prapor","c":"多鱼之漏","l":"3","o":["在储备站取得第一份加密文件","在储备站指挥地堡的办公室内取得第一份军事文件","在储备站指挥地堡的办公室内取得第二份军事文件","在储备站指挥地堡的大厅内取得第三份军事文件","上交第一份文件","上交第二份文件","上交第三份文件"],"r":["XP 28000","Rub 300000"],"u":"12"},{"t":"Prapor","c":"塔市进口货","l":"3","o":["在灯塔或储备站使用装有 Hybrid 46 消音器和 PM II 1-8x24 瞄准镜的 SR-25 消灭 PMC 6 名"],"r":["XP 28000","Rub 300000","解锁 工作台 2级 制作 9x39毫米 PAB-9"],"u":"29"},{"t":"Prapor","c":"铁证如山","l":"3","o":["上交任意在战局中找到的俄制手榴弹 10 个","使用 GP-25 榴弹发射器消灭任意敌对目标 10 个"],"r":["XP 28000","Rub 300000","解锁 Prapor","解锁 Prapor"],"u":"36"},{"t":"Prapor","c":"小菜一碟","l":"3","o":["在灯塔的污水处理厂找到直升机","使用MS2000指示器标记直升机","消灭污水处理厂直升机停机坪周围任意目标 10 名"],"r":["XP 28000","Rub 300000"],"u":"40"},{"t":"Prapor","c":"我们的土地，我们的血","l":"3","o":["使用 GP-25 榴弹发射器消灭 游荡者","10 名"],"r":["XP 28000","Rub 300000","解锁 Prapor","解锁 Prapor"],"u":"42"},{"t":"Prapor","c":"踩点行动","l":"3","o":["前往灯塔，调查污水处理厂任意一座厂房建筑的屋顶","以幸存状态撤离该区域"],"r":["XP 28000","Rub 300000","解锁 Prapor"],"u":"43"},{"t":"Prapor","c":"武装郊游","l":"3","o":["使用装有消音器和 KP-SR2 反射式瞄具的 SR-2M 在储备站或灯塔消灭任意目标 30 名"],"r":["XP 28000","Rub 300000"],"u":"57"},{"t":"Prapor","c":"特别联络","l":"3","o":["在森林 RUAF 大门旁的巨石处藏匿军用电缆","使用转移功能从森林转移到储备站","在储备站 LAV 装甲车旁地下仓库顶的沙袋处藏匿 Bulbex 剪线器"],"r":["XP 28000","Rub 300000"],"u":"58"},{"t":"Prapor","c":"管制材料","l":"4","o":["上交在战局中找到物品：6-STEN-140-M 军用电池 1 个","上交在战局中找到物品：OFZ 30x165 毫米炮弹 3 个"],"r":["XP 65000","Rub 490000","+2 魅力技能等级","解锁 工作台1级"],"u":"34"},{"t":"Prapor","c":"最好的差事","l":"4","o":["在储备站或灯塔使用 AK-74 系列突击步枪消灭任意目标 30 名"],"r":["XP 65000","Rub 490000","+1 弹匣训练技能等级","解锁 Prapor"],"u":"25"},{"t":"Prapor","c":"恐吓者","l":"4","o":["在任意地图命中头部击杀Scav 40 名"],"r":["XP 65000","Rub 490000","+2 弹匣训练技能等级","+4 冲锋枪技能等级","解锁 工作台 3级 制作 7.62x39毫米 BP"],"u":"38"},{"t":"Prapor","c":"护送","l":"4","o":["于白天在工厂击杀PMC 2 名","在海关击杀PMC 2 名","在海岸线击杀PMC 2 名","在储备站击杀PMC 2 名","在森林击杀PMC 2 名","在立交桥击杀PMC 2 名","在实验室击杀PMC 2 名","在中心区击杀PMC 2 名"],"r":["XP 65000","Rub 490000","+4 榴弹发射器技能等级","+4 下挂式发射器技能等级","+4 弹匣训练技能等级"],"u":"39"},{"t":"Prapor","c":"透透气","l":"4","o":["在海岸线、灯塔或储备站使用带有 EKP-1S-03 瞄具的 RPDN 机枪消灭任意目标 40 名"],"r":["XP 65000","Rub 490000","+4 轻机枪技能等级","+4 重机枪技能等级","解锁 Prapor"],"u":"50"},{"t":"Prapor","c":"体验独一份","l":"4","o":["在灯塔或实验室使用 Aklys Defense“迅猛龙”突击步枪消灭任意目标 30 名"],"r":["XP 65000","Rub 490000","+4 轻机枪技能等级","+4 重机枪技能等级","解锁 Prapor"],"u":"60"},{"t":"Prapor","c":"艺术就是爆炸","l":"4","o":["使用手榴弹或者榴弹发射器消灭 PMC 行动人员 20 名","提示：地图固定榴弹炮不算击杀"],"r":["XP 65000","Rub 490000","+4 榴弹发射器技能等级","+4 下挂式发射器技能等级","解锁 Prapor"],"u":"65"},{"t":"Prapor","c":"特殊订单","l":"4","o":["上交战局中找到的物品：Red Rebel 冰镐 1 个"],"r":["XP 65000","Rub 490000","Prapor +1.5","+2 魅力技能等级","解锁 Prapor"],"u":"4907"},{"t":"Prapor","c":"惩罚者 - 1","l":"","o":["在海关使用 AKS-74U 消灭 Scav 25 名"],"r":["XP 10000","Rub 200000","解锁 工作台 2级 制作 5.45x39毫米 PP"],"u":"18"},{"t":"Prapor","c":"惩罚者 - 2","l":"","o":["在海岸线使用 AKM 系列武器消灭 Scav 15 名"],"r":["XP 1000","Rub 50000","解锁 Prapor","解锁 Prapor"],"u":"19"},{"t":"Prapor","c":"惩罚者 - 3","l":"","o":["在储备站使用 9x39 口径武器消灭 Scav 12 名","上交在战局中找到物品：半面巾 7 个"],"r":["XP 28000","Rub 300000","解锁 Prapor"],"u":"20"},{"t":"Prapor","c":"惩罚者 - 4","l":"","o":["在灯塔使用 SVDS 或 TKPD 消灭 Scav 10 名","在灯塔穿戴 Scav 背心消灭 Scav 10 名","上交在战局中找到物品：Bars A-2607 95Kh18 匕首 10 把"],"r":["XP 28000","解锁 Prapor","解锁 Prapor"],"u":"21"},{"t":"Prapor","c":"惩罚者 - 5","l":"","o":["上交在战局中找到物品：任意 AK-74 突击步枪 1 把","上交在战局中找到物品：柯尔特 M4A1 卡宾枪 1 把","上交在战局中找到物品：马卡洛夫 PM 手枪 2 把","使用轻机枪消灭 PMC 行动人员 10 名","使用轻机枪消灭 Scav 20 名"],"r":["XP 28000","解锁 Prapor","解锁 Prapor"],"u":"22"},{"t":"Prapor","c":"惩罚者 - 6","l":"","o":["使用指定类型武器在灯塔、海岸线、储备站、中心区或实验室消灭 PMC 行动人员 30 名","上交战局中找到物品：BEAR 或 USEC 狗牌 10 个","找到并消灭任意 Boss 5 名"],"r":["XP 28000","解锁 Prapor"],"u":"23"},{"t":"Prapor","c":"大客户","l":"","o":["在海关找到装有化学品的载具","使用MS2000指示器标记载具"],"r":["XP 10000"],"u":"35"},{"t":"Prapor","c":"往昔时光 - 1","l":"","o":["穿戴 6B43 防弹衣和 Kiver-M 头盔在工厂消灭 PMC 行动人员 5 名"],"r":["XP 28000","Rub 300000"],"u":"51"},{"t":"Prapor","c":"往昔时光 - 2","l":"","o":["使用黄金 TT-33 手枪消灭任意目标 10 名"],"r":["XP 28000","Rub 330000"],"u":"54"},{"t":"Prapor","c":"人间地狱 - 1","l":"","o":["按照要求改装 MP-43-1C 霰弹枪"],"r":["XP 3000","Rub 98000"],"u":"52"},{"t":"Prapor","c":"人间地狱 - 2","l":"","o":["使用双管霰弹枪消灭 邪教徒","2 名"],"r":["XP 28000","Rub 330000"],"u":"53"},{"t":"Prapor","c":"忠实观众","l":"","o":["在森林山上的悬崖处安装 WI-FI 摄像头","在海岸线码头的观景台处安装 WI-FI 摄像头","在工厂的办公区走廊处安装WI-FI摄像头"],"r":["XP 65000","Rub 490000"],"u":"55"},{"t":"Prapor","c":"货运延误 - 1","l":"","o":["上交在森林交货点找到的包裹"],"r":["XP 10000","Rub 200000"],"u":"61"},{"t":"Prapor","c":"油料交换","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Therapist","c":"新手上路","l":"1","o":["在中心区找到 Emercom 站点","上交任意在战局中找到的医疗物品 3 个"],"r":["XP 3000","Rub 98000"],"u":"101"},{"t":"Therapist","c":"短缺","l":"1","o":["上交在战局中找到物品：Salewa 急救包 3 个"],"r":["XP 3000","Rub 98000"],"u":"66"},{"t":"Therapist","c":"水瓶座行动","l":"1","o":["在海关找到被藏在宿舍楼里的水","上交任意在战局中找到的饮用水 3 个"],"r":["XP 3000","Rub 98000"],"u":"67"},{"t":"Therapist","c":"带血的水","l":"1","o":["在海关击杀Scav 15 名"],"r":["XP 3000","Rub 98000"],"u":"68"},{"t":"Therapist","c":"药剂师","l":"1","o":["在海关找到装有设备的箱子","上交手提箱"],"r":["XP 3000","Rub 98000"],"u":"72"},{"t":"Therapist","c":"供给计划","l":"1","o":["在森林锯木厂小屋里取得机密文件夹0052","以幸存状态撤离森林","上交机密文件夹"],"r":["XP 3000","Rub 98000"],"u":"77"},{"t":"Therapist","c":"货运追踪","l":"1","o":["在海关找到并获取 TerraGroup 货运清单","上交找到的信息"],"r":["XP 3000","Rub 98000"],"u":"110"},{"t":"Therapist","c":"无主货物","l":"1","o":["在海关使用 MS2000 指示器标记任意一个 TerraGroup 特殊货箱"],"r":["XP 3000","Rub 98000"],"u":"111"},{"t":"Therapist","c":"秋季综合征","l":"1","o":[],"r":[],"u":""},{"t":"Therapist","c":"卫生标准","l":"2","o":["上交战局中找到的物品：气体分析仪 2 个","在工厂（白图）的医学实验室内藏匿气体分析仪"],"r":["XP 10000","Rub 200000"],"u":"69"},{"t":"Therapist","c":"人口普查","l":"2","o":["在塔科夫街区取得记载有人口数据的记录","上交日志"],"r":["XP 10000","Rub 200000"],"u":"75"},{"t":"Therapist","c":"城市的解药","l":"2","o":["在塔科夫街区找到化学品实验室","取得装有毒品样本的容器","上交容器","在塔科夫街区消灭 Scav 10 名"],"r":["XP 10000","Rub 200000"],"u":"76"},{"t":"Therapist","c":"一般储备","l":"2","o":["上交在战局中找到物品：牛肉罐头（小包装） 15 个"],"r":["XP 10000","Rub 20000"],"u":"88"},{"t":"Therapist","c":"救助站点","l":"2","o":["上交物品：宿舍 303 房钥匙","上交物品：ZB-014 钥匙","上交物品：军事检查站钥匙","上交物品：加油站储藏室钥匙"],"r":["XP 10000","Rub 200000"],"u":"94"},{"t":"Therapist","c":"兽医也是医","l":"2","o":["在塔科夫街区找到并检查兽医诊所","在塔科夫街区找到并检查 X 光技师的工作间","在塔科夫街区 Primorsky 大街找到第一家药店","在塔科夫街区 Primorsky 大街找到第二家药店","在塔科夫街区 Cardinal 公寓区附近找到第三家药店","上交任意在战局中找到的医疗物品 5 个"],"r":["XP 10000","Rub 200000"],"u":"99"},{"t":"Therapist","c":"急诊室的故事","l":"2","o":["在塔科夫街区找到并获取救护车急救员的手机","通过Primorsky大道出租车载具撤离点撤离","上交手机"],"r":["XP 10000","Rub 200000"],"u":"100"},{"t":"Therapist","c":"刨根问底","l":"2","o":["在工厂提取破损罐体中的化学品样本","上交采集到的样本"],"r":["XP 10000","Rub 200000"],"u":"108"},{"t":"Therapist","c":"塔科夫屠夫","l":"2","o":["在中心区找到并获取化学品容器","在塔科夫街区将化学容器放置藏匿在警察局"],"r":["XP 10000","Rub 200000"],"u":"113"},{"t":"Therapist","c":"善良之针","l":"3","o":["上交在战局中找到物品：肾上腺素注射器 5 个"],"r":["XP 28000","Rub 300000"],"u":"71"},{"t":"Therapist","c":"汽车修理","l":"3","o":["上交在战局中找到物品：汽车蓄电池 4 个","上交在战局中找到物品：火花塞 8 个"],"r":["XP 28000","Rub 300000"],"u":"73"},{"t":"Therapist","c":"病历","l":"3","o":["在储备站取得第一份医学报告","在储备站取得第二份医学报告","上交第一份报告","上交第二份报告"],"r":["XP 28000","Rub 300000"],"u":"74"},{"t":"Therapist","c":"同事","l":"3","o":["找到被派往海岸线疗养院的小组","找到被派往海岸线码头的小组","找到被派往海岸线别墅的小组","以幸存状态撤离该区域"],"r":["XP 2800","Rub 300000"],"u":"89"},{"t":"Therapist","c":"塔科夫式手腕","l":"3","o":["在海岸线找到并获取 Sanitar","的手术包","上交 Sanitar","的手术包","在海岸线别墅区找到并获取 Sanitar","的检眼镜","上交 Sanitar","的检眼镜"],"r":["XP 28000","Rub 300000"],"u":"90"},{"t":"Therapist","c":"海边假期","l":"3","o":["在灯塔找到并获取线人的公文包","上交找到的包裹"],"r":["XP 28000","Rub 300000"],"u":"96"},{"t":"Therapist","c":"消失的线人","l":"3","o":["在灯塔度假村区域找到失踪的小队","以幸存状态撤离该区域"],"r":["XP 28000","Rub 300000"],"u":"97"},{"t":"Therapist","c":"缉毒行动","l":"3","o":["在灯塔找到隐蔽的毒品实验室","在毒品实验室中藏匿WI-FI摄像头"],"r":["XP 28000","Rub 300000"],"u":"98"},{"t":"Therapist","c":"灭虫服务","l":"4","o":["在实验室穿戴防毒面具或呼吸面罩，在 60 米内消灭任意敌对目标 40 名"],"r":["XP 65000","Rub 490000","+2 活力技能等级","+4 免疫技能等级","解锁 医疗站 2级 制作 M.U.L.E. 兴奋剂"],"u":"87"},{"t":"Therapist","c":"急单","l":"4","o":["上交在战局中找到物品：便携式除颤器 3 个","上交在战局中找到物品：检眼镜 3 个","上交在战局中找到物品：LEDX 皮肤透照仪 2 个","上交在战局中找到物品：一堆药 20 个","上交在战局中找到物品：OLOLO 瓶装复合维生素 10 个"],"r":["XP 65000","Rub 490000","+4 手术技能等级","+4 免疫技能等级"],"u":"95"},{"t":"Therapist","c":"街区之下","l":"4","o":["使用转移功能从塔科夫街区转移到实验室（在单次战局中）","在同场战局中 侦查","实验室的服务器机房","在同场战局中 侦查","实验室存放危险化合物的圆顶帐篷","在同场战局中 侦查","实验室库房大门的控制室"],"r":["XP 65000","Rub 490000","+2 健康技能等级","+4 手术技能等级","解锁 医疗站2级"],"u":"109"},{"t":"Therapist","c":"邮递员派特 - 2","l":"","o":["上交 Prapor","信使身上的信件"],"r":["XP 3000","Rub 98000","解锁 Therapist"],"u":"92"},{"t":"Therapist","c":"医疗隐私 - 1","l":"","o":["在海岸线找到第一辆救护车，并使用MS2000指示器标记","在海岸线找到第二辆救护车，并使用MS2000指示器标记","在海岸线找到第三辆救护车，并使用MS2000指示器标记","在海岸线找到第四辆救护车，并使用MS2000指示器标记"],"r":["XP 3000","Rub 98000","解锁 Therapist","解锁 Therapist"],"u":"79"},{"t":"Therapist","c":"医疗隐私 - 2","l":"","o":["在海岸线疗养院西楼的房间内找到任何关于 TerraGroup 研究的文件","上交找回的信息","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000","解锁 Therapist"],"u":"80"},{"t":"Therapist","c":"医疗隐私 - 3","l":"","o":["在森林找到那辆曾属于疗养院医疗服务负责人的车","提取血液样本","上交血液样本"],"r":["XP 10000","Rub 200000","解锁 Therapist"],"u":"81"},{"t":"Therapist","c":"医疗隐私 - 4","l":"","o":["获得“疲劳”效果，并持续至少 8 分钟"],"r":["XP 28000","Rub 300000","解锁 Therapist"],"u":"82"},{"t":"Therapist","c":"医疗隐私 - 5","l":"","o":["在夜间工厂找到交货点","将任意类型的火药埋藏在指定地点"],"r":["XP 28000","Rub 300000","解锁 Therapist"],"u":"83"},{"t":"Therapist","c":"医疗隐私 - 6","l":"","o":["在工厂找到死亡的工人，并获取他们的血液样本","上交战局中找到的物品：LEDX 皮肤透照仪","在实验室将血液样本藏匿在 Sanitar","的办公室里"],"r":["XP 65000","Rub 490000","解锁 Therapist","解锁 Therapist"],"u":"106"},{"t":"Therapist","c":"质量标准","l":"","o":["在实验室找到并获取特殊版本的 LEDX 皮肤透照仪","上交找到的物品"],"r":["XP 28000","Rub 300000"],"u":"103"},{"t":"Therapist","c":"出于好奇","l":"","o":["在海关找到装有化学品的载具","使用MS2000指示器标记载具"],"r":["XP 10000"],"u":"93"},{"t":"Therapist","c":"艰难抉择","l":"","o":["不要杀死 Sanitar","上交在战局中找到的： AHF1-M 兴奋剂注射器","1 个","上交在战局中找到的： 3-(b-TG) 兴奋剂注射器","1 个","上交在战局中找到的： TerraGroup实验室访问钥匙卡","10 张"],"r":["XP 65000"],"u":"91"},{"t":"Therapist","c":"这带子糟透了","l":"","o":["在迷宫中找到行刑室","找到并获取任何酷刑折磨的证据","上交找到的信息"],"r":["XP 28000","Rub 300000"],"u":"114"},{"t":"Therapist","c":"健全替代","l":"","o":["上交实验室日志"],"r":["XP 3000"],"u":"107"},{"t":"Therapist","c":"口干舌燥 - 往日回响","l":"","o":[],"r":[],"u":""},{"t":"Therapist","c":"口干舌燥 - 秘密配方","l":"","o":["上交战局中找到的物品：肾上腺素注射器 2 个","上交战局中找到的物品：OLOLO 瓶装复合维生素 4 个","上交战局中找到的物品：瓶装生理盐水 3 个"],"r":["XP 10000","解锁 医疗站 2级 制作 2A2-(b-TG)兴奋剂注射器"],"u":"105"},{"t":"Therapist","c":"战争从未改变","l":"","o":["在战局中找到物品：Nooby Shield 碘化钾片 10 个","上交物品"],"r":["XP 27000","Rub 300000"],"u":"5586"},{"t":"Therapist","c":"生化分析","l":"","o":["在战局中找到物品：Aceso Xpress 半自动 生化分析","仪 3 个","上交物品"],"r":["XP 32000","Rub 400000","解锁 Therapist"],"u":"5591"},{"t":"Fence","c":"良心作祟 - 1","l":"","o":["在海关找到前冠军的房间","调查前任冠军的遭遇","以幸存状态撤离海关"],"r":["XP 11700","Rub 50000"],"u":"468"},{"t":"Fence","c":"两害相权","l":"","o":["找到并获取 竞技场裁判","的黑料","上交找到的信息"],"r":["XP 18500","Rub 165000"],"u":"124"},{"t":"Fence","c":"这是什么梗?","l":"","o":["在塔科夫各个地图一共安装27个摄像头"],"r":["XP 30000","Rub 200000"],"u":"131"},{"t":"Fence","c":"收藏家","l":"","o":["上交战局中找到的以下所有物品"],"r":[],"u":"117"},{"t":"Fence","c":"抉择","l":"","o":["上交Epsilon安全箱 1 个"],"r":["XP 433333","Rub 1000000","+2 藏身处管理技能等级"],"u":"118"},{"t":"Fence","c":"建立联系","l":"","o":["Fence","信任度达到 5.0"],"r":["XP 8800","EUR 600"],"u":"125"},{"t":"Fence","c":"陌路相交","l":"","o":["在不消灭 Scav 的情况下消灭 PMC 7 名"],"r":["XP 25600","EUR 1200"],"u":"126"},{"t":"Fence","c":"免疫力","l":"","o":["在“未知毒素”效果影响下撤离区域"],"r":["XP 28000","EUR 1150"],"u":"127"},{"t":"Fence","c":"小本生意 - 1","l":"","o":["上交战局中找到的 Den 玩偶","1 个","上交战局中找到的 Killa 玩偶","1 个","上交战局中找到的 Tagilla 玩偶","1 个","上交战局中找到的 Reshala 玩偶","1 个","上交战局中找到的 Scav 玩偶"],"r":["XP 22800","EUR 1800"],"u":"128"},{"t":"Fence","c":"小本生意 - 2","l":"","o":["消灭任意 Scav 阵营 Boss 的保镖 10 名，但不击杀 Boss 本人"],"r":["XP 36800","EUR 2200"],"u":"129"},{"t":"Fence","c":"小本生意 - 3","l":"","o":["在海岸线沉陷村庄内的祭祀圈埋藏一把 邪教徒","的刀","在海岸线疗养院内的祭祀圈埋藏一把 邪教徒","的刀","在森林河边村庄内的祭祀圈埋藏一把 邪教徒","的刀","在森林锯木厂旁的祭祀圈埋藏一把 邪教徒","的刀","任务目标"],"r":["XP 30000","EUR 2000"],"u":"130"},{"t":"Fence","c":"亡羊补牢 - 信任","l":"","o":["上交在战局中找到的：BEAR狗牌 5 个","上交在战局中找到的：USEC狗牌 5 个"],"r":[],"u":"120"},{"t":"Fence","c":"亡羊补牢 - 赌注","l":"","o":["使用任意AK系列突击步枪击杀PMC干员 7 名"],"r":[],"u":"119"},{"t":"Fence","c":"亡羊补牢 - 酒保","l":"","o":["上交在战局中找到的：Dan Jackiel瓶装威士忌 1 瓶","上交在战局中找到的：塔可乐 3 瓶"],"r":[],"u":"122"},{"t":"Fence","c":"亡羊补牢 - 收藏","l":"","o":["上交在战局中找到的：柯尔特M4A1突击步枪 2 把"],"r":[],"u":"123"},{"t":"Fence","c":"亡羊补牢 - Wergild","l":"","o":["上交 1,000,000 卢布"],"r":[],"u":"121"},{"t":"Skier","c":"快车初体验","l":"1","o":["在中心区使用载具撤离点"],"r":["XP 3000","EUR 500"],"u":"164"},{"t":"Skier","c":"Polikhim流浪汉","l":"1","o":["在立交桥、中心区或森林消灭 Scav 25 名"],"r":["XP 3000","EUR 500"],"u":"33"},{"t":"Skier","c":"供应商","l":"1","o":["上交在战局中找到的：Module-3M防弹衣 1 个","上交在战局中找到的：TOZ-106 霰弹枪 1 个"],"r":["XP 3300","EUR 500"],"u":"132"},{"t":"Skier","c":"敲诈者","l":"1","o":["在海关找到并获取被藏匿的高价值货物","上交高价值货物"],"r":["XP 3000","EUR 500"],"u":"133"},{"t":"Skier","c":"U盘里有什么？","l":"1","o":["在战局中找到物品：加密 U 盘 2 个"],"r":["XP 3000","EUR 500"],"u":"135"},{"t":"Skier","c":"金色失物","l":"1","o":["在海关宿舍 303 房间找到并获取镀金 Zibbo 打火机","在海关宿舍 303 房间藏匿一个普通 Zibbo 打火机","上交找到的物品"],"r":["XP 3000","EUR 500"],"u":"136"},{"t":"Skier","c":"情报就是力量","l":"1","o":["在森林安装无线摄像头以监视伐木场码头","在立交桥安装无线摄像头以监视Kiba武器商店大门"],"r":["XP 3000","EUR 500"],"u":"147"},{"t":"Skier","c":"禁止打劫","l":"1","o":["在海岸线或立交桥走私者营地范围内消灭任意目标 10 名"],"r":["XP 3000","EUR 500"],"u":"165"},{"t":"Skier","c":"私人俱乐部","l":"1","o":["在海关找到并获取 Skier","的钱包","上交找到的物品"],"r":["XP 3000","EUR 500"],"u":"178"},{"t":"Skier","c":"暗中破坏","l":"1","o":["在森林锯木厂小屋里取得机密文件夹0052","以幸存状态撤离森林","上交机密文件夹"],"r":["XP 4500","Rub 180000"],"u":"157"},{"t":"Skier","c":"风波","l":"2","o":["在工厂使用手枪消灭任意敌对目标 10 名"],"r":["XP 10000","EUR 500"],"u":"134"},{"t":"Skier","c":"维他命","l":"2","o":["上交在战局中找到物品：呼吸面罩 4 个","上交在战局中找到物品：医用输血工具 3 个","在工厂找到并获取化学品容器","上交化学品容器"],"r":["XP 10000","EUR 1000"],"u":"141"},{"t":"Skier","c":"供货","l":"2","o":["上交在战局中找到物品：呼吸面罩 4 个","上交在战局中找到物品：医用输血工具 3 个","在海关找到并获取化学品容器","上交化学品容器"],"r":["XP 10000","EUR 1000"],"u":"142"},{"t":"Skier","c":"好吃到上瘾","l":"2","o":["在塔科夫街区的白鲸餐厅找到并获取有关烹饪的秘密信息","上交找到的信息"],"r":["XP 10000","EUR 1000"],"u":"143"},{"t":"Skier","c":"秘制食谱","l":"2","o":["在塔科夫街区的 TerraGroup 办公室找到并获取红色瓶装神秘原料","上交找到的物品"],"r":["XP 10000","EUR 1000"],"u":"144"},{"t":"Skier","c":"西方来客","l":"2","o":["消灭 PMC 行动人员 5 名"],"r":["XP 10000","EUR 1000"],"u":"145"},{"t":"Skier","c":"愿者上钩","l":"2","o":["在海关将金项链藏到宿舍楼三楼的微波炉里","在森林将金项链藏到伐木场宿舍区的中间小屋内"],"r":["XP 10000","EUR 1000"],"u":"148"},{"t":"Skier","c":"老赖","l":"2","o":["在塔科夫街区找到 老赖","在塔科夫街区找到私人监狱看守的公寓房间","上交物品：铁门钥匙 1 把"],"r":["XP 10000","EUR 1000"],"u":"149"},{"t":"Skier","c":"软禁","l":"2","o":["在塔科夫街区找到失踪小队被关押的位置","在塔科夫街区找到 老赖","上交物品：Chekannaya 15 公寓钥匙"],"r":["XP 10000","EUR 1000"],"u":"150"},{"t":"Skier","c":"借刀杀人","l":"2","o":["在海关穿戴指定装备使用 Scav 武器消灭 PMC 8 名"],"r":["XP 10000","EUR 1000"],"u":"154"},{"t":"Skier","c":"隔墙有“眼”","l":"2","o":["在工厂的第一个起重机驾驶室内安装WI-FI摄像头","在工厂的第二个起重机驾驶室内安装WI-FI摄像头","在工厂的第三个起重机驾驶室内安装WI-FI摄像头"],"r":["XP 10000","EUR 1000","解锁 Skier"],"u":"175"},{"t":"Skier","c":"出口在此","l":"2","o":["在工厂以幸存状态通过“庭院大门”撤离点撤离"],"r":["XP 10000","EUR 1000"],"u":"174"},{"t":"Skier","c":"肮脏游戏","l":"3","o":["将MS200指示器放在海岸线疗养院的 医疗物资箱","上","将MS200指示器放在海岸线别墅的 医疗物资箱","上","将MS200指示器放在海岸线码头的 医疗物资箱","上"],"r":["XP 28000","EUR 2000"],"u":"158"},{"t":"Skier","c":"安全通道","l":"3","o":["在储备站地下仓库内消灭 Scav 5 名","上交任意战局中找到的地下仓库钥匙（RB-PSP 或 RB-PSV）3 把"],"r":["XP 28000","EUR 2000"],"u":"159"},{"t":"Skier","c":"长路漫漫","l":"3","o":["消灭灯塔或海岸线海边与主路上的 Scav 7 名"],"r":["XP 28000","Rub 2000","解锁 Skier"],"u":"161"},{"t":"Skier","c":"失踪货物","l":"3","o":["在灯塔找到失事的直升机","找到并获取线人的情报文件夹","上交文件夹"],"r":["XP 28000","EUR 2000"],"u":"162"},{"t":"Skier","c":"发财计划","l":"3","o":["在塔科夫街区使用 MS2000 指示器标记 Klimov 大道上的任意一台 ATM 机"],"r":["XP 28000","EUR 2000","解锁 Skier"],"u":"166"},{"t":"Skier","c":"头号机密","l":"3","o":["在灯塔找到雷达站指挥员的办公室","在房间内找到并获取装有航班路线的军用机械硬盘","上交硬盘"],"r":["XP 28000","EUR 2000","解锁 Skier","解锁 Skier"],"u":"163"},{"t":"Skier","c":"转口贸易","l":"3","o":["将 Virtex 可编程处理器藏匿在灯塔简易实验室内","将军用 COFDM 无线信号发射器藏匿在灯塔简易实验室内"],"r":["XP 28000","EUR 2000","解锁 Skier"],"u":"225"},{"t":"Skier","c":"绝密技术","l":"3","o":["在储备站找到装有 T-90M 车长控制面板的包裹","上交包裹"],"r":["XP 28000","EUR 2000"],"u":"227"},{"t":"Skier","c":"大音希声","l":"4","o":["在储备站、灯塔、中心区或实验室使用消音 12 铅径霰弹枪消灭任意敌对目标 30 名"],"r":["XP 65000","EUR 2800","+4 专注技能等级","+4 散弹枪技能等级","解锁 Skier"],"u":"152"},{"t":"Skier","c":"一派胡言","l":"4","o":["将 AXMC 狙击步枪藏匿在灯塔度假村网球场的垃圾堆内","将劳力土潜水金腕表藏匿在灯塔度假村网球场的垃圾堆内","将军用闪存装置藏匿在灯塔度假村网球场的垃圾堆内"],"r":["XP 65000","EUR 2800","+4 抗压技能等级","+4 搜索技能等级","解锁 Skier"],"u":"153"},{"t":"Skier","c":"夜间扫荡","l":"4","o":["上交获得不寻常的邪教仪式刀 12 把","找到并消灭消灭 邪教徒","5 名"],"r":["XP 65000","EUR 2800","+4 搜索技能等级","+4 抗压技能等级","解锁 Skier"],"u":"160"},{"t":"Skier","c":"北国新秀","l":"4","o":["使用装有夜视仪或热成像瞄具的栓动式步枪消灭 PMC 行动人员 20 名"],"r":["XP 65000","EUR 2800","+4 专注技能等级","+4 隐蔽行动技能等级","解锁 Skier"],"u":"179"},{"t":"Skier","c":"化学品 - 1","l":"","o":["在海关取得任何关于安全副官生平的信息","上交信息","取得可以帮助调查的物品","上交物品"],"r":["XP 3000","EUR 500","解锁 Skier"],"u":"137"},{"t":"Skier","c":"化学品 - 2","l":"","o":["在海关找到任何可以帮助调查的证据","上交证据","在海关找到任何可以帮助调查的信息","上交信息"],"r":["XP 3000","EUR 500","解锁 Jaeger","解锁 医疗站 2级 制作 xTG-12解毒剂"],"u":"138"},{"t":"Skier","c":"化学品 - 3","l":"","o":["在工厂取得装有化学品的注射器","上交装有化学品的注射器"],"r":["XP 10000","EUR 1000","解锁 Skier"],"u":"139"},{"t":"Skier","c":"化学品 - 4","l":"","o":["在海关找到装有化学品的载具","使用MS2000指示器标记化学品转运车"],"r":["XP 10000"],"u":"140"},{"t":"Skier","c":"赚点快钱 - 1","l":"","o":["竞技场广告海报放在海关 Scav 营地"],"r":["XP 3000","EUR 500","解锁 竞技场裁判"],"u":"168"},{"t":"Skier","c":"高光时刻","l":"","o":["在立交桥找到并获取特殊版本的游戏杂志","上交找到的物品"],"r":["XP 28000","EUR 1800"],"u":"169"},{"t":"Skier","c":"严词指控","l":"","o":["在海岸线的木屋内找到并获取硬盘","上交找到的物品"],"r":["XP 28000","EUR 1800"],"u":"170"},{"t":"Skier","c":"一报还一报","l":"","o":["在森林 Prapor","安放 WI-FI 摄像头的地点藏匿金公鸡塑像雕像","在海岸线 Prapor","安放 WI-FI 摄像头的地点藏匿金公鸡塑像雕像","在工厂 Prapor","安放 WI-FI 摄像头的地点藏匿金公鸡塑像雕像"],"r":["XP 65000","EUR 2800"],"u":"171"},{"t":"Skier","c":"口干舌燥 - 养家糊口","l":"","o":["上交在战局中找到物品：5 升丙烷罐 2 个"],"r":["XP 10000","EUR 1000"],"u":"172"},{"t":"Skier","c":"口干舌燥 - 送货服务","l":"","o":["在森林找到指定埋藏点","埋藏第一个丙烷罐","在海关找到指定埋藏点","埋藏第二个丙烷罐"],"r":["XP 10000"],"u":"173"},{"t":"Skier","c":"诱人新货","l":"","o":["在立交桥找到并获取丢失的武器箱","上交找回的货物"],"r":["XP 28000","EUR 2000","解锁 Skier"],"u":"176"},{"t":"Skier","c":"致命道具","l":"","o":["使用 AA-12 霰弹枪消灭任意目标 20 名"],"r":["XP 65000","Rub 150000","解锁 Skier"],"u":"177"},{"t":"Skier","c":"人往高处走","l":"","o":["在森林击杀 PMC 行动人员 2 名"],"r":["XP 10000","EUR 1000"],"u":"180"},{"t":"Skier","c":"偏离路线","l":"","o":["在塔科夫街区使用 MS2000 标记器标记“倒塌的吊车” BTR","站点","在塔科夫街区使用 MS2000 标记器标记“废弃 Scav 检查站” BTR","站点","在塔科夫街区使用 MS2000 标记器标记“Pinewood 酒店” BTR","站点","在塔科夫街区使用 MS2000 标记器标记“市中心” BTR","站点","在塔科夫街区使用 MS2000 标记器标记“电车” BTR"],"r":["XP 17900","EUR 1100"],"u":"181"},{"t":"Skier","c":"后知后觉","l":"","o":["在森林找到山下的地堡","在地堡内藏匿第一包俄制口径穿甲弹药包","在地堡内藏匿第二包俄制口径穿甲弹药包","在地堡内藏匿第三包俄制口径穿甲弹药包"],"r":["XP 21800","EUR 1600"],"u":"183"},{"t":"Skier","c":"关键伙伴","l":"","o":["卖任何物品给 Peacekeeper","75 件"],"r":["XP 14600","EUR 900"],"u":"184"},{"t":"Skier","c":"致命论据","l":"","o":["在森林找到并获取 RPG 弹药包裹","上交包裹"],"r":["XP 22500","EUR 1800"],"u":"185"},{"t":"Skier","c":"识时务者为俊杰","l":"","o":["使用转移功能从海关转移到储备站","使用转移功能从储备站转移到森林","使用转移功能从森林转移到灯塔","以幸存状态撤离灯塔","在完成其他目标的同时消灭 PMC 行动人员 5 名"],"r":["XP 85200","EUR 5000"],"u":"182"},{"t":"Skier","c":"绝对威信","l":"","o":["在迷宫中找到并消灭“米诺陶”","在迷宫中消灭米诺陶的保镖 6 名"],"r":["XP 28000","EUR 1800","解锁 Skier","解锁 Skier"],"u":"186"},{"t":"Skier","c":"公道价 - 1","l":"","o":["上交 50,000 欧元"],"r":["XP 10000"],"u":"4499"},{"t":"Skier","c":"公道价 - 2","l":"","o":["完成任务： 同好俱乐部"],"r":["XP 28000"],"u":"4500"},{"t":"Skier","c":"有利可图的生意","l":"","o":["上交物品：Trijicon REAP-IR热成像瞄准镜 15 个"],"r":["+1 抗压技能等级","+1 感知技能等级","+1 专注技能等级","+1 瞄准训练技能等级","+1 隐蔽行动技能等级"],"u":"188"},{"t":"Skier","c":"安全保障","l":"","o":["上交物品：BNTI Zhuk（甲虫）防弹衣（数码丛林迷彩） 15 个","上交物品：Vulkan-5 (火神) LShZ-5 重型防弹头盔 (黑色) 12 个","上交物品：Maska-1SCh面罩（ Killa","版本） 3 个"],"r":["+1 专注技能等级","+1 感知技能等级","+1 抗压技能等级","+1 轻型护甲技能等级","+1 重型护甲技能等级"],"u":"189"},{"t":"Skier","c":"学无止境","l":"","o":["上交物品：HK 416A5 5.56x45突击步枪 15 把","上交物品：5.56x45毫米 Mk 318 Mod 0 (SOST) 4500 发","上交物品：UVSR“针叶林-1”求生砍刀 8 个"],"r":["+1 耐力技能等级","+1 力量技能等级","+1 代谢技能等级","+1 魅力技能等级","+1 智力技能等级"],"u":"190"},{"t":"Skier","c":"站稳脚跟","l":"","o":["上交物品：Propital 30 根","上交物品：米屈肼注射器 30 根","上交物品：M.U.L.E. 兴奋剂 30 根","上交物品：eTG-change再生兴奋剂注射器 30 根","上交物品：SJ6 TGLabs战斗兴奋剂注射器 30 根","上交物品：SJ9 TGLabs战斗兴奋剂注射器 30 根","上交物品：SJ12 TGLabs战斗兴奋剂注射器 30 根","上交物品：Obdolbos 2 鸡尾酒兴奋剂注射器 30 根"],"r":["+1 抗压技能等级","+1 活力技能等级","+1 手术技能等级","+1 健康技能等级","+1 免疫技能等级"],"u":"191"},{"t":"Skier","c":"利润保留","l":"","o":["上交物品：显示卡 30 张","上交物品：实体比特币 15 个"],"r":["+1 工艺技能等级","+1 感知技能等级","+1 专注技能等级","+1 搜索技能等级","+1 免疫技能等级"],"u":"192"},{"t":"Skier","c":"人生之课","l":"","o":["上交物品：Tarkovskaya瓶装伏特加 8 瓶","上交物品：Dan Jackiel瓶装威士忌 15 瓶","上交物品：“凶狠跑刀崽”私酒 15 瓶"],"r":["+1 耐力技能等级","+1 力量技能等级","+1 代谢技能等级","+1 魅力技能等级","+1 智力技能等级"],"u":"193"},{"t":"Skier","c":"安慰奖","l":"","o":["以幸存状态撤离实验室 15 次","在实验室消灭 掠夺者","100 名"],"r":["+1 近战技能等级","+1 手枪技能等级","+1 散弹枪技能等级","+1 冲锋枪技能等级","+1 重机枪技能等级"],"u":"194"},{"t":"Peacekeeper","c":"先声夺人","l":"1","o":["使用转移功能从海关转移到海岸线","以幸存状态撤离海岸线"],"r":["XP 3000","USD 500"],"u":"240"},{"t":"Peacekeeper","c":"新路线，新机遇","l":"1","o":["在同场战局中侦察中心区 Mira 大道和高架路的交汇路口","在同场战局中找到中心区通往塔科夫街区的道路","在同场战局中使用转移功能从中心区转移到塔科夫街区","以幸存状态撤离塔科夫街区（或使用转移功能前往其他地图）"],"r":["XP 3000","USD 500"],"u":"239"},{"t":"Peacekeeper","c":"铁鸟坠落","l":"1","o":["在森林找到并获取第一个电机控制器","上交找到的物品","在森林找到并获取第一个单轴光纤陀螺仪","上交找到的物品"],"r":["XP 3000","USD 500"],"u":"156"},{"t":"Peacekeeper","c":"猎虎行动","l":"1","o":["在海关使用 MS2000 指示器标记任意一辆 UN“虎”装甲车"],"r":["XP 3000","USD 500"],"u":"196"},{"t":"Peacekeeper","c":"徒步旅行","l":"1","o":[],"r":[],"u":""},{"t":"Peacekeeper","c":"燃料短缺","l":"1","o":["上交战局中找到的物品：任意家居用品 5 个","上交战局中找到的物品：任意易燃物品 3 个","可选上交的任意家居用品","Ortodontox","牙膏","小苏打","盐","肥皂","厕纸"],"r":["XP 3000","USD 500"],"u":"204"},{"t":"Peacekeeper","c":"主钥匙","l":"1","o":["在海岸线后山碉堡内找到疗养院封闭区域的钥匙","上交钥匙"],"r":["XP 3000","USD 500","解锁 Peacekeeper"],"u":"206"},{"t":"Peacekeeper","c":"化学实验","l":"1","o":["在海关实验楼的医学实验室内藏匿波纹软管"],"r":["XP 3000","USD 500"],"u":"208"},{"t":"Peacekeeper","c":"悬结已解","l":"1","o":["在工厂找到实验室日志","在森林的旧锯木厂中藏匿日志"],"r":["XP 3000","USD 500","解锁 Peacekeeper"],"u":"238"},{"t":"Peacekeeper","c":"渔具","l":"2","o":["在海岸线找到防波堤旁边的船只","将 MF-UNTAR 防弹衣藏匿在船上","将 Leatherman 多功能工具藏匿在船上"],"r":["XP 10000","USD 1100"],"u":"195"},{"t":"Peacekeeper","c":"破铜烂铁","l":"2","o":["在海岸线找到第一辆T-90坦克，并使用MS2000指示器标记","在海岸线找到第二辆T-90坦克，并使用MS2000指示器标记","在海岸线找到第三辆T-90坦克，并使用MS2000指示器标记"],"r":["XP 10000","USD 1100"],"u":"197"},{"t":"Peacekeeper","c":"鹰眼","l":"2","o":["在海岸线找到第一架无人机的坠毁点","在第一架坠毁的无人机上找到SAS硬盘","上交第一块SAS硬盘","在海岸线找到第二架无人机的坠毁点","在第二架坠毁的无人机上找到SAS硬盘","上交第二块SAS硬盘"],"r":["XP 10000","USD 1000"],"u":"198"},{"t":"Peacekeeper","c":"人道主义援助","l":"2","o":["使用MS2000指示器标记第一辆卡车","使用MS2000指示器标记第二辆卡车","上交 MRE个人即食口粮 5 个"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"199"},{"t":"Peacekeeper","c":"邪教","l":"2","o":["在海岸线找到 失踪的线人","以幸存状态撤离该区域"],"r":["XP 1000","USD 1000"],"u":"200"},{"t":"Peacekeeper","c":"武器流通","l":"2","o":["用 MS2000 指示器标记森林的第一处仪式地点","用 MS2000 指示器标记森林的第二处仪式地点","用 MS2000 指示器标记海岸线的仪式地点"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"201"},{"t":"Peacekeeper","c":"单程票","l":"2","o":["在工厂使用 AUG 爆头消灭任意敌对目标 15 名"],"r":["XP 10000","USD 1100"],"u":"202"},{"t":"Peacekeeper","c":"你渴望电力吗","l":"2","o":["在海岸线疗养院东楼找到发电机","在海岸线疗养院西楼找到发电机","上交战局中找到的物品：金属油桶或野营燃料桶 3 个"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"205"},{"t":"Peacekeeper","c":"秘密消息","l":"2","o":[],"r":[],"u":""},{"t":"Peacekeeper","c":"此路不通","l":"2","o":["在塔科夫街区找到运送货物的车队","找到偷袭位置","以幸存状态撤离该区域"],"r":["XP 10000","USD 1100"],"u":"209"},{"t":"Peacekeeper","c":"你的车该洗了","l":"2","o":["在塔科夫街区的车行办公室找到数字存储装置","上交存储装置"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"214"},{"t":"Peacekeeper","c":"无中生有 - 塔科夫街区","l":"2","o":["在塔科夫街区找到第一辆LAV III装甲车，并使用MS2000指示器标记","在塔科夫街区找到斯特赖克轮式突击炮，并使用MS2000指示器标记","在塔科夫街区找到第二辆LAV III装甲车，并使用MS2000指示器标记"],"r":["XP 10000","USD 1100"],"u":"230"},{"t":"Peacekeeper","c":"神秘货物","l":"3","o":["在海岸线疗养院东楼的计算机中心找到可能包含情报的物品","上交找回的数据"],"r":["XP 2800","USD 2100"],"u":"210"},{"t":"Peacekeeper","c":"定向追踪","l":"3","o":["在海岸线疗养院找到蓝色水桶所在的房间","取得任何有关第二部分货物运输的信息","上交找回的信息","在海岸线疗养院内找到被藏匿的 TerraGroup 货物"],"r":["XP 28000","USD 2100"],"u":"211"},{"t":"Peacekeeper","c":"演示原型","l":"3","o":[],"r":[],"u":""},{"t":"Peacekeeper","c":"来自塔科夫的礼物","l":"3","o":["在灯塔的海边找到TerraGroup的货物","在灯塔或储备站使用 M203 榴弹发射器消灭任意敌对目标 10 名"],"r":["XP 28000","USD 2100","解锁 Peacekeeper","解锁 Peacekeeper"],"u":"213"},{"t":"Peacekeeper","c":"无中生有 - 储备站","l":"3","o":["在储备站找到并检查第一辆BMP-2步战车","标记第一辆BMP-2步战车","在储备站找到并检查第二辆BMP-2步战车","标记第二辆BMP-2步战车","在储备站找到并检查第三辆BMP-2步战车","标记第三辆BMP-2步战车","在储备站找到并检查第四辆BMP-2步战车","标记第四辆BMP-2步战车"],"r":["XP 28000","USD 2100"],"u":"228"},{"t":"Peacekeeper","c":"无中生有 - 灯塔","l":"3","o":["在灯塔找到第一辆BRDM装甲车，并使用MS2000指示器标记","在灯塔找到第二辆BRDM装甲车，并使用MS2000指示器标记","在灯塔找到第一辆斯特赖克轮式突击炮，并使用MS2000指示器标记","在灯塔找到第二辆斯特赖克轮式突击炮，并使用MS2000指示器标记"],"r":["XP 28000","USD 2100"],"u":"229"},{"t":"Peacekeeper","c":"清洁工","l":"3","o":["在实验室消灭 掠夺者","或黑色军团干员 10 名"],"r":["XP 28000","EUR 2100","解锁 Peacekeeper"],"u":"232"},{"t":"Peacekeeper","c":"人口过剩","l":"3","o":["在灯塔度假村区域消灭任意敌对目标 10 名","上交战局中找到的物品：地形调查地图、情报文件夹，或 TerraGroup 蓝色文件夹 5 个"],"r":["XP 28000","USD 2100","解锁 Peacekeeper"],"u":"235"},{"t":"Peacekeeper","c":"向导","l":"4","o":["以“幸存”状态撤离工厂或海关","以“幸存”状态撤离实验室或灯塔","以“幸存”状态撤离森林或立交桥","以“幸存”状态撤离海岸线或储备站","以“幸存”状态撤离中心区或塔科夫街区","消灭任意敌对目标 15 名","任务进行过程中，你不可以死亡或以其它状态离开战局（包括:阵亡，擅离，失踪，匆匆逃离）"],"r":["XP 65000","USD 3100","+2 抗压技能等级","+4 精确射手步枪技能等级","解锁 Peacekeeper"],"u":"222"},{"t":"Peacekeeper","c":"样品","l":"4","o":["上交在战局中找到物品：P22 兴奋剂注射器 1 根","上交在战局中找到物品：米屈肼兴奋剂注射器 1 根","上交在战局中找到物品：AHF1-M 兴奋剂注射器 1 根","上交在战局中找到物品：3-(b-TG) 兴奋剂注射器 1 根","上交在战局中找到物品：M.U.L.E. 兴奋剂注射器 1 根","上交在战局中找到物品：\"Obdolbos\"鸡尾酒兴奋剂注射器 1 根","上交在战局中找到物品：L1（去甲肾上腺素）兴奋剂注射器 1 根"],"r":["XP 65000","USD 3100","解锁 Peacekeeper","解锁 Peacekeeper"],"u":"223"},{"t":"Peacekeeper","c":"TerraGroup 雇员","l":"4","o":["在实验室找到 Sanitar","的工作室","取得有关 Sanitar","工作的情报物品","上交找到的情报"],"r":["XP 65000","USD 3100","+2 抗压技能等级","+4 冲锋枪技能等级","解锁 Peacekeeper"],"u":"224"},{"t":"Peacekeeper","c":"维和任务","l":"4","o":["在立交桥穿戴UN制式装备（UN头盔、MF-UNTAR防弹背心，M4A1或M16步枪）击杀Scav 12 名","在海关穿戴 UN 制式装备（UN头盔与防弹背心）使用 5.56x45 口径 UN 武器消灭 Scav 12 名","在森林或储备站穿戴 UN 制式装备（UN头盔与防弹背心）使用 5.56x45 口径 UN 武器消灭 Scav 12 名","在海岸线或塔科夫街区穿戴 UN 制式装备（UN头盔与防弹背心）使用 5.56x45 口径 UN 武器消灭 Scav 12 名"],"r":["XP 65000","USD 3100","+2 瞄准训练技能等级","解锁 Peacekeeper","解锁 Skier"],"u":"226"},{"t":"Peacekeeper","c":"最烂的差事","l":"4","o":["使用 AR-15 系列武器在储备站、灯塔、海岸线或中心区从 100 米外消灭任意敌对目标 30 名"],"r":["XP 65000","USD 3100","+2 瞄准训练技能等级","+2 精确射手步枪技能等级","解锁 Peacekeeper"],"u":"231"},{"t":"Peacekeeper","c":"特殊装备","l":"4","o":["上交在战局中找到的：军用闪存装置 4 个","上交在战局中找到的：VPX闪存模块 5 个","上交在战局中找到的：Virtex可编程处理器 5 个","上交在战局中找到的：UHF RFID固定式读取器 5 个","上交在战局中找到的：军用COFDM无线信号发射器 5 个"],"r":["XP 65000","USD 3100","+4 手枪技能等级","+4 左轮手枪技能等级","解锁 Peacekeeper"],"u":"233"},{"t":"Peacekeeper","c":"反抗","l":"4","o":["在灯塔、中心区、储备站、海岸线或塔科夫街区消灭 BEAR PMC 20 名","上交战局中找到的物品：BEAR 狗牌 20 个"],"r":["XP 65000","USD 3100","+4 冲锋枪技能等级","+2 瞄准训练技能等级","解锁 Peacekeeper"],"u":"234"},{"t":"Peacekeeper","c":"战利品","l":"4","o":["上交战局中找到的物品：BEAR 狗牌（转生 1 级或更高）10 个","上交战局中找到的物品：USEC 狗牌（转生 1 级或更高）10 个","可选的上交狗牌","BEAR","BEAR","BEAR","BEAR","BEAR","BEAR"],"r":["XP 65000","USD 3100","+4 手枪技能等级","+4 左轮手枪技能等级","解锁 Peacekeeper"],"u":"236"},{"t":"Peacekeeper","c":"彻夜难眠","l":"4","o":["21:00-06:00 期间在塔科夫街区、灯塔、储备站、中心区或海岸线消灭任意敌对目标 40 名"],"r":["XP 65000","USD 3100","+4 冲锋枪技能等级","+2 瞄准训练技能等级","解锁 Peacekeeper"],"u":"237"},{"t":"Peacekeeper","c":"湿活 - 1","l":"","o":["在海岸线使用 M4A1、M16、ADAR 或 TX-15 消灭 Scav 10 名"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"215"},{"t":"Peacekeeper","c":"湿活 - 2","l":"","o":["在海岸线找到渔民的住所","使用MS2000指示器标记钓鱼桌"],"r":["XP 10000","USD 1100","解锁 Peacekeeper"],"u":"216"},{"t":"Peacekeeper","c":"湿活 - 3","l":"","o":["在海岸线找到Artyom的车","使用 MS2000 指示器标记 Artyom 的车"],"r":["XP 28000","USD 2100","解锁 工作台 2级 制作 .300 Blackout M62 曳光弹"],"u":"217"},{"t":"Peacekeeper","c":"湿活 - 4","l":"","o":["在海岸线取得疗养院房客名单","上交找到的物品"],"r":["XP 28000","USD 2100","解锁 工作台 3级 制作 7.62x51毫米 M80A1"],"u":"218"},{"t":"Peacekeeper","c":"湿活 - 5","l":"","o":["在海岸线找到关于Artyom工作的信息","上交信息"],"r":["XP 28000","解锁 Peacekeeper"],"u":"219"},{"t":"Peacekeeper","c":"湿活 - 6","l":"","o":["使用 7.62x51 口径的精确射手步枪在海岸线或灯塔从 50 米外消灭任意敌对目标 15 名"],"r":["XP 2800","USD 3100","解锁 Peacekeeper"],"u":"220"},{"t":"Peacekeeper","c":"机密情报","l":"","o":["在迷宫内找到并获取特殊的储存模块","在迷宫的组装车间内安放一枚手榴弹","上交找到的信息"],"r":["XP 28000","USD 2000","解锁 Peacekeeper"],"u":"241"},{"t":"Peacekeeper","c":"和平原子","l":"","o":["在破冰船上找到并获取核反应单元控制日志","上交找到的物品"],"r":["XP 24000","USD 4200"],"u":"5589"},{"t":"Peacekeeper","c":"窃听风暴","l":"","o":["修复破冰船通往轮机舱路上自动化控制室内的设备","修复破冰船轮机舱下方自动化控制室内的设备","修复破冰船靠近货舱位置自动化控制室内的设备","在破冰船主控室内安放黑客入侵装置"],"r":["XP 30000","USD 6500","解锁 Peacekeeper"],"u":"5590"},{"t":"Mechanic","c":"救援行动","l":"1","o":["获得钥匙并进入科学家办公室家","找到并获取科学家的硬盘","上交硬盘"],"r":["XP 3000","Rub 98000"],"u":"306"},{"t":"Mechanic","c":"稳定信号","l":"1","o":["在森林使用 MS2000 指示器标记任意一个气象站"],"r":["XP 3000","Rub 98000"],"u":"307"},{"t":"Mechanic","c":"不良嗜好","l":"1","o":["在战局中找到物品：马宝路、云尔斯顿或无彩香烟 15 个","可选的上交的香烟","马宝路","云尔斯顿","无彩"],"r":["XP 3000","Rub 98000"],"u":"261"},{"t":"Mechanic","c":"挖矿","l":"1","o":["在海关找到罚没品仓库","取得装有显卡的包裹","上交显卡包裹"],"r":["XP 3000","Rub 98000","解锁 Mechanic","解锁 竞技场裁判"],"u":"262"},{"t":"Mechanic","c":"工欲善其事","l":"1","o":["在海关车库区找到并获取经过改装的工具套件","上交找到的物品"],"r":["XP 3000","Rub 98000"],"u":"318"},{"t":"Mechanic","c":"急先锋","l":"1","o":["将 1 个 Trijicon REAP-IR 瞄准镜藏匿在海关新加油站垃圾箱后方"],"r":["XP 3000","Rub 98000","解锁 Mechanic"],"u":"270"},{"t":"Mechanic","c":"枪匠 - MP-133","l":"1","o":["按照要求改装MP-133","改装攻略","耐久度：60或更高","人机工效：45或更高","后坐力(垂直+水平)：850以下","占格：4x1或更小","弹夹容量:5或更大","战术设备","改装清单"],"r":["XP 3000","Rub 98000"],"u":"278"},{"t":"Mechanic","c":"枪匠 - AKS-74U","l":"1","o":["按照要求改装AKS-74U","改装攻略","耐久度：60或更高","人机工效：56或更高","后坐力(垂直+水平)：550以下","射击场：100或更大","弹匣容量：60或更多","重量：不超过3.5 kg","占格：3x2 或更小（ 注意 :必须要折叠枪托）"],"r":["XP 3000","Rub 98000"],"u":"279"},{"t":"Mechanic","c":"枪匠 - HK MP5","l":"1","o":["按照要求改装MP5","改装攻略","耐久度：60或更高","人机工效：45或更高","后坐力(垂直+水平)：240以下","射击场：200或更大","重量：不超过4kg","改装清单","图示"],"r":["XP 3000","Rub 98000","解锁 Mechanic"],"u":"280"},{"t":"Mechanic","c":"恶意环伺","l":"2","o":["在海岸线找到第一个信号源","在海岸线第一个信号源放置信号干扰器","在海岸线找到第二个信号源","在海岸线第二个信号源放置信号干扰器"],"r":["XP 10000","Rub 200000"],"u":"252"},{"t":"Mechanic","c":"捕鼠计划","l":"2","o":["上交在战局中找到的： 电脑CPU","3 个","上交在战局中找到的： 可充电电池","3 个","上交在战局中找到的： 印制电路板","3 个","上交在战局中找到的： 损坏的GPhone","3 个"],"r":["XP 10000","Rub 200000"],"u":"253"},{"t":"Mechanic","c":"侦查","l":"2","o":["找到第一个工厂撤离点","找到第二个工厂撤离点","找到第三个工厂撤离点","找到第四个工厂撤离点","以 幸存 状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"254"},{"t":"Mechanic","c":"投机第一步","l":"2","o":["在工厂使用一套工具修复第一块控制面板","在工厂使用一套工具修复第二块控制面板"],"r":["XP 10000","Rub 200000","解锁 Mechanic"],"u":"259"},{"t":"Mechanic","c":"化学橱柜","l":"2","o":["在海岸线疗养院找到 Sanitar","的办公室","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"268"},{"t":"Mechanic","c":"探望","l":"2","o":["取得塔科夫街区 Concordia 公寓区停车场车辆进出情况的相关数据","上交信息"],"r":["XP 10000","Rub 200000"],"u":"275"},{"t":"Mechanic","c":"你被盯上了","l":"2","o":["在塔科夫街区找到监视点位","取得观察结果","上交数据"],"r":["XP 10000","Rub 200000"],"u":"276"},{"t":"Mechanic","c":"公司福报","l":"2","o":["在塔科夫街区找到IT公司的办公室","解开公司获得成功的秘密","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"308"},{"t":"Mechanic","c":"高效秘诀","l":"2","o":["解开塔科夫街区IT公司员工士气高涨的秘密","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"309"},{"t":"Mechanic","c":"黑天鹅计划","l":"2","o":["在工厂使用 MS2000 指示器标记任意一个热交换器"],"r":["XP 10000","Rub 200000"],"u":"316"},{"t":"Mechanic","c":"化工厂的秘密","l":"2","o":["在海关实验楼的医疗实验室找到并获取精密工具","使用转移功能从海关转移到工厂（在单次战局中）","在工厂的实验室储藏间藏匿精密工具"],"r":["XP 10000","Rub 200000","解锁 Mechanic","解锁 Prapor"],"u":"317"},{"t":"Mechanic","c":"枪匠 - OP-SKS","l":"2","o":["按照要求改装OP-SKS","改装攻略","耐久度：60或更高","人机工效：35或更高","后坐力(垂直+水平)：350以下","射击场：600或更大","弹夹容量:20或更大","消音器","改装清单"],"r":["XP 10000","Rub 200000"],"u":"281"},{"t":"Mechanic","c":"枪匠 - M870","l":"2","o":["按照要求改装雷明顿 Model 870","改装攻略","耐久度：60或更高","人机工效：60或更高","后坐力(垂直+水平)：500以下","改装清单","图示","名称","解锁方式"],"r":["XP 10000","Rub 200000","解锁 Mechanic","解锁 竞技场裁判"],"u":"282"},{"t":"Mechanic","c":"物尽其用","l":"3","o":[],"r":[],"u":""},{"t":"Mechanic","c":"后门","l":"3","o":["在储备站找到地下指挥地堡的秘密出口","以幸存状态从秘密出口撤离"],"r":["XP 28000","Rub 300000"],"u":"256"},{"t":"Mechanic","c":"肥料","l":"3","o":["在战局中找到物品：电线 10 个","在战局中找到物品：电容 6 个"],"r":["XP 28000","Rub 300000"],"u":"266"},{"t":"Mechanic","c":"进口","l":"3","o":["上交战局内找到的物品：VPX 闪存模块 1 个","上交战局内找到的物品：UHF RFID 固定式读取器 1 个"],"r":["XP 28000","Rub 300000","解锁 Mechanic"],"u":"267"},{"t":"Mechanic","c":"商业机密","l":"3","o":["在灯塔污水处理厂找到并获取水泵运行数据","上交提取的数据","在灯塔污水处理厂找到并获取泵站运行数据","上交提取的数据"],"r":["XP 28000","Rub 300000"],"u":"271"},{"t":"Mechanic","c":"能源危机","l":"3","o":["在灯塔找到一组油罐，并使用MS2000指示器标记","在灯塔找到第一辆油罐车，并使用MS2000指示器标记","在灯塔找到第二辆油罐车，并使用MS2000指示器标记","在灯塔找到第三辆油罐车，并使用MS2000指示器标记"],"r":["XP 28000","Rub 300000"],"u":"272"},{"t":"Mechanic","c":"半导体危机","l":"3","o":["上交在战局中找到物品：显卡 1 个","上交在战局中找到物品：CPU 风扇 8 个"],"r":["XP 28000","Rub 300000","解锁 Mechanic"],"u":"263"},{"t":"Mechanic","c":"神秘的门","l":"3","o":["在塔科夫街区调查神秘的信号干扰","安装WI-FI摄像头以监视房门","安装WI-FI摄像头以监视楼梯"],"r":["XP 28000","Rub 300000"],"u":"277"},{"t":"Mechanic","c":"枪匠 - AKM","l":"3","o":["按照要求改装AKM","改装攻略","耐久度：60或更高","人机工效：25或更高","后坐力(垂直+水平)：400以下","射击场：800或更大","消音器","改装清单","图示"],"r":["XP 5800","Rub 50000","解锁 Prapor"],"u":"283"},{"t":"Mechanic","c":"枪匠 - M4A1","l":"3","o":["按照要求改装M4A1","改装攻略","耐久度：60或更高","人机工效：37或更高","后坐力(垂直+水平)：300以下","射击场：800或更大","重量：不超过3.8kg","弹夹容量:至少为60","消音器"],"r":["XP 28000","Rub 300000"],"u":"284"},{"t":"Mechanic","c":"枪匠 - AKS-74N","l":"3","o":["按照要求改装AKS-74N","改装攻略","耐久度：60或更高","人机工效：52或更高","后坐力(垂直+水平)：275以下","占格：5x2或更小","改装清单","图示","名称"],"r":["XP 28000","Rub 300000"],"u":"285"},{"t":"Mechanic","c":"枪匠 - P226R","l":"3","o":["按照要求改装P226R","改装攻略","耐久度：60或更高","人机工效：77或更高","后坐力(垂直+水平)：610以下","改装清单","图示","名称","解锁方式"],"r":["XP 28000","Rub 300000"],"u":"286"},{"t":"Mechanic","c":"枪匠 - AK-105","l":"3","o":["按照要求改装AK-105","改装攻略","耐久度：60或更高","人机工效：21或更高","后坐力(垂直+水平)：500以下","射击场：800或更大","重量：不超过4.8kg","消音器","改装清单"],"r":["XP 28000","Rub 300000"],"u":"287"},{"t":"Mechanic","c":"枪匠 - Vector 9x19","l":"3","o":["按照要求改装KRISS Vector 9x19","改装攻略","耐久度：60或更高","人机工效：48或更高","后坐力(垂直+水平)：240以下","射击场：300或更大","消音器","改装清单","图示"],"r":["XP 28000","Rub 300000"],"u":"288"},{"t":"Mechanic","c":"枪匠 - MPX","l":"3","o":["按照要求改装SIG MPX","改装攻略","耐久度：60或更高","人机工效：47或更高","后坐力(垂直+水平)：225以下","射击场：300或更大","重量：不超过4kg","改装清单","图示"],"r":["XP 28000","Rub 300000","解锁 Mechanic","解锁 竞技场裁判"],"u":"289"},{"t":"Mechanic","c":"枪匠 - AS VAL","l":"3","o":["按照要求改装AS VAL","改装攻略","耐久度：60或更高","人机工效：27或更高","后坐力(垂直+水平)：220以下","改装清单","图示","名称","解锁方式"],"r":["XP 28000","Rub 300000","解锁 Mechanic","解锁 竞技场裁判"],"u":"292"},{"t":"Mechanic","c":"狙击疯魔","l":"4","o":["使用栓动式步枪一命消灭任意敌对目标 15 名"],"r":["XP 65000","Rub 490000","+4 故障排除技能等级","+4 栓动式步枪技能等级","解锁 Mechanic"],"u":"264"},{"t":"Mechanic","c":"天神射手","l":"4","o":["在海关或灯塔使用栓动式步枪爆头击杀 PMC 行动人员 5 名","在塔科夫街区或海岸线使用栓动式步枪爆头击杀 PMC 行动人员 5 名","在立交桥或中心区使用栓动式步枪爆头击杀 PMC 行动人员 5 名","在森林或储备站使用栓动式步枪爆头击杀 PMC 行动人员 5 名"],"r":["XP 65000","Rub 490000","+4 智力技能等级","+4 栓动式步枪技能等级","解锁 Mechanic"],"u":"265"},{"t":"Mechanic","c":"致命校准","l":"4","o":["从100米开外击杀PMC 20 名"],"r":["XP 65000","Rub 490000","+2 智力技能等级","+4 武器维护技能等级","解锁 Prapor"],"u":"269"},{"t":"Mechanic","c":"目标与手段","l":"4","o":["使用 9x39 毫米口径的武器在 50 米开外消灭 PMC 20 名"],"r":["XP 12500","Rub 490000","+4 武器维护技能等级","+4 故障排除技能等级","解锁 Mechanic"],"u":"4908"},{"t":"Mechanic","c":"轻重缓急","l":"4","o":["不穿戴任何护甲、头盔或插板胸挂，仅佩戴耳机消灭 PMC 行动人员 10 名","不佩戴任何耳机，穿戴 TSH-4M-L 软质坦克乘员头盔消灭 PMC 行动人员 10 名"],"r":["XP 65000","Rub 490000","+4 智力技能等级","解锁 Peacekeeper"],"u":"5363"},{"t":"Mechanic","c":"介绍","l":"","o":["在森林坠机处旁边找到 Jaeger","的营地","取得 Jaeger","的加密留言","上交留言"],"r":["XP 4500","Rub 35000","解锁 Jaeger"],"u":"250"},{"t":"Mechanic","c":"直播 - 1","l":"","o":["在灯塔找到隐蔽的录制室","在录制室内放置信号干扰器"],"r":["XP 10000"],"u":"273"},{"t":"Mechanic","c":"直播 - 2","l":"","o":["在塔科夫街区的杂货商店找到血腥直播的拍摄地点","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"274"},{"t":"Mechanic","c":"航空包裹","l":"","o":["在森林的旧锯木厂发射一枚红色信号弹"],"r":["XP 10000","Rub 200000"],"u":"312"},{"t":"Mechanic","c":"镜头就位，开拍！","l":"","o":[],"r":[],"u":""},{"t":"Mechanic","c":"同好俱乐部","l":"","o":["在储备站找到并获取 AK-50 枪管","在塔科夫一处检查站找到并获取 AK-50 防尘盖","在海关指定位置藏匿 AK-50 枪身主体","在海关指定位置藏匿 AK-50 护木","在海关指定位置藏匿 AK-50 枪管","在海关指定位置藏匿 AK-50 防尘盖"],"r":["XP 65000","解锁 Mechanic","解锁 Mechanic","解锁 Mechanic","解锁 Mechanic"],"u":"4498"},{"t":"Mechanic","c":"一臂之力","l":"","o":["在森林找到并获取 Prapor","的包裹","以幸存状态撤离该区域","完成任务： 货运延误 - 1"],"r":["XP 10000","Rub 200000"],"u":"320"},{"t":"Mechanic","c":"影子雇员","l":"","o":["在中心区找到 Knossos LLC 高级经理的轿车","找到并获取经理的日志","上交日志"],"r":["XP 10000","Rub 200000"],"u":"321"},{"t":"Mechanic","c":"大海捞针","l":"","o":["在中心区调查 TerraGroup 总部门前的公园","在立交桥调查卡丁车场","在立交桥调查儿童游乐场","在塔科夫街区调查 Concordia 公寓的儿童游乐场","在海岸线调查岸边的建筑工地","在海岸线调查疗养院内的儿童游乐场"],"r":["XP 10000"],"u":"322"},{"t":"Mechanic","c":"暗藏玄机","l":"","o":["找到与 Knossos LLC 相关的有效线索","尝试进入 Knossos LLC 设施"],"r":["XP 10000"],"u":"323"},{"t":"Mechanic","c":"强制结盟","l":"","o":["帮助大妈进行调查","找到打开西楼地下安全门的方法"],"r":["Rub 40000"],"u":"324"},{"t":"Mechanic","c":"武装侦察","l":"","o":["找出海岸线疗养院地堡密闭门后有什么"],"r":["XP 28000"],"u":"325"},{"t":"Mechanic","c":"检验假说","l":"","o":["在迷宫内找到武器原型测试区域","上交战局中找到的物品：Labrys研发记录 5 份"],"r":["XP 28000"],"u":"326"},{"t":"Mechanic","c":"枪匠大师 - 1","l":"","o":["按照要求改装HK 416A5","改装攻略","耐久度：80或更高","人机工效：50或更高","后坐力(垂直+水平)：310以下","重量：不超过4kg","弹匣容量：至少为30","改装清单","图示"],"r":["XP 10000","解锁 Mechanic","解锁 Mechanic"],"u":"291"},{"t":"Mechanic","c":"枪匠大师 - 2","l":"","o":["按照要求改装R11 RSASS","改装攻略","耐久度：60或更高","人机工效：17或更高","后坐力(垂直+水平)：300以下","射击场：1500或更大","重量：不超过6.7kg","消音器","为了使此任务能成功上交，您需要取下弹匣。"],"r":["XP 13600","USD 500","解锁 Peacekeeper"],"u":"290"},{"t":"Mechanic","c":"枪匠大师 - 3","l":"","o":["按照要求改装DVL-10","改装攻略","耐久度：60或更高","人机工效：36或更高","后坐力(垂直+水平)：450以下","射击场：2000或更大","重量：不超过6.7kg","为了使此任务能成功上交，您需要取下弹匣","改装清单"],"r":["XP 10000","解锁 Mechanic","解锁 Mechanic"],"u":"293"},{"t":"Mechanic","c":"枪匠大师 - 4","l":"","o":["按照要求改装AK-102","改装攻略","耐久度：60或更高","人机工效：53或更高","后坐力(垂直+水平)：300以下","射击场：800或更大","占格：4x2或更小","改装清单","图示"],"r":["XP 10000","Rub 200000","解锁 Mechanic"],"u":"294"},{"t":"Mechanic","c":"枪匠大师 - 5","l":"","o":["按照要求改装AKMN","改装攻略","耐久度：60或更高","人机工效：40或更高","后坐力(垂直+水平)：380以下","重量：不超过5kg","改装清单","图示","名称"],"r":["XP 28000","Rub 300000"],"u":"295"},{"t":"Mechanic","c":"枪匠大师 - 6","l":"","o":["按照要求改装SVDS","改装攻略","耐久度：60或更高","人机工效：10或更高","后坐力(垂直+水平)：500以下","消音器","改装清单","图示","名称"],"r":["XP 28000","解锁 Mechanic"],"u":"296"},{"t":"Mechanic","c":"枪匠大师 - 7","l":"","o":["按照要求改装M1A","改装攻略","耐久度：60或更高","人机工效：20或更高","后坐力(垂直+水平)：400以下","重量：不超过7.3kg","20发弹匣","改装清单","图示"],"r":["XP 28000","Rub 300000","解锁 Peacekeeper"],"u":"297"},{"t":"Mechanic","c":"枪匠大师 - 8","l":"","o":["按照要求改装M700","按照要求改装M1911","M700","M700 改装要求：","耐久度：60或更高","人机工效：35或更高","后坐力(垂直+水平)：500以下","射击场：1500或更大","重量：不超过6kg"],"r":["XP 28000","Rub 300000"],"u":"298"},{"t":"Mechanic","c":"枪匠大师 - 9","l":"","o":["按照要求改装M4A1","改装攻略","耐久度：60或更高","人机工效：40或更高","后坐力(垂直+水平)：280以下","重量：不超过5kg","改装清单","图示","名称"],"r":["XP 28000","Rub 300000"],"u":"299"},{"t":"Mechanic","c":"枪匠大师 - 10","l":"","o":["按照要求改装CMMG Mk47","改装攻略","耐久度：60或更高","人机工效：30或更高","重量：不超过5kg","改装清单","图示","名称","解锁方式"],"r":["XP 28000"],"u":"300"},{"t":"Mechanic","c":"枪匠大师 - 11","l":"","o":["按照要求改装KAC SR-25","改装攻略","耐久度：60或更高","人机工效：25或更高","重量：不超过6kg","改装清单","图示","名称","解锁方式"],"r":["XP 28000","解锁 Mechanic","解锁 工作台 3级 制作 Trijicon REAP-IR热成像步枪瞄准镜"],"u":"301"},{"t":"Mechanic","c":"枪匠大师 - 12","l":"","o":["按要求改装 T-5000","按要求改装 PP-19-01","按要求改装 Glock 17","T-5000","耐久度：60或更高","人机工效：18或更高","消音器","T-5000改装清单","图示"],"r":["XP 28000","解锁 Mechanic"],"u":"319"},{"t":"Mechanic","c":"枪匠大师 - 13","l":"","o":["按照要求改装PKP机枪","改装攻略","耐久度：60或更高","人机工效：10或更高","后坐力(垂直+水平)：950以下","弹匣容量：100","改装清单","图示","名称"],"r":["XP 28000","解锁 Mechanic"],"u":"302"},{"t":"Mechanic","c":"网络供应商 - 1","l":"","o":["上交在战局中找到的： 电子元件","4 个","上交在战局中找到的： 气体分析仪","4 个","上交在战局中找到的： 损坏的Gphone","4 个","上交在战局中找到的： 军用COFDM无线信号发射器","4 个"],"r":["XP 18600"],"u":"242"},{"t":"Mechanic","c":"网络供应商 - 2","l":"","o":["将信号中继器安装在灯塔污水处理厂的米-8 直升机内部","将信号中继器安装在灯塔废弃的 USEC 别墅区内","将信号中继器安装在可以俯瞰灯塔的高处","将信号中继器安装在灯塔海边沉没建筑的房顶"],"r":["XP 19100"],"u":"243"},{"t":"Mechanic","c":"试探 - 1","l":"","o":["消灭位于灯塔本体区域的PMC行动人员 15 名"],"r":["XP 23500"],"u":"244"},{"t":"Mechanic","c":"试探 - 2","l":"","o":["在森林找到第一个地堡，并使用MS2000指示器标记","在森林找到第二个地堡，并使用MS2000指示器标记","在森林找到第三个地堡，并使用MS2000指示器标记","在森林找到第四个地堡，并使用MS2000指示器标记"],"r":["XP 24200"],"u":"245"},{"t":"Mechanic","c":"试探 - 3","l":"","o":["在实验室消灭 掠夺者","7 名","上交在战局中找到的： SJ9 TGLabs战斗兴奋剂注射器","1 根","上交在战局中找到的： SJ6 TGLabs战斗兴奋剂注射器","5 根","上交在战局中找到的： SJ1 TGLabs战斗兴奋剂注射器","15 根"],"r":["XP 24800"],"u":"246"},{"t":"Mechanic","c":"灯塔之匙","l":"","o":["上交在战局中找到的： 绝缘胶带","1 个","上交在战局中找到的： 军用电路板","2 个","上交在战局中找到的： 有机玻璃片","2 个","上交在战局中找到的： 可用液晶显示屏","1 个","上交在战局中找到的： 军用COFDM无线信号发射器"],"r":["XP 30500"],"u":"247"},{"t":"Mechanic","c":"咚咚咚","l":"","o":["在灯塔小岛附近检查应答机能否正常工作","以幸存状态撤离该区域"],"r":["XP 31300"],"u":"248"},{"t":"Mechanic","c":"邂逅","l":"","o":["获得V3 U盘","重置无线电发射器","上交U盘","前往灯塔","提示","如果击杀 Zryachiy","会失去此任务"],"r":["XP 32000"],"u":"249"},{"t":"Mechanic","c":"破镜重圆","l":"","o":["获得V3 U盘","重置无线电发射器","上交U盘","前往灯塔"],"r":[],"u":"305"},{"t":"Mechanic","c":"破镜重圆 - 收买人心","l":"","o":["上交 1,000,000 卢布"],"r":[],"u":"303"},{"t":"Mechanic","c":"破镜重圆 - 装备","l":"","o":["上交在 战局中 找到的 4 个 SVDS狙击步枪"],"r":[],"u":"304"},{"t":"Mechanic","c":"破镜重圆 - 大扫除","l":"","o":["在储备站击杀 25 名 掠夺者"],"r":[],"u":"310"},{"t":"Mechanic","c":"破镜重圆 - 安保","l":"","o":["在污水处理厂西边的警车处放置 WI-FI摄像头","在污水处理厂东南角的黄色推土机处放置 WI-FI摄像头","在污水处理厂北边工业区附近的军车处放置 WI-FI摄像头","在污水处理厂附近南部大桥上的黄色公交车处放置 WI-FI摄像头"],"r":[],"u":"311"},{"t":"Mechanic","c":"破镜重圆 - 软件","l":"","o":["上交在 战局中 找到的 15 个 加密U盘"],"r":[],"u":"5668"},{"t":"Mechanic","c":"破镜重圆 - 隔离","l":"","o":["在实验室的隔离区内放置 WI-FI摄像头"],"r":[],"u":"5669"},{"t":"Ragman","c":"Make ULTRA Great Again","l":"1","o":["在立交桥消灭任意目标 10 名"],"r":["XP 3000","Rub 98000"],"u":"328"},{"t":"Ragman","c":"燃油危机","l":"1","o":["在立交桥使用 MS2000 指示器标记发电站周边的任意一辆油罐车","在立交桥使用 MS2000 指示器标记北部区域的任意一辆油罐车"],"r":["XP 3000","Rub 98000"],"u":"333"},{"t":"Ragman","c":"盛装杀戮","l":"1","o":["在战局中找到物品：Kinda 牛仔帽 2 个","在战局中找到物品：任意苏联毛帽 2 个"],"r":["XP 3000","Rub 98000"],"u":"336"},{"t":"Ragman","c":"感恩的心","l":"1","o":["将绿色提花头巾藏匿在森林锯木厂的码头上","把雷硼嬉皮太阳镜藏匿在森林锯木厂的码头上"],"r":["XP 3000","Rub 98000"],"u":"337"},{"t":"Ragman","c":"探路者","l":"1","o":["在立交桥查看铁路撤离点","在立交桥查看 EMERCOM 检查站撤离点","在立交桥查看发电站载具撤离点"],"r":["XP 3000","Rub 98000"],"u":"340"},{"t":"Ragman","c":"库存清单","l":"1","o":["在立交桥取得Goshan货物清单","上交Goshan货物清单","在立交桥取得OLI货物清单","上交OLI货物清单","在立交桥取得IDEA货物清单","上交IDEA货物清单"],"r":["XP 3000","Rub 98000"],"u":"341"},{"t":"Ragman","c":"损失惨重","l":"1","o":["在立交桥取得OLI货运路线文件","上交文件"],"r":["XP 3000","XP 98000"],"u":"342"},{"t":"Ragman","c":"小事大帮忙","l":"1","o":["在森林找到第一个燃料堆，并使用MS2000指示器标记","在森林找到第二个燃料堆，并使用MS2000指示器标记","在森林找到第三个燃料堆，并使用MS2000指示器标记"],"r":["XP 3000","Rub 98000"],"u":"346"},{"t":"Ragman","c":"长期合作","l":"1","o":["在立交桥消灭 PMC 行动人员 4 名"],"r":["XP 3000","Rub 98000"],"u":"361"},{"t":"Ragman","c":"大甩卖","l":"2","o":["检查AVOKADO商店","检查KOSTIN商店","检查tRend商店","检查DINO CLOTHES商店","检查TOP BRAND商店"],"r":["XP 10000","Rub 200000"],"u":"329"},{"t":"Ragman","c":"审计","l":"2","o":["在塔科夫街区取得财务记录","上交日志"],"r":["XP 10000","Rub 200000"],"u":"330"},{"t":"Ragman","c":"芭蕾舞者","l":"2","o":["在塔科夫街区找到芭蕾舞爱好者的公寓","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"331"},{"t":"Ragman","c":"火线速递","l":"2","o":["在立交桥的指定位置藏匿 ComTac II 耳机 1 个","在立交桥的指定位置藏匿 6B47 头盔 1 个","在立交桥的指定位置藏匿 Gzhel-K 护甲 1 个"],"r":["XP 10000","Rub 200000"],"u":"338"},{"t":"Ragman","c":"微型客车","l":"2","o":["在立交桥找到第一辆黄色 微型客车","，并使用MS2000指示器标记","在立交桥找到第二辆黄色 微型客车","，并使用MS2000指示器标记","在立交桥找到第三辆黄色 微型客车","，并使用MS2000指示器标记","上交战局中找到的物品：任意工具 10 个"],"r":["XP 10000","Rub 200000"],"u":"343"},{"t":"Ragman","c":"成功的关键","l":"2","o":["在立交桥取得服装设计手册（一）","上交服装设计手册（一）","在立交桥取得服装设计手册（二）","上交服装设计手册（二）"],"r":["XP 10000","Rub 200000"],"u":"349"},{"t":"Ragman","c":"财务总监","l":"2","o":["在立交桥将 Goshan 收银机钥匙藏匿在 BIZARRO 商店的试衣间内","在立交桥将 IDEA 收银机钥匙藏匿在 #9 收银台","在立交桥将 OLI 收银机钥匙藏匿在 #7-8 收银台"],"r":["XP 10000","Rub 200000"],"u":"352"},{"t":"Ragman","c":"绝不上当","l":"2","o":["在海岸线上找到 Ragman","的 SUV车辆","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"362"},{"t":"Ragman","c":"花花公子","l":"2","o":["在塔科夫街区佩戴 Bomber 无檐小便帽和雷硼嬉皮太阳镜消灭任意敌人 30 名","在塔科夫街区的理发店里藏匿Bomber 无檐小便帽","在塔科夫街区的理发店里藏匿雷硼嬉皮太阳镜"],"r":["XP 10000","Rub 200000"],"u":"363"},{"t":"Ragman","c":"浑水摸鱼","l":"2","o":["在海关指定位置藏匿 DVL-10 狙击步枪","在海关指定位置藏匿 DVL-1O 狙击步枪弹匣","在海关指定位置藏匿 ELCAN SpecterDR 瞄准镜","在海关指定地点藏匿任意 7.62x51 弹药包"],"r":["XP 10000","Rub 200000"],"u":"373"},{"t":"Ragman","c":"高保真","l":"3","o":["在塔科夫街区找到音乐人集会点","找到并获取带有刻字的吉他拨片","上交吉他拨片"],"r":["XP 28000","Rub 300000"],"u":"332"},{"t":"Ragman","c":"雪中送炭","l":"3","o":["在储备站使用MS2000指示器标记第一组油罐","在储备站使用MS2000指示器标记第二组油罐"],"r":["XP 28000","Rub 300000"],"u":"334"},{"t":"Ragman","c":"储备专家","l":"3","o":["检查储备站兵营东楼（黑兵）的第一个军械库","检查储备站兵营东楼（黑兵）的值班室","检查储备站兵营东楼（黑兵）的第二个军械库","检查储备站兵营南楼（白兵）的第一个军械库","检查储备站兵营南楼（白兵）的第二个军械库","上交在这些房间内找到的装备 3 件"],"r":["XP 28000","Rub 300000"],"u":"335"},{"t":"Ragman","c":"垃圾佬","l":"3","o":["上交战局中找到的物品：任意面部装备 (面罩 \u0026 面具) 15 个","上交战局中找到的物品：任意头部装备 (头饰 \u0026 头盔) 15 个","上交战局中找到的物品：任意耳机 15 个","上交战局中找到的物品：任意眼部装备 15 个","上交战局中找到的物品：任意型号的防弹衣 15 件"],"r":["XP 28000","Rub 300000"],"u":"339"},{"t":"Ragman","c":"奢侈无罪","l":"3","o":["上交战局中找到的物品：猫雕 2 个","上交战局中找到的物品：金蛋 2 个","上交战局中找到的物品：马雕像 2 个","上交战局中找到的物品：金公鸡塑像 2 个","上交战局中找到的物品：青铜狮雕 2 个","上交战局中找到的物品：劳力土潜水金表 2 个"],"r":["XP 28000","Rub 300000"],"u":"354"},{"t":"Ragman","c":"酒瘾","l":"3","o":["上交在战局中找到物品：Tarkovskaya 瓶装伏特加 10 瓶","上交在战局中找到物品：Dan Jackiel 瓶装威士忌 10 瓶","上交在战局中找到物品：桶装纯净水 3 桶","上交在战局中找到物品：瓶装 Pevko 淡啤酒 10 瓶"],"r":["XP 28000","Rub 300000"],"u":"359"},{"t":"Ragman","c":"此路是我开！","l":"3","o":["同场战局中在塔科夫街区消灭任意目标 5 名","使用转移功能从街区转移到立交桥（在单次战局中）","同场战局中在立交桥区消灭任意目标 5 名"],"r":["XP 28000","Rub 300000"],"u":"372"},{"t":"Ragman","c":"古董爱好者","l":"4","o":["上交战局中找到的物品：古董茶壶 3 个","上交战局中找到的物品：古董花瓶 3 个","上交战局中找到的物品：Axel鹦鹉雕像 2 个","上交战局中找到的物品：乌鸦雕像 2 个","上交战局中找到的物品：黄金骷髅指环 5 个"],"r":["XP 65000","Rub 490000","+4 魅力技能等级","解锁 Ragman"],"u":"347"},{"t":"Ragman","c":"临行密密缝 - 1","l":"","o":["上交在战局中找到物品：带眼洞滑雪头套 1 个","上交在战局中找到物品：Pilgrim 旅行包","1 个"],"r":["XP 10000","Rub 200000","解锁 Ragman","解锁 Ragman"],"u":"344"},{"t":"Ragman","c":"临行密密缝 - 2","l":"","o":["上交战局内找到的物品：WARTECH TV-109 + TV-106 胸挂 2 件","上交战局内找到的物品：BlackRock 胸挂 2件"],"r":["XP 10000","Rub 200000","解锁 卫生间 1级 制作 6B23-2 防弹衣（山地丛林迷彩）"],"u":"348"},{"t":"Ragman","c":"临行密密缝 - 3","l":"","o":["上交获得物品：HighCom Trooper TFO 防弹背心 2 件","上交获得物品：BNTI Gzhel-K（彩瓷-K）防弹衣 2 件"],"r":["XP 10000","Rub 200000","解锁 卫生间 2级 制作 Ars Arma A18 Skanda 插板胸挂（复合迷彩）"],"u":"353"},{"t":"Ragman","c":"临行密密缝 - 4","l":"","o":["上交物品：6B43 屏障-Sh 防弹衣 1 件","上交战局中找到的物品：五级或六级防弹插板 10 个"],"r":["XP 10000","Rub 200000","解锁 卫生间 3级 制作 5.11 Tactical TacTec 插板胸挂（丛林绿）"],"u":"355"},{"t":"Ragman","c":"纺织业 - 1","l":"","o":["上交在战局中找到物品：芳纶纤维布料 5 个","上交在战局中找到物品：防撕布料 10 个","上交在战局中找到物品：尼龙绳索 3 个"],"r":["XP 65000","解锁 Ragman","解锁 Ragman","解锁 Ragman","解锁 Ragman"],"u":"357"},{"t":"Ragman","c":"纺织业 - 2","l":"","o":["上交在战局中找到物品：绒布布料 10 个","上交在战局中找到物品：Cordura 聚酰胺面料 10 个","上交在战局中找到物品：KEKTAPE 管道胶带 5 个"],"r":["XP 65000","解锁 Prapor","解锁 Ragman","解锁 Ragman"],"u":"358"},{"t":"Ragman","c":"人靠衣装 - 1","l":"","o":["击杀 掠夺者","100 名","上交在战局中找到的 WARTECH 品牌装备 50 件","Wartech品牌装备","MK3 TV-104","WT胸挂","TV-115","TV-110","Berkut"],"r":["XP 28000","解锁 卫生间 2级 制作 FirstSpear Strandhogg 插板胸挂 （丛林绿）","解锁 Ragman","解锁 Ragman","解锁 Ragman"],"u":"364"},{"t":"Ragman","c":"人靠衣装 - 2","l":"","o":["击杀 游荡者","100 名","上交在战局中找到的 LBT 品牌装备 50 件","LBT品牌装备","LBCR","LBCR GE","Slick","Slick","Slick"],"r":["XP 65000","解锁 竞技场裁判","解锁 Ragman","解锁 Ragman","解锁 Ragman"],"u":"365"},{"t":"Ragman","c":"城市之匙","l":"","o":["在塔科夫街区的城市博物馆找到并获取纪念钥匙","上交找到的物品"],"r":["XP 28000","Rub 300000"],"u":"366"},{"t":"Ragman","c":"看不见的大手","l":"","o":["消灭背包容量在20格以上的任意目标 15 名"],"r":["XP 12800","Rub 100000"],"u":"367"},{"t":"Ragman","c":"经济流动","l":"","o":["向 Ragman","出售任意背包或胸挂 250 件"],"r":["XP 32000","Rub 300000"],"u":"368"},{"t":"Ragman","c":"特殊提议","l":"","o":["上交在战局中找到物品： Sanitar","的包 1 个","上交在战局中找到物品：AVS 插板胸挂（ Tagilla","版）1 件","上交在战局中找到物品：LBT-1961A 胸挂（Goons特别版）1 件","上交在战局中找到物品：NICE COMM 3 BVS 系统 1 件","上交在战局中找到物品：CPC 插板胸挂（Goons 特别版）1 件"],"r":["XP 85500","Rub 400000"],"u":"369"},{"t":"Ragman","c":"实战考验","l":"","o":["穿戴任意款式的 Goon 版胸挂找到并消灭除 Goon 小队、Wedge 与 Partisan","外的任意 Boss 5 名"],"r":["XP 92000","Rub 410000"],"u":"370"},{"t":"Ragman","c":"旧情难却","l":"","o":["上交物品：实体比特币 15 个"],"r":["解锁 PMC 双层口袋"],"u":"371"},{"t":"Ragman","c":"再次延误","l":"","o":["在森林找到失踪的送货人员","以幸存状态撤离该区域"],"r":["XP 10000","Rub 200000"],"u":"376"},{"t":"Ragman","c":"稳定业务","l":"","o":["在中心区单场战局内击杀 Scav 7 名","以幸存状态撤离地点"],"r":["XP 28000","Rub 300000"],"u":"377"},{"t":"Ragman","c":"感官分析 - 1","l":"","o":["获得物品：“凶狠跑刀崽”私酒 1 瓶","前往森林或塔科夫街区","上交“凶狠跑刀崽”私酒给 BTR","司机"],"r":["XP 28000","Rub 300000"],"u":"378"},{"t":"Ragman","c":"清空外围","l":"","o":["PVP：在迷宫内消灭PMC 24 个","PVE：在迷宫内消灭任意目标 36 个"],"r":["XP 28000","Rub 300000","解锁 Ragman"],"u":"380"},{"t":"Ragman","c":"新鲜到货","l":"","o":[],"r":[],"u":""},{"t":"Ragman","c":"新起点【一转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Ragman","c":"新起点【二转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Ragman","c":"新起点【三转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Ragman","c":"新起点【四转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Ragman","c":"新起点【五转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Ragman","c":"新起点【六转】","l":"","o":["在战局中找到物品：AMG-10 液压油 5 个","上交物品"],"r":["XP 32000","Rub 360000","解锁 Prapor"],"u":"5585"},{"t":"Jaeger","c":"熟人","l":"1","o":["上交任意饮食 10 个","可选上交的任意食品","饼干","面包块","Emelya","士腻架","方便面","塔克肉干","蛋黄酱"],"r":["XP 3000","Rub 98000"],"u":"381"},{"t":"Jaeger","c":"急救措施","l":"1","o":["上交在战局中找到任意医疗包 4 个","上交在战局中找到任意创伤处理类医疗物品 4 个","可选上交的医疗包","AI-2","IFAK","AFAK","车载急救包","Salewa","Grizzly"],"r":["XP 3000","Rub 98000"],"u":"400"},{"t":"Jaeger","c":"污秽遍地……","l":"1","o":["在立交桥、中心区、森林或海关消灭 Scav 20 名"],"r":["XP 3000","Rub 98000"],"u":"416"},{"t":"Jaeger","c":"快枪手","l":"1","o":["在森林不穿戴任何防弹护甲与头盔击杀任意目标 10 名"],"r":["XP 3000","Rub 98000"],"u":"418"},{"t":"Jaeger","c":"危机四伏塔科夫","l":"1","o":["在森林 USEC 营地周围找到高密度雷区","在中心区找到阔剑地雷"],"r":["XP 3000","Rub 98000"],"u":"436"},{"t":"Jaeger","c":"事倍功半","l":"1","o":["在海关找到秘密撤离点"],"r":["XP 3000","Rub 98000"],"u":"439"},{"t":"Jaeger","c":"猎人之路 - 愤怒守望者","l":"1","o":["在海关宿舍楼区域击杀PMC 3 名"],"r":["XP 3000","Rub 98000"],"u":"405"},{"t":"Jaeger","c":"猎人之路 - 战利品","l":"1","o":["找到并消灭 Reshala","1 次","上交战局中找到的物品： Reshala","的黄金 TT-33 手枪 1 把"],"r":["XP 3000","Rub 98000"],"u":"407"},{"t":"Jaeger","c":"猎人之路 - 正义","l":"1","o":["消灭 Reshala","的保镖 3 名","上交 Reshala","保镖的防弹衣 1 件"],"r":["XP 3000","Rub 98000"],"u":"408"},{"t":"Jaeger","c":"猎人之路 - 森林管理员","l":"1","o":["找到并消灭 Shturman","1 次","搜索 Shturman","的尸体，找到他的储物箱钥匙","上交 Shturman","的宝箱钥匙"],"r":["XP 3000","Rub 98000"],"u":"410"},{"t":"Jaeger","c":"美味香肠","l":"2","o":["搜索Nikitskaya大街的Shestyorochka（Шестёрочка）商店","搜索Primorsky大道的Sparja（Спаржа）商店","搜索Pinewood酒店的Sparja（Спаржа）商店","搜索Concordia区的Goshan商店","上交战局中找到的物品：咸狗牛肉肠 1 个"],"r":["XP 1000","Rub 200000"],"u":"384"},{"t":"Jaeger","c":"别开枪！","l":"2","o":["在塔科夫街区幸存，并通过 Klimov 大街信号弹撤离点撤离"],"r":["XP 10000","Rub 200000"],"u":"385"},{"t":"Jaeger","c":"礼节性拜访","l":"2","o":["在海岸线的废弃村庄里找到村庄主席的房子","在海岸线的废弃村庄里找到渔夫的房子","在海岸线的废弃村庄里找到牧师的房子","以“幸存”状态撤离海岸线"],"r":["XP 10000","Rub 200000"],"u":"394"},{"t":"Jaeger","c":"怀旧之情","l":"2","o":["在疗养院找到 Jaeger","的海景房间","找到并获取 Jaeger","的相册","上交相册"],"r":["XP 10000","Rub 200000"],"u":"395"},{"t":"Jaeger","c":"幽闭恐惧症","l":"2","o":["在工厂的老旧地下通道内消灭任意目标 5 名"],"r":["XP 10000","Rub 200000"],"u":"434"},{"t":"Jaeger","c":"妥善保管","l":"2","o":["在工厂的TerraGroup仓库找到化学品容器","上交化学品容器"],"r":["XP 10000","Rub 200000"],"u":"435"},{"t":"Jaeger","c":"猎人必修课","l":"2","o":["在工厂需要破门的位置找到合适的绊线布设点位","在海关三层宿舍楼楼梯间处找到合适的绊线布设点位"],"r":["XP 10000","Rub 200000"],"u":"437"},{"t":"Jaeger","c":"猎人之路 - 脱销","l":"2","o":["找到并消灭 Killa","1 次","在战局中找到 Killa","的头盔","上交 Killa","的头盔"],"r":["XP 10000","Rub 200000"],"u":"409"},{"t":"Jaeger","c":"猎人之路 - 工厂头目","l":"2","o":["找到并消灭 Tagilla","1 次","上交在战局中找到的BOSS鸭舌帽"],"r":["XP 10000","Rub 200000"],"u":"412"},{"t":"Jaeger","c":"猎人之路 - 大动作","l":"2","o":["找到并消灭 Kaban","1 次"],"r":["XP 10000","Rub 200000"],"u":"423"},{"t":"Jaeger","c":"猎人之路 - 坏警察","l":"2","o":["找到并消灭 Kollontay","1 次","上交在战局中找到的 Kollontay","的警棍 1 个"],"r":["XP 10000","Rub 200000"],"u":"431"},{"t":"Jaeger","c":"储备","l":"3","o":["在储备站找到地下食品仓库","以幸存状态撤离该区域"],"r":["XP 28000","Rub 300000"],"u":"402"},{"t":"Jaeger","c":"鱼塘","l":"3","o":["上交在战局中找到物品：TerraGroup 实验室访问钥匙卡 2 张"],"r":["XP 28000","Rub 300000"],"u":"406"},{"t":"Jaeger","c":"害虫防治","l":"3","o":["消灭储备站兵营大楼周围的 Scav 10 名"],"r":["XP 28000","Rub 300000"],"u":"417"},{"t":"Jaeger","c":"隐士","l":"3","o":["在灯塔找到 Jaeger","朋友的藏身处","找到写给 Jaeger","的留言","上交留言"],"r":["XP 28000","Rub 300000"],"u":"420"},{"t":"Jaeger","c":"卑鄙的外乡人","l":"3","o":["在灯塔消灭 Scav（单场战局内完成）5 名","使用转移功能从灯塔转移到海岸线（在单次战局中）","在海岸线消灭 Scav（单场战局内完成）5 名"],"r":["XP 28000","Rub 300000"],"u":"438"},{"t":"Jaeger","c":"猎人之路 - 周边安全","l":"3","o":["在工厂消灭 PMC 行动人员 6 名"],"r":["XP 28000","Rub 300000"],"u":"401"},{"t":"Jaeger","c":"猎人之路 - 杀戮森林","l":"3","o":["在塔科夫街区、储备站、灯塔或海岸线消灭 Scav 50 名"],"r":["XP 28000","Rub 300000"],"u":"403"},{"t":"Jaeger","c":"猎人之路 - 蒸发密令","l":"3","o":["找到并消灭 Glukhar","上交在战局中找到的 Glukhar","保镖的头盔 2 个"],"r":["XP 28000","Rub 300000"],"u":"413"},{"t":"Jaeger","c":"猎人之路 - 解放","l":"3","o":["击杀 掠夺者","6 名"],"r":["XP 28000","Rub 300000"],"u":"414"},{"t":"Jaeger","c":"猎人之路 - 流浪汉","l":"3","o":["消灭 游荡者","10 名"],"r":["XP 28000","Rub 300000"],"u":"421"},{"t":"Jaeger","c":"猎人之路 - 管理者","l":"3","o":["在灯塔火车站发射一枚黄色信号弹","在灯塔火车站范围内消灭任意目标 6 名"],"r":["XP 28000","Rub 300000"],"u":"389"},{"t":"Jaeger","c":"流浪狗","l":"4","o":["在同场战局中找到并消灭 Knight","在同场战局中找到并消灭 Big Pipe","在同场战局中找到并消灭 Birdeye"],"r":["XP 65000","Rub 490000","+4 隐蔽行动技能等级"],"u":"422"},{"t":"Jaeger","c":"狩猎之旅","l":"4","o":["使用栓动式步枪消灭任意 Boss 20 名"],"r":["XP 65000","Rub 490000","+4 栓动式步枪技能等级","解锁 Jaeger"],"u":"411"},{"t":"Jaeger","c":"屠宰场","l":"4","o":["在日间工厂使用近战武器消灭 Scav 10 名","在塔科夫街区使用近战武器消灭 Scav 10 名","在灯塔使用近战武器消灭 Scav 10 名","在海岸线使用近战武器消灭 Scav 10 名","在储备站使用近战武器消灭 Scav 10 名","在中心区使用近战武器消灭 Scav 10 名"],"r":["XP 65000","Rub 490000","+2 近战技能等级","+4 散弹枪技能等级","解锁 Jaeger"],"u":"390"},{"t":"Jaeger","c":"猎人之路 - 虐待狂","l":"4","o":["找到并消灭 Sanitar","1 次","上交在战局中找到的 Sanitar","背包"],"r":["XP 65000","Rub 490000","+4 隐蔽行动技能等级"],"u":"415"},{"t":"Jaeger","c":"猎人之路 - 控制","l":"4","o":["同场战局中在实验室内消灭任意目标 10 名"],"r":["XP 65000","Rub 490000","+3 投掷物技能等级","解锁 Jaeger"],"u":"739"},{"t":"Jaeger","c":"猎人之路 - 无情杀手","l":"4","o":["找到并消灭 Tagilla","1 次","找到并消灭 Killa","1 次","找到并消灭 Reshala","1 次","找到并消灭 Shturman","1 次","找到并消灭 Glukhar"],"r":["XP 65000","XP 490000","+4 散弹枪技能等级","+4 投掷物技能等级","解锁 Jaeger"],"u":"419"},{"t":"Jaeger","c":"直播 - 3","l":"","o":["在塔科夫街区的老房子里找到血腥直播的拍摄地点","以幸存状态撤离该区域"],"r":["XP 28000","Rub 300000","解锁 Jaeger"],"u":"386"},{"t":"Jaeger","c":"直播 - 4","l":"","o":["在塔科夫街区找到 邪教徒","的聚集处","以幸存状态撤离该区域"],"r":["XP 28000","Rub 300000"],"u":"387"},{"t":"Jaeger","c":"直播 - 5","l":"","o":["找到并消灭 邪教徒","祭司 1 名","在塔科夫街区的Chekannaya大街找到仪式地点","在仪式地点藏匿一把 邪教徒","的刀"],"r":["XP 28000","解锁 Jaeger"],"u":"388"},{"t":"Jaeger","c":"塔科夫神射手 - 1","l":"","o":["使用栓动式步枪在 40 米开外通过机械瞄具击杀 Scav 5 名"],"r":["XP 3000","Rub 98000","解锁 Jaeger","解锁 Jaeger"],"u":"424"},{"t":"Jaeger","c":"塔科夫神射手 - 2","l":"","o":["使用栓动式步枪在 40 米开外命中任意目标的腿部 3 次","使用栓动式步枪在 40 米开外命中任意目标的头部 2 次"],"r":["XP 10000","Rub 200000","解锁 Jaeger","解锁 Jaeger"],"u":"425"},{"t":"Jaeger","c":"塔科夫神射手 - 3","l":"","o":["使用栓动式步枪在 25 米以内消灭 PMC 行动人员 3 名"],"r":["XP 10000","Rub 200000","解锁 Jaeger","解锁 工作台 1级 制作 .366 AP"],"u":"426"},{"t":"Jaeger","c":"塔科夫神射手 - 4","l":"","o":["使用栓动式步枪消灭任意敌对目标 15 名"],"r":["XP 28000","Rub 300000","解锁 Jaeger","解锁 工作台 3级 制作 7.62x54R 7BT1"],"u":"427"},{"t":"Jaeger","c":"塔科夫神射手 - 5","l":"","o":["使用栓动式步枪消灭狙击 Scav 5 名"],"r":["XP 28000","Rub 300000","解锁 Jaeger"],"u":"428"},{"t":"Jaeger","c":"塔科夫神射手 - 6","l":"","o":["使用消音栓动式步枪消灭 PMC 行动人员 5 名"],"r":["XP 65000","Rub 490000","解锁 Jaeger","解锁 Jaeger"],"u":"429"},{"t":"Jaeger","c":"塔科夫神射手 - 7","l":"","o":["使用栓动式步枪一命消灭 PMC 行动人员 5 名"],"r":["XP 65000","解锁 Jaeger"],"u":"430"},{"t":"Jaeger","c":"生存者之路 - 危险零距离","l":"","o":["不穿戴任何防弹衣或插板胸挂消灭 PMC 行动人员 5 名"],"r":["XP 10000","解锁 Jaeger"],"u":"382"},{"t":"Jaeger","c":"生存者之路 - 省吃俭用","l":"","o":["在森林的ZB-016地堡里藏匿IskraIskra 1 包","在森林的ZB-016地堡里藏匿瓶装水 1 平","在森林的ZB-014地堡里藏匿IskraIskra 1 包","在森林的ZB-014地堡里藏匿瓶装水 1 平"],"r":["XP 10000","解锁 Jaeger"],"u":"383"},{"t":"Jaeger","c":"生存者之路 - Zhivchik","l":"","o":["获得“脱水”状态，并维持状态生效 5 分钟时间（工厂除外）","以幸存状态撤离该区域"],"r":["XP 10000","解锁 Jaeger"],"u":"391"},{"t":"Jaeger","c":"生存者之路 - 受伤的野兽","l":"","o":["在疼痛状态下消灭 Scav 3 名"],"r":["XP 10000","解锁 Jaeger"],"u":"392"},{"t":"Jaeger","c":"生存者之路 - 硬汉","l":"","o":["在森林单局内不使用医疗物品的情况下击杀Scav 3 名","完成任务前，你不能使用 任何 医疗物品 和 注射器"],"r":["XP 28000","解锁 Jaeger"],"u":"393"},{"t":"Jaeger","c":"生存者之路 - 冷血","l":"","o":["在“颤栗”效果下爆头消灭 PMC 行动人员 2 名"],"r":["XP 28000","解锁 工作台 3级 制作 12/70 AP-20 穿甲独头弹"],"u":"396"},{"t":"Jaeger","c":"生存者之路 - 瘾君子","l":"","o":["在任意兴奋剂效果影响下，在森林消灭 Scav 15 名"],"r":["XP 65000","Rub 30000","解锁 Jaeger"],"u":"397"},{"t":"Jaeger","c":"生存者之路 - 雕鸮","l":"","o":["不使用任何夜视仪或热成像瞄具，在 21:00-04:00 期间消灭 Scav （工厂除外）6 名"],"r":["XP 28000"],"u":"398"},{"t":"Jaeger","c":"猎人之路 - 支配者","l":"","o":["击杀被闪光弹致盲的PMC 2 名"],"r":["XP 28000","解锁 Ragman"],"u":"404"},{"t":"Jaeger","c":"口干舌燥 - 猎犬行动","l":"","o":["22:00-07:00 期间在海岸线消灭 Scav 12 名"],"r":["XP 10000"],"u":"433"},{"t":"Jaeger","c":"如楔在侧","l":"","o":[],"r":[],"u":""},{"t":"Lightkeeper","c":"守望者箴言","l":"","o":["在迷宫的第一个特殊位置藏匿 邪教徒","的刀","在迷宫的第二个特殊位置藏匿 邪教徒","的刀","在迷宫的第三个特殊位置藏匿 邪教徒","的刀"],"r":["XP 56800","USD 4200"],"u":"456"},{"t":"Lightkeeper","c":"外部订单","l":"","o":["在储备站的机电仓库找到并获取电子干扰器","将该装置藏匿在森林的指定位置"],"r":["XP 46700","USD 4000"],"u":"454"},{"t":"Lightkeeper","c":"简单副业","l":"","o":["在储备站军医院楼顶找到并获取 Lightkeeper","的货箱","将货物藏匿在森林的 Scav 小屋"],"r":["XP 56700","USD 4000"],"u":"455"},{"t":"Lightkeeper","c":"情报之源","l":"","o":["在森林幸存，并通过南部载具撤离点撤离","在海关幸存，并通过宿舍载具撤离点撤离","在立交桥幸存，并通过发电站载具撤离点撤离","在中心区幸存，并通过警方封锁线载具撤离点撤离","在塔科夫街区幸存，并通过Primorsky（Приморский)大道出租车载具撤离点撤离","在塔科夫街区找到第一辆Patrol-A装甲车，并使用 MS2000指示器","标记","在塔科夫街区找到第二辆Patrol-A装甲车，并使用 MS2000指示器","标记"],"r":["解锁 情报中心2级"],"u":"444"},{"t":"Lightkeeper","c":"失踪的线人","l":"","o":["在街区找到线人的藏身处","找到第二个藏身处的钥匙","找到线人备用藏身处","找到线人的日记","将情报上交给 Lightkeeper"],"r":["解锁 Mechanic"],"u":"445"},{"t":"Lightkeeper","c":"抢夺先机","l":"","o":["幸存 撤离灯塔","在灯塔的 游荡者","基地找到伪造的情报","在储备站的维修中心里找到原始情报","将伪造的情报藏匿在BMP-2下方以完成调包","将原始情报带给 Lightkeeper"],"r":["解锁 情报中心 2级 制作 UHF RFID固定式读取器","解锁 Ragman"],"u":"446"},{"t":"Lightkeeper","c":"归还人情","l":"","o":["在森林的大山附近击杀 15 名PMC","将“ 蓝色文件夹","”藏匿在USEC营地的黑色SUV里面","将“ 蓝色文件夹","”藏匿在USEC营地卫星天线附近的箱子里"],"r":[],"u":"447"},{"t":"Lightkeeper","c":"以牙还牙","l":"","o":["找到并消灭 Glukhar","消灭 Glukhar","的 6 名保镖","在雷达站发射一枚 黄色信号弹","在储备站幸存，并从峭壁斜坡撤离"],"r":["解锁 Ragman"],"u":"448"},{"t":"Lightkeeper","c":"挑衅","l":"","o":["在立交桥使用 Ash-12","击杀任何 20 名位于Kiba Arms商店附近的任意敌人","将咸狗牛肉肠藏匿在Kiba Arms商店里","将一瓶“凶狠跑刀崽”私酒藏匿在秘密安全屋里","将厕纸藏匿在秘密物资箱里","以幸存状态撤离该区域"],"r":["解锁 工作台 3级 制作 FLIR RS-32 2.25-9x 35毫米 60Hz热成像步枪瞄准镜"],"u":"449"},{"t":"Lightkeeper","c":"按图索骥","l":"","o":["击杀 掠夺者","20 名","搜索实验室的武器测试区域","搜索实验室的人体实验室","在实验室的主管办公室里找到加密磁带","将磁带上交给 Lightkeeper"],"r":["解锁 Mechanic"],"u":"619"},{"t":"Lightkeeper","c":"观察员","l":"","o":["在塔科夫街区的 Concordia 公寓内找到一处能够俯瞰建筑工地的狙击点","在红色桌子附近藏匿一个 AI .338 LM 战术声音抑制器","在塔科夫街区的 Primorsky 公寓楼内找到一处能够俯瞰十字路口的狙击点","在山羊床底下藏匿一个Trijicon REAP-IR热成像步枪瞄准镜","以 幸存 状态撤离该区域"],"r":["XP 5600","Rub 3500","解锁 工作台 3级 制作 微控制器电路板"],"u":"450"},{"t":"Lightkeeper","c":"大显身手","l":"","o":["达到 10 级的狙击步枪操作技能等级","从350开外击杀 10 名狙击Scav"],"r":[],"u":"451"},{"t":"Lightkeeper","c":"大都会之谜","l":"","o":["在塔科夫街区找到装有货物的载具","清理区域内的 50 名PMC（全图）","用 MS2000指示器","标记货物所在区域","在装甲车队附近发射黄色信号弹以表明任务完成","以 幸存 状态撤离该区域"],"r":["解锁 Mechanic","解锁 Peacekeeper","解锁 Peacekeeper","解锁 Peacekeeper"],"u":"452"},{"t":"Lightkeeper","c":"天降大礼","l":"","o":["找到并获取 竞技场裁判","的黑料","上交找到的信息"],"r":["XP 25500","USD 1000"],"u":"457"},{"t":"Arena","c":"赚点快钱 - 2","l":"","o":["上交战局中找到的物品：饮品 5 个","上交战局中找到的物品：食物 5 个"],"r":["XP 2900"],"u":"458"},{"t":"Arena","c":"收视灵药","l":"","o":["在海关的工厂厂房内安装第一个 WI-FI 摄像头","在海关的工厂厂房内安装第二个 WI-FI 摄像头","在海关的工厂厂房内安装第三个 WI-FI 摄像头","在海关的工厂厂房内安装第四个 WI-FI 摄像头","在海关的工厂厂房内击杀任意目标 15 名"],"r":["XP 32000"],"u":"471"},{"t":"Arena","c":"平衡之力 - 1","l":"","o":["在任意地图使用 Steyr AUG 消灭 Scav 5 名"],"r":["XP 5100"],"u":"459"},{"t":"Arena","c":"平衡之力 - 2","l":"","o":["在任意地图穿戴 PACA 防弹衣击杀 PMC 行动人员 2 名"],"r":["XP 7000"],"u":"4476"},{"t":"Arena","c":"惊喜","l":"","o":["上交战局中找到的物品：四级及以上装甲板 3 个"],"r":["XP 3600"],"u":"460"},{"t":"Arena","c":"声东击西 - 1","l":"","o":["在中心区区域的咖啡馆二楼安放 TP-200 砖型 TNT 3 个"],"r":["XP 5000"],"u":"461"},{"t":"Arena","c":"声东击西 - 2","l":"","o":["在塔科夫街区消灭 Kaban","或 Kollontay","的保镖 2 个","任务进行期间不得击中 Kaban","或 Kollontay"],"r":["XP 10000"],"u":"462"},{"t":"Arena","c":"竞技场差事","l":"","o":["完成任务： 专业热身 - 2","完成任务： 再创新高！- 6","完成任务： 保持领先"],"r":["XP 19500"],"u":"5453"},{"t":"Arena","c":"专业热身 - 1","l":"","o":["在竞技场 LastHero 或 CheckPoint 模式进行一场游戏"],"r":["XP 1800"],"u":"5450"},{"t":"Arena","c":"专业热身 - 2","l":"","o":["在竞技场任意模式击杀 20 名敌人"],"r":["XP 2400"],"u":"5451"},{"t":"Arena","c":"再创新高！- 1","l":"","o":["在竞技场赢得一场 CheckPoint 或 LastHero 模式的战斗"],"r":["XP 2800"],"u":"463"},{"t":"Arena","c":"再创新高！- 2","l":"","o":["在竞技场赢得一场 TeamFight 或 BlastGang 或 CheckPoint 模式的战斗"],"r":["XP 3500"],"u":"464"},{"t":"Arena","c":"再创新高！- 3","l":"","o":["在竞技场赢得两场 TeamFight 或 BlastGang 或 CheckPoint 模式的战斗，至少取得前三名的排名"],"r":["XP 4500"],"u":"465"},{"t":"Arena","c":"再创新高！- 4","l":"","o":["上交卢布 1000000 卢布","在竞技场进行六场 TeamFight 或 BlastGang 或 CheckPoint 模式的战斗，至少赢得其中三场","失败条件：在六场比赛中失败四场"],"r":["XP 5600"],"u":"466"},{"t":"Arena","c":"再创新高！- 5","l":"","o":["在竞技场赢得一场 TeamFight 或 BlastGang 或 CheckPoint 模式的战斗，至少取得前二名的排名"],"r":["XP 6900"],"u":"467"},{"t":"Arena","c":"再创新高！- 6","l":"","o":["在竞技场连续赢得两场 TeamFight 或 BlastGang 或 CheckPoint 模式的战斗","重要提示","做完任务后请前往本体交本任务，这样能直接解锁配方（竞技场交会吞配方）","如果你本体交还是卡配方了：还有个办法，在竞技场先购买短剑，然后本体就可以购买了"],"r":["XP 7700","解锁 竞技场裁判"],"u":"5449"},{"t":"Arena","c":"保持领先","l":"","o":["在竞技场任意模式击杀 75 名敌人"],"r":["XP 9100"],"u":"5452"},{"t":"Arena","c":"良心作祟 - 2","l":"","o":["在竞技场任意游戏模式中消灭敌人 100 名"],"r":["XP 23000"],"u":"469"},{"t":"Arena","c":"两难抉择","l":"","o":["找到并获取 竞技场裁判","的黑料","上交找到的信息"],"r":["XP 18500"],"u":"470"},{"t":"Arena","c":"迟来的奖励","l":"","o":["上交一个 传奇奖章"],"r":[],"u":"472"},{"t":"Arena","c":"First Introduction","l":"","o":["在竞技场玩一局 Last Hero 或 CheckPoint"],"r":["XP 1800","Rub 300000"],"u":"5607"},{"t":"Arena","c":"Gladiator Life - Part 1","l":"","o":["在竞技场 Last Hero 模式下击杀敌人 15 名"],"r":["XP 2100","Rub 22000"],"u":"5608"},{"t":"Arena","c":"Gladiator Life - Part 2","l":"","o":["在竞技场 CheckPoint 模式下占点 5 次"],"r":["XP 2200","Rub 29000"],"u":"5609"},{"t":"Arena","c":"Gladiator Life - Part 3","l":"","o":["在竞技场 CheckPoint 模式下使用 压制 或 突击 击杀敌人 10 名"],"r":["XP 2400","Rub 33500"],"u":"5610"},{"t":"Arena","c":"Gladiator Life - Part 4","l":"","o":["在竞技场 CheckPoint 模式下赢得一场比赛"],"r":["XP 2800","Rub 37500"],"u":"5611"},{"t":"Arena","c":"Gladiator Life - Part 5","l":"","o":["在竞技场 任意 模式下 爆头 击杀敌人 5 名"],"r":["XP 3000","Rub 40000"],"u":"5612"},{"t":"Arena","c":"Gladiator Life - Part 6","l":"","o":["在竞技场 任意 模式下使用 侦查","或 狙击 击杀敌人 10 名"],"r":["XP 3000","Rub 44000"],"u":"5613"},{"t":"Arena","c":"Gladiator Life - Part 7","l":"","o":["在竞技场 任意 模式下使用任意 兴奋剂 或 止痛药","的效果下击杀敌人 5 名"],"r":["XP 3500","Rub 48000"],"u":"5614"},{"t":"Arena","c":"Gladiator Life - Part 8","l":"","o":["在竞技场 TeamFight 或 BlastGang 或 ShootOut 模式下赢得 两 回合"],"r":["XP 3700","Rub 52000"],"u":"5615"},{"t":"Arena","c":"Gladiator Life - Part 9","l":"","o":["在竞技场 Last Hero 模式下以最低第 五 名完成比赛"],"r":["XP 4000","Rub 55000"],"u":"5616"},{"t":"Arena","c":"Gladiator Life - Part 10","l":"","o":["在竞技场 CheckPoint 模式下获得目标 1500 分","在竞技场 CheckPoint 模式下击杀敌人 20 名"],"r":["XP 6900","Rub 59000"],"u":"5617"},{"t":"Arena","c":"Gladiator Life - Final Exam","l":"","o":["在竞技场 TeamFight 或 BlastGang 或 ShootOut 模式下 不死亡 赢得一回合比赛"],"r":["XP 5000","Rub 150000"],"u":"5618"},{"t":"Arena","c":"Gladiator Doping - Part 1","l":"","o":["在竞技场 任意 模式下处于 止痛药","状态下击杀敌人 30 名"],"r":["XP 4500","Rub 155000"],"u":"5619"},{"t":"Arena","c":"Gladiator Doping - Part 2","l":"","o":["在竞技场 任意 模式下使用针剂 Propital","状态下击杀敌人 30 名"],"r":["XP 4500","Rub 165500"],"u":"5620"},{"t":"Arena","c":"Gladiator Doping - Part 3","l":"","o":["在竞技场 任意 模式下使用针剂 人造血（蓝血）注射器","状态下击杀敌人 30 名"],"r":["XP 4500","Rub 170200"],"u":"5621"},{"t":"Arena","c":"Gladiator Doping - Part 4","l":"","o":["在竞技场 任意 模式下使用针剂 Zagustin止血剂","状态下击杀敌人 30 名","在竞技场 任意 模式下使用针剂 Propital","状态下击杀敌人 30 名","在竞技场 任意 模式下使用针剂 米屈肼注射器","状态下击杀敌人 30 名"],"r":["XP 9999","Rub 110000"],"u":"5622"},{"t":"Arena","c":"Professional - Part 1","l":"","o":["在竞技场 BlastGang 模式下 安放 或 拆除 炸弹包 3 次"],"r":["XP 7500","Rub 66000"],"u":"5623"},{"t":"Arena","c":"Professional - Part 2","l":"","o":["在竞技场 BlastGang 或 TeamFight 模式下以最低第 四 名赢得比赛"],"r":["XP 7500","Rub 71000"],"u":"5624"},{"t":"Arena","c":"Professional - Part 3","l":"","o":["在竞技场 BlastGang 或 TeamFight 模式下获得 回合 MVP"],"r":["XP 15000","Rub 111000"],"u":"5625"},{"t":"Arena","c":"Jack of All Trades","l":"","o":["在竞技场 任意 模式下使用 突击 击杀敌人 20 名","在竞技场 任意 模式下使用 压制 击杀敌人 20 名","在竞技场 任意 模式下使用 侦查","击杀敌人 20 名","在竞技场 任意 模式下使用 狙击 击杀敌人 20 名"],"r":["XP 12500","Rub 80000"],"u":"5635"},{"t":"Arena","c":"All for the Show - Heroism","l":"","o":["在竞技场 任意 模式下以 小流血 或 大出血 状态下击杀敌人 5 名"],"r":["XP 10000","Rub 60000"],"u":"5636"},{"t":"Arena","c":"Jack of All Trades - Pro","l":"","o":["在竞技场 BlastGang 或 TeamFight 模式下用 突击 赢得一场 回合","在竞技场 BlastGang 或 TeamFight 模式下用 压制 赢得一场 回合","在竞技场 BlastGang 或 TeamFight 模式下用 侦查","赢得一场 回合","在竞技场 BlastGang 或 TeamFight 模式下用 狙击 赢得一场 回合"],"r":["XP 12000","Rub 64400"],"u":"5641"},{"t":"Arena","c":"All for the Show - Soldier","l":"","o":["在竞技场 CheckPoint 模式下佩戴 黑色贝雷帽","或 蓝色贝雷帽","或 橄榄绿贝雷帽","击杀敌人 50 名"],"r":["XP 7500","Rub 60000"],"u":"5642"},{"t":"Arena","c":"I Am Speed - Part 1","l":"","o":["在竞技场 任意 模式下使用任意 武器 在10秒内连杀两人 10 次"],"r":["XP 32000","Rub 88200"],"u":"5647"},{"t":"Arena","c":"I Am Speed - Part 2","l":"","o":["在竞技场 CheckPoint 模式下单局占点 12 次"],"r":["XP 32000","Rub 88200"],"u":"5648"},{"t":"Arena","c":"I Am Speed - Part 3","l":"","o":["在竞技场 CheckPoint 或 BlastGang 或 LastHero 或 TeamFight 模式下单局击杀敌人 25 名"],"r":["XP 40000","Rub 99100"],"u":"5649"},{"t":"Arena","c":"All for the Show - Supremacy","l":"","o":["在竞技场 任意 模式下使用 AK-12 5.45x39突击步枪","击杀敌人 5 名或以上并获得 MVP"],"r":["XP 28000"],"u":"5650"},{"t":"Arena","c":"Superhuman","l":"","o":["在竞技场 Last Hero 模式下使用任意 近战武器 且佩戴 食尸鬼面具","击杀敌人 1 名"],"r":["Rub 222222"],"u":"5652"},{"t":"BTR","c":"坚持到底","l":"","o":["消灭 游荡者","30 名"],"r":["XP 25000","Rub 120400"],"u":"5581"},{"t":"BTR","c":"拯救大兵罗曼","l":"","o":["在森林使用 MS2000 指示器标记前往灯塔的转移点","使用转移功能从森林转移到灯塔","在灯塔使用 MS2000 指示器标记前往森林的转移点"],"r":["XP 42000"],"u":"5582"},{"t":"BTR","c":"苦涩的胜利","l":"","o":["上交物品：“凶狠跑刀崽”私酒 2 瓶","上交物品：黑麦面包块 4 个","上交物品：Tarkovskaya瓶装伏特加 4 瓶","上交物品：咸狗牛肉肠 2 个","与 BTR","司机对话","幸存撤离战局","上交的物品不需要代勾"],"r":["XP 30000"],"u":"5583"},{"t":"BTR","c":"宿醉","l":"","o":["返回 BTR","司机处，了解司机和走私者的谈判情况","不需要上交任何物品，对话即可完成任务"],"r":["XP 60000"],"u":"5584"},{"t":"BTR","c":"感官分析 - 2","l":"","o":["上交物品：“凶狠跑刀崽”私酒 1 瓶","上交的物品不需要代勾"],"r":["XP 6800","Rub 32000"],"u":"485"},{"t":"BTR","c":"货运延误 - 2","l":"","o":["找到并侦察森林铁路技术站的仓库","找到并侦察森林铁路技术站的办公室","找到并侦察森林铁路技术站的车库","完成任务： 一臂之力"],"r":["XP 11500","Rub 84000"],"u":"473"},{"t":"BTR","c":"风火轮","l":"","o":["找到 BTR","的备用路轮，并使用 MS2000 标记器标记"],"r":["XP 24300","Rub 116000"],"u":"474"},{"t":"BTR","c":"风火轮 - 再次出发","l":"","o":["在储备站找到 BTR","的备用路轮，并使用 MS2000 标记器标记"],"r":["XP 13500","Rub 84000"],"u":"475"},{"t":"BTR","c":"现世报","l":"","o":["在森林击杀 Scav 10 名"],"r":["XP 16000","Rub 85000"],"u":"476"},{"t":"BTR","c":"必然回应","l":"","o":["在森林击杀Scav 5 名","使用转移功能从森林转移到储备站","在储备站击杀Scav 5 名"],"r":["XP 15500","Rub 82000"],"u":"478"},{"t":"BTR","c":"奠定基石","l":"","o":["卖任何物品给 Prapor","50 件","卖任何物品给 Ragman","50 件","卖任何物品给 Peacekeeper","50 件"],"r":["XP 14500","Rub 126000"],"u":"477"},{"t":"BTR","c":"自然交换","l":"","o":["将第一个金属燃料桶藏匿在海岸线的走私者基地","将第二个金属燃料桶藏匿在海岸线的走私者营地"],"r":["XP 26800","Rub 96000"],"u":"479"},{"t":"BTR","c":"投石问路","l":"","o":["在灯塔找到峭壁通路的第一段，并使用 MS2000 指示器标记","在灯塔找到峭壁通路的第二段，并使用 MS2000 指示器标记","在灯塔找到峭壁通路的第三段，并使用 MS2000 指示器标记","在灯塔找到峭壁通路的第四段，并使用 MS2000 指示器标记"],"r":["XP 13200","Rub 85000"],"u":"480"},{"t":"BTR","c":"电池换新","l":"","o":["上交物品：6-STEN-140-M 军用电池","上交的物品不需要代勾"],"r":["XP 58700","Rub 284000"],"u":"481"},{"t":"BTR","c":"对空遮断","l":"","o":["在森林指定交货点取得包裹","上交包裹"],"r":["XP 25400","Rub 96000","解锁 Mechanic"],"u":"482"},{"t":"BTR","c":"反将一军","l":"","o":["在森林的第一个 RPG 弹药箱藏匿一个 VOG-25 手榴弹","在森林的第二个 RPG 弹药箱藏匿一个 VOG-25 手榴弹","在森林的第三个 RPG 弹药箱藏匿一个 VOG-25 手榴弹"],"r":["XP 23400","Rub 175000"],"u":"483"},{"t":"BTR","c":"独立的代价","l":"","o":["在海关找到并获取控告信","使用转移功能从海关转移到储备站","将信件藏匿在储备站驻军总部的三楼","使用转移功能从储备站转移到森林","在森林击杀任意目标 3 名","使用转移功能从森林转移到灯塔","在灯塔火车站仓库发射一枚黄色信号弹","在灯塔码头发射一枚黄色信号弹","在完成其他目标的同时消灭 10名 Scav"],"r":["XP 85400","Rub 300000","解锁 Mechanic","解锁 Mechanic"],"u":"484"}];
+const NAMES = {"枪匠 - 8":"Gunsmith - Part 8","枪匠 - 11":"Gunsmith - Part 11","奢侈无罪 - 1":"Living High is Not a Crime - Part 1","花盆剑圣":"Make a Notch","客户沟通":"Customer Communication","Kappa之路":"The Kappa Path","直播 - 2":"Broadcast - Part 2","狩猎之旅":"Hunting Trip","暗度陈仓":"No Fuss Needed","小事大帮忙":"The Blood of War - Part 3","湿活 - 5":"Wet Job - Part 5","借刀杀人":"Setup","美味香肠":"The Delicious Sausage","你的车该洗了":"Your Car Needs a Service","苏共之辉 - 1":"Glory to CPSU - Part 1","卫生标准 - 1":"Sanitary Standards - Part 1","猎人之路 - 愤怒守望者":"The Huntsman Path - Evil Watchman","打靶训练":"Shooting Cans","敲诈者":"The Extortionist","介绍":"Introduction","网络供应商 - 2":"Network Provider - Part 2","破镜重圆 - 软件":"Make Amends - Software","特殊装备":"Special Equipment","老谋治老狗":"Old Dog With Old tricks","观光客":"Hustle","供应商":"Supplier","兽医也是医 - 1":"Pets Won\u0027t Need It - Part 1","大都会之谜":"Trouble in the Big City","危机四伏塔科夫":"Rough Tarkov","生存者之路 - Junkie":"The Survivalist Path - Junkie","无中生有 - 塔科夫街区":"Revision - Streets of Tarkov","停战！":"Stop the Fight!","同事 - 1":"Colleagues - Part 1","试探 - 2":"Assessment - Part 2","生存者之路 - 战地军医":"The Survivalist Path - Combat Medic","彻夜难眠":"Insomnia","酒瘾":"Booze","屠宰场":"Slaughterhouse","以牙还牙":"Payback","疗养之旅 - 7":"Spa Tour - Part 7","塔科夫神射手 - 1":"The Tarkov Shooter - Part 1","欢迎来到塔科夫！":"Welcome to Tarkov","亡羊补牢 - 收藏":"Compensation for Damage - Collection","无中生有 - 灯塔":"Revision - Lighthouse","缉毒行动":"Drug Trafficking","枪匠 - 2":"Gunsmith - Part 2","软禁 - 2":"House Arrest - Part 2","开发者之谜 - 1":"Developer\u0027s Secrets - Part 1","维他命 - 2":"Vitamins - Part 2","芭蕾舞者":"Ballet Lover","兽医也是医 - 2":"Pets Won\u0027t Need It - Part 2","供给计划":"Supply Plans","救援行动":"Saving the Mole","垃圾佬":"Scavenger","首秀":"Debut","信号 - 4":"Signal - Part 4","成人之“美”":"U-SUCC","试驾 - 5":"Test Drive - Part 5","塔科夫对决":"This Is a Tarkov Showdown","猎人之路 - 流浪汉":"The Huntsman Path - Outcasts","租借法案 - 1":"Lend-Lease - Part 1","故事结束":"Fairy Tale Showdown","亡羊补牢 - Wergild":"Compensation for Damage - Wergild","绝不上当":"Nothing Fishy About This","街头大力士":"Local Strong Man","善良的雪姑娘":"A Kind Snow Maiden","卫生标准 - 2":"Sanitary Standards - Part 2","医疗隐私 - 6":"Health Care Privacy - Part 6","试探 - 3":"Assessment - Part 3","开发者之谜 - 2":"Developer\u0027s Secrets - Part 2","破镜重圆 - 隔离":"Make Amends - Quarantine","潮流害死猫":"What Not To Wear","城市的解药":"Urban Medicine","奢靡人生":"Luxurious Life","蛋卷冰淇淋":"Ice Cream Cones","无礼相送":"No Gifts for You","从容不迫":"Ready for Anything","人道主义援助":"Humanitarian Supplies","猎人之路 - 脱销":"The Huntsman Path - Sellout","一路奔向危险地带":"Highway to the Danger Zone","杀鸡儆猴":"Hint","最好的差事":"Best Job in the World","禁止打劫":"No Swiping","疗养之旅 - 5":"Spa Tour - Part 5","锯木厂之王":"King of the Sawmill","时尚领主":"Art of Style","破镜重圆 - 收买人心":"Make Amends - Buyout","小菜一碟":"Easy Job - Part 1","塔科夫神射手 - 4":"The Tarkov Shooter - Part 4","直播 - 3":"Broadcast - Part 3","老赖":"Debtor","火线速递":"Hot Delivery","绿色通道":"Green Corridor","急诊室的故事":"Ambulances Again","枪匠 - 15":"Gunsmith - Part 15","邪教":"The Cult - Part 1","妥善保管":"Dragnet","直播 - 1":"Broadcast - Part 1","我爱我家":"Home Comfort","地堡 - 2":"The Bunker - Part 2","派对筹办":"Party Preparations","滑稽守墓人":"Funny Graveyard Keeper","集大成者":"Jack of All Trades","枪匠 - 20":"Gunsmith - Part 20","医疗隐私 - 2":"Health Care Privacy - Part 2","断章取义":"That\u0027s What She Said","安宁疗养院":"Sanatorium Orderly","疗养之旅 - 3":"Spa Tour - Part 3","救护车":"Ambulance","战利品":"Trophies","高保真":"Audiophile","运动员":"Athlete","刨根问底":"All Is Revealed","武器大师":"Gun Connoisseur","医疗隐私 - 4":"Health Care Privacy - Part 4","我听见了黑暗之声":"I Hear the Voice of Darkness","出警 - 检票":"Gendarmerie - Tickets, Please","暴怒“盲”":"Blind Fury","财不外露":"Properties All Around","麻醉":"Anesthesia","战斗试验":"Action test","止痛药":"Painkiller","猎人之路 - 虐待狂":"The Huntsman Path - Sadist","猎人之路 - 管理者":"The Huntsman Path - Administrator","导师":"Mentor","进口":"Import","大音希声":"Silent Caliber","苏共之辉 - 2":"Glory to CPSU - Part 2","屋顶战神":"Kings of the Rooftops","枪匠 - 14":"Gunsmith - Part 14","不良嗜好":"Bad Habit","自食其“刃”":"Killer of Killers","水瓶座行动 - 1":"Operation Aquarius - Part 1","西式质检":"Western Quality Standards","彻底缓解":"Complete Remission","瓮中捉鳖":"Grouse Hunting","医疗隐私 - 1":"Health Care Privacy - Part 1","大客户":"Big Customer","纺织业 - 1":"Textile - Part 1","屡教不改":"True Crime","枪匠 - 13":"Gunsmith - Part 13","“熊”心壮志":"BEAR With Me","枪匠 - 5":"Gunsmith - Part 5","生存者之路 - 冷血":"The Survivalist Path - Cold Blooded","四海为家":"Vagabond","盛装杀戮":"Dressed to Kill","占山为王":"Our Own Land","猎人必修课":"Every Hunter Knows This","猎人之路 - 支配者":"The Huntsman Path - Controller","蒙眼守望者":"The Blind Watcher","塔科夫神射手 - 8":"The Tarkov Shooter - Part 8","损失惨重":"Database - Part 2","圣诞老人已黑化":"Bad Santa","别开枪！":"Cease Fire!","试驾 - 1":"Test Drive - Part 1","叛无所依":"No Place for Renegades","租借法案 - 2":"Lend-Lease - Part 2","长路漫漫":"Long Road","亡羊补牢 - 赌注":"Compensation for Damage - Wager","最烂的差事":"Worst Job in the World","化学橱柜":"Chemistry Closet","枪匠 - 10":"Gunsmith - Part 10","挖矿":"Farming - Part 3","无声锯木厂":"Silence of the Sawmill","枪匠 - 19":"Gunsmith - Part 19","枪匠 - 1":"Gunsmith - Part 1","风波":"Stirrup","库存清单":"Database - Part 1","TerraGroup 雇员":"TerraGroup Employee","试驾 - 4":"Test Drive - Part 4","枪匠 - 特殊订单":"Gunsmith - Special Order","重获信任":"Trust Regain","疾速追杀":"John\u0027s Heir","猎人之路 - 物资":"The Huntsman Path - Trophy","维他命 - 1":"Vitamins - Part 1","外部信任 - 1":"Overseas Trust - Part 1","枪匠 - 12":"Gunsmith - Part 12","公司福报":"Developer\u0027s Secrets - Part 1","健全替代":"A Healthy Alternative","成功的关键":"The Key to Success","猎人之路 - 邪恶守望者":"The Huntsman Path - Evil Watchman","同事 - 2":"Colleagues - Part 2","试探 - 1":"Assessment - Part 1","供需关系":"Supply and Demand","圆环舞":"Khorovod","雪中送炭":"A Fuel Matter","向导":"The Guide","枪匠 - 7":"Gunsmith - Part 7","感恩的心":"Gratitude","7号杀手":"Killer7","枪匠 - 18":"Gunsmith - Part 18","疗养之旅 - 6":"Spa Tour - Part 6","急先锋":"The Courier","数据库 - 1":"Database - Part 1","暗中破坏":"Kind of Sabotage","生存者之路 - 座头市":"The Survivalist Path - Zatoichi","猎人之路 - 坏警察":"The Huntsman Path - Crooked Cop","大甩卖":"Big Sale","不祥的预感":"Bad Feeling","掷弹兵":"Grenadier","邪教 - 1":"The Cult - Part 1","破镜重圆 - 安保":"Make Amends - Security","枪匠 - 22":"Gunsmith - Part 22","西方来客 - 1":"Friend From the West - Part 1","病历":"Disease History","长期合作":"Long Line","短缺":"Shortage","夜间扫荡":"Night Sweep","人口普查":"Population Census","生存者之路 -  雕鸮":"The Survivalist Path - Eagle-Owl","猎人之路 - 正义":"The Huntsman Path - Justice","滚雪球":"Snowball","生存者之路 - 危险零距离":"The Survivalist Path - Unprotected but Dangerous","维和任务":"Peacekeeping Mission","带血的水":"Operation Aquarius - Part 2","临行密密缝 - 4":"Sew it Good - Part 4","坚如燧石":"Flint","百里挑一":"Cream of the Crop","坏兄弟":"You Are Not My Brother","来去匆匆":"In and Out","此路不通":"Road Closed","煽风点火":"Disrupting the Party","红色之书":"The Red Book","害虫防治":"Pest Control","破镜重圆 - 大扫除":"Make Amends - Sweep Up","神秘货物 - 4":"Cargo X - Part 4","枪匠 - 9":"Gunsmith - Part 9","生存者之路 - 省吃俭用":"The Survivalist Path - Thrifty","猎人之路 - 无情杀手":"The Huntsman Path - Relentless","化工厂的秘密":"Secrets of Polikhim","猎人之路 - 周边安全":"The Huntsman Path - Secured Perimeter","战争之血 - 3":"The Blood of War - Part 3","挖矿 - 3":"Farming - Part 3","探望":"Surveillance","是不是忘了点啥？":"Missing Something?","失踪的线人":"Missing Informant","疗养之旅 - 1":"Spa Tour - Part 1","枪匠 - 23":"Gunsmith - Part 23","风流倜傥":"Charisma Brings Success","商业机密":"Corporate Secrets","归还人情":"Return the Favor","枪匠 - 25":"Gunsmith - Part 25","马拉松":"Marathon","化学品 - 3":"Chemical - Part 3","幽闭恐惧症":"Claustrophobia","化学品 - 2":"Chemical - Part 2","化学品 - 1":"Chemical - Part 1","枪匠 - 3":"Gunsmith - Part 3","神秘货物 - 2":"Cargo X - Part 2","医疗隐私 - 5":"Health Care Privacy - Part 5","天神射手":"A Shooter Born in Heaven","纺织业 - 2":"Textile - Part 2","疗养之旅 - 2":"Spa Tour - Part 2","软禁 - 1":"House Arrest - Part 1","锤子和镰刀！":"Hammer and Scythe","致命校准":"Calibration","储备":"Reserve","生意至上":"Shady Business","怀旧之情":"Nostalgia","水瓶座行动 - 2":"Operation Aquarius - Part 2","“理所应得”":"Ours by Right","塔科夫神射手 - 3":"The Tarkov Shooter - Part 3","急单":"Crisis","狙击疯魔":"Psycho Sniper","神秘货物 - 1":"Cargo X - Part 1","反抗":"Counteraction","发财计划":"Pyramid Scheme","惩罚者 - 3":"The Punisher - Part 3","品“酒”师":"Cocktail Tasting","首席大臣":"Cardinal Richelieu","信号 - 2":"Signal - Part 2","左右为难":"A Healthy Alternative","谁才是医生？":"Who Called the Doctor?","急救护理":"Emergency Care","挖矿 - 1":"Farming - Part 1","猎人之路 - 控制者":"The Huntsman Path - Controller","重要伤员":"Important Patient","一信之缘":"You\u0027ve Got Mail","硝烟野餐":"Shootout Picnic","酒壮人胆":"Drunken Master","罪证":"Bad Rep Evidence","灯塔之匙":"Key to the Tower","汽车修理":"Car Repair","挑衅":"Provocation","哈雷大法好":"Harley Forever","化学品 - 4":"Chemical - Part 4","私人诊所":"Private Clinic","收买人心":"Loyalty Buyout","那个时髦的人":"The Stylish One","愿者上钩":"Chumming","U盘里有什么？":"What’s on the Flash Drive?","枪匠 - 24":"Gunsmith - Part 24","为了圣诞树！":"To the Tree!","猎人":"Hunter","悬结已解":"One Less Loose End","ULTRA霸主":"Master of ULTRA","猎人之路 - 工厂头目":"The Huntsman Path - Factory Chief","试驾 - 2":"Test Drive - Part 2","圈内人":"Insider","美“轮”美奂":"All-Wheel Drive","礼节性拜访":"Courtesy Visit","情报之源":"Information Source","快枪手":"Swift One","猎人之路 - 森林管理员":"The Huntsman Path - Woods Keeper","交际困难":"Communication Difficulties","湿活 - 4":"Wet Job - Part 4","邪教 - 2":"The Cult - Part 2","求救信":"Letters","初露锋芒":"Prestigious","消失的线人":"Lost Contact","破镜重圆":"Make Amends","杀戮之王！":"Long Live the King!","直播 - 5":"Broadcast - Part 5","好吃到上瘾 - 2":"Beyond the Red Meat - Part 2","你就是克里斯":"Chris\u0027s Heir","失踪货物":"Missing Cargo","生存者之路 - 硬汉":"The Survivalist Path - Tough Guy","战争之血 - 1":"The Blood of War - Part 1","样品":"Samples","数据库 - 2":"Database - Part 2","出口在此":"Exit Here","枪匠 - 16":"Gunsmith - Part 16","临行密密缝 - 3":"Sew it Good - Part 3","枪匠 - 21":"Gunsmith - Part 21","悬案又起":"Another Cold Case","灭虫服务":"Decontamination Service","无意冒犯":"No Offence","地堡 - 1":"The Bunker - Part 1","物尽其用":"Surplus Goods","生存者之路 - 受伤的野兽":"The Survivalist Path - Wounded Beast","黑天鹅计划":"Black Swan","破镜重圆 - 装备":"Make Amends - Equipment","肮脏游戏":"Rigged Game","试驾 - 3":"Test Drive - Part 3","观察员":"Spotter","大放送之夜":"Sales Night","清点库存":"Inventory Check","恐吓者":"Intimidator","一天一个苹果 - 医生远离我":"An Apple a Day Keeps the Doctor Away","未雨绸缪":"Before the Rain","隔墙有“眼”":"The Walls Have Eyes","网络供应商 - 1":"Network Provider - Part 1","渔具":"Fishing Gear","旅行家":"Traveler","抢夺先机":"Snatch","有始有终":"Marathon - From Beginning To End","搜索任务":"Search Mission","和平之烟":"Smoke the Peace Pipe","三人成虎！":"Now There Are Three of Them!","背景调查":"Background Check","往事速递":"Delivery From the Past","药剂师":"Pharmacist","惩罚者 - 6":"The Punisher - Part 6","冬日之灵":"Maslenitsa","机不可失":"Out of Time","功业皆浮云":"Time To Clean My Karma","隐士":"The Hermit","猎人之路 - 蒸发密令 - 2":"The Huntsman Path - Eraser - Part 2","清洁工":"The Cleaner","咚咚咚":"Knock-Knock","流浪狗":"Stray Dogs","护送":"Escort","鱼塘":"Fishing Place","外部信任 - 2":"Overseas Trust - Part 2","猎人之路 - 大动作":"The Huntsman Path - Big Game","临行密密缝 - 1":"Sew it Good - Part 1","赴汤蹈火":"Into the Inferno","新路线，新机遇":"New Day, New Paths","枪匠 - 17":"Gunsmith - Part 17","希波克拉底誓言":"Hippocratic Oath","街区之下":"Beneath The Streets","绝密技术":"Classified Technologies","新手上路":"First in Line","战争之血 - 2":"The Blood of War - Part 2","小菜一碟 - 2":"Easy Job - Part 2","出警 - 商场":"Gendarmerie - Mall Cop","财务总监":"Supervisor","头号机密":"Top Secret","PMC挚友":"PMC\u0027s Best Friend","安全通道":"Safe Corridor","临行密密缝 - 2":"Sew it Good - Part 2","再入轮回":"Samsara Wheel Spins Again","海边假期":"Seaside Vacation","微型客车":"Minibus","中门对狙":"Now That\u0027s a Good Shot","邮递员派特 - 2":"Postman Pat - Part 2","神秘货物 - 3":"Cargo X - Part 3","奢侈无罪 - 2":"Living High is Not a Crime - Part 2","湿活 - 3":"Wet Job - Part 3","挖矿 - 4":"Farming - Part 4","枪匠 - 4":"Gunsmith - Part 4","游历塔科夫":"Marathon - Sightseeing","正义执行":"Justice","左右逢源":"Perfect Mediator","特别联络":"Special Comms","直播 - 4":"Broadcast - Part 4","邂逅":"Getting Acquainted","叉车拼多多":"Forklift Certified","萤火虫":"Firefly","塔科夫神射手 - 2":"The Tarkov Shooter - Part 2","医疗隐私 - 3":"Health Care Privacy - Part 3","最后的细枝末节":"One Less Loose End","邮递员派特 - 1":"Postman Pat - Part 1","出警 - 巡逻":"Gendarmerie - District Patrol","卑鄙的外乡人":"Forester\u0027s Duty","暗中掩护":"Provide Cover","稳定信号":"Steady Signal","Polikhim流浪汉":"Polikhim Hobo","寻血猎犬":"Bloodhounds","猎虎行动":"Tigr Safari","探囊取物":"Shaking Up the Teller","出于好奇":"Out of Curiosity","猎人之路 - 杀戮森林":"The Huntsman Path - Forest Cleaning","占有者":"Possessor","湿活 - 6":"Wet Job - Part 6","熟人":"Acquaintance","湿活 - 2":"Wet Job - Part 2","侦查":"Scout","肥料":"Fertilizers","名震一方":"More Prestigious","挖矿 - 2":"Farming - Part 2","收藏家":"Collector","多鱼之漏":"Documents","猎人之路 - 蒸发密令":"The Huntsman Path - Eraser - Part 1","能源危机":"Energy Crisis","花花公子":"Dandies","高端竞赛":"High Competition","疗养之旅 - 4":"Spa Tour - Part 4","金色失物":"Golden Swag","救赎之道":"A Key to Salvation","掠地攻城":"Capturing Outposts","西方来客 - 2":"Friend From the West - Part 2","迷航无归":"Lost","塔科夫神射手 - 5":"The Tarkov Shooter - Part 5","按图索骥":"Following the Bread Crumbs","危险之路":"Dangerous Road","情报就是力量":"Informed Means Armed","亡羊补牢 - 酒保":"Compensation for Damage - Barkeep","此路是我开！":"Know Your Place!","一般储备":"General Wares","惩罚者 - 2":"The Punisher - Part 2","神秘的门":"The Door","无中生有 - 储备站":"Revision - Reserve","审计":"Audit","破铜烂铁":"Scrap Metal","你被盯上了":"Watching You","抉择":"The Choice","踩点行动":"Reconnaissance","快车初体验":"Burning Rubber","生存者之路 - Zhivchik":"The Survivalist Path - Zhivchik","东窗事发":"Failed Setup","和 平 精 英":"INVOLVED IN PEACE","再寻救护车":"Ambulances Again","设施维护":"Capacity Check","后门":"Back Door","信号 - 3":"Signal - Part 3","湿活 - 1":"Wet Job - Part 1","亡羊补牢 - 信任":"Compensation for Damage - Trust","惩罚者 - 4":"The Punisher - Part 4","吹哨人":"Tourists","同事":"Colleagues - Part 1","惩罚者 - 1":"The Punisher - Part 1","小菜一碟 - 1":"Easy Job - Part 1","人口过剩":"Overpopulation","信号 - 1":"Signal - Part 1","谈判失败":"Deal to Make","管制材料":"Regulated Materials","塔科夫神射手 - 6":"The Tarkov Shooter - Part 6","同事 - 3":"Colleagues - Part 3","石油存储":"BP Depot","生存大师":"Survivor","惩罚者 - 大丰收":"The Punisher. Harvest","惩罚者 - 5":"The Punisher - Part 5","大显身手":"Make an Impression","现在谁是大哥？":"Call Your Brother","好吃到上瘾 - 1":"Beyond the Red Meat - Part 1","枪匠 - 6":"Gunsmith - Part 6","鹰眼":"Eagle Eye","塔科夫神射手 - 7":"The Tarkov Shooter - Part 7","致命结果":"Fatal Outcome"};
+const MAPDEF = {
+  '海关': { note:'南侧为 PMC 常见出生方向，北侧铁路与 ZB 掩体', lm:[
+    {n:'三层宿舍', kw:['宿舍','203','214','218','220','303'], x:30, y:56},
+    {n:'加油站', kw:['加油站'], x:20, y:46},
+    {n:'油罐车', kw:['油罐车'], x:26, y:38},
+    {n:'工棚 / 仓库', kw:['工棚','仓库'], x:45, y:38},
+    {n:'车库', kw:['车库'], x:36, y:72},
+    {n:'集装箱区', kw:['集装箱'], x:50, y:70},
+    {n:'Tarcone 办公室', kw:['Tarcone','主管办公室','关口'], x:62, y:60},
+    {n:'化学车间 / 厂区', kw:['化学车间','厂区','化学品'], x:66, y:50},
+    {n:'ZB-014', kw:['ZB-014'], x:60, y:24},
+    {n:'军事检查站', kw:['军事检查站','检查站'], x:76, y:32},
+    {n:'铁路通道', kw:['铁路'], x:52, y:16},
+    {n:'大桥', kw:['大桥'], x:88, y:48},
+    {n:'Scav 营地', kw:['Scav 营地','营地'], x:14, y:28},
+    {n:'岩石通道', kw:['岩石通道'], x:12, y:64}
+  ]},
+  '海岸线': { note:'疗养院是全图核心热点，东西两翼都要跑', lm:[
+    {n:'疗养院西楼', kw:['西楼','西翼','疗养院'], x:40, y:44},
+    {n:'疗养院东楼', kw:['东楼','东翼','321'], x:50, y:44},
+    {n:'水泵房', kw:['水泵房','泵房'], x:56, y:56},
+    {n:'码头', kw:['码头'], x:64, y:72},
+    {n:'别墅', kw:['别墅'], x:28, y:64},
+    {n:'沉没村庄', kw:['沉没村庄','沉陷村庄','村庄'], x:18, y:76},
+    {n:'气象站', kw:['气象站'], x:72, y:28},
+    {n:'加油站', kw:['加油站'], x:80, y:50},
+    {n:'木屋', kw:['木屋'], x:34, y:28}
+  ]},
+  '森林': { note:'开阔地形，注意远距离栓狙', lm:[
+    {n:'锯木厂', kw:['锯木厂','伐木场'], x:50, y:44},
+    {n:'Scav 营地', kw:['Scav 营地','营地'], x:28, y:34},
+    {n:'猎人小屋', kw:['小屋'], x:56, y:36},
+    {n:'RUAF 大门', kw:['RUAF'], x:72, y:60},
+    {n:'山下地堡', kw:['地堡'], x:24, y:56},
+    {n:'河边村庄', kw:['河边村庄','村庄'], x:40, y:72}
+  ]},
+  '工厂': { note:'局时短、遭遇密，刷击杀类任务最快', lm:[
+    {n:'3 号门', kw:['3 号门','三号门','3号门'], x:28, y:28},
+    {n:'起重机驾驶室', kw:['起重机'], x:56, y:38},
+    {n:'办公区走廊', kw:['办公区','办公室'], x:68, y:58},
+    {n:'医学实验室', kw:['医学实验室'], x:40, y:64},
+    {n:'庭院大门', kw:['庭院大门'], x:18, y:70},
+    {n:'隧道', kw:['隧道'], x:76, y:28}
+  ]},
+  '立交桥': { note:'纯捞金图，三大超市 + KIBA 枪店', lm:[
+    {n:'KIBA 枪店', kw:['KIBA','Kiba'], x:44, y:30},
+    {n:'IDEA', kw:['IDEA'], x:32, y:42},
+    {n:'OLI', kw:['OLI'], x:62, y:42},
+    {n:'Goshan', kw:['Goshan'], x:50, y:64},
+    {n:'ULTRA', kw:['ULTRA'], x:38, y:52},
+    {n:'停车场', kw:['停车场'], x:76, y:60},
+    {n:'电力站', kw:['电力站','发电'], x:18, y:60}
+  ]},
+  '储备站': { note:'Raider 随机刷新，别轻装进', lm:[
+    {n:'地堡控制室', kw:['地堡','控制室'], x:50, y:48},
+    {n:'白兵楼（2 号军营）', kw:['2 号军营','白兵楼'], x:34, y:38},
+    {n:'黑兵楼（1 号军营）', kw:['1 号军营','黑兵楼'], x:40, y:62},
+    {n:'白王楼', kw:['空中管制','白王楼'], x:64, y:36},
+    {n:'军医院', kw:['军医院','白主教'], x:28, y:54},
+    {n:'学院大楼', kw:['学院大楼','黑主教'], x:62, y:62},
+    {n:'LAV 装甲车', kw:['LAV'], x:74, y:50},
+    {n:'地下仓库', kw:['地下仓库','RB-PSP','RB-PSV'], x:50, y:74}
+  ]},
+  '灯塔': { note:'敢死队（Rogues）看守污水处理厂', lm:[
+    {n:'污水处理厂', kw:['污水处理厂'], x:44, y:38},
+    {n:'度假村', kw:['度假村'], x:60, y:66},
+    {n:'网球场', kw:['网球场'], x:68, y:72},
+    {n:'水上别墅', kw:['水上别墅','别墅'], x:74, y:54},
+    {n:'主路', kw:['主路'], x:32, y:60},
+    {n:'灯塔岛', kw:['灯塔岛'], x:84, y:34}
+  ]},
+  '街区': { note:'城市图，垂直空间多，注意楼顶', lm:[
+    {n:'Primorsky 大街', kw:['Primorsky'], x:46, y:50},
+    {n:'Cardinal 公寓', kw:['Cardinal'], x:66, y:34},
+    {n:'TerraGroup 办公室', kw:['TerraGroup'], x:56, y:40},
+    {n:'白鲸餐厅', kw:['白鲸'], x:38, y:40},
+    {n:'警察局', kw:['警察局'], x:34, y:62},
+    {n:'Pinewood 酒店', kw:['Pinewood'], x:62, y:56},
+    {n:'Rodina 影院', kw:['Rodina'], x:50, y:66},
+    {n:'不动产管理处', kw:['不动产'], x:28, y:44},
+    {n:'化学品实验室', kw:['化学品实验室','毒品'], x:72, y:62},
+    {n:'电车', kw:['电车'], x:22, y:56},
+    {n:'邮局', kw:['邮局','挂号信'], x:40, y:28},
+    {n:'兽医诊所 / 药店', kw:['兽医','药店','X 光'], x:56, y:72}
+  ]},
+  '中心区': { note:'新手保护图，局时短、任务点密集', lm:[
+    {n:'Emercom 站点', kw:['Emercom'], x:24, y:72},
+    {n:'TerraGroup 大楼', kw:['TerraGroup'], x:56, y:38},
+    {n:'酒商店', kw:['酒商店','酒瓶','商店'], x:44, y:54},
+    {n:'建筑工地', kw:['建筑工地','工地'], x:66, y:60},
+    {n:'警方封锁线', kw:['警方封锁线','封锁线'], x:30, y:34},
+    {n:'固定重武器点', kw:['KORD','AGS'], x:70, y:40},
+    {n:'载具撤离点', kw:['载具撤离'], x:20, y:50}
+  ]},
+  '实验室': { note:'Raider 全员重甲，弹药要求高', lm:[
+    {n:'服务器机房', kw:['服务器机房'], x:34, y:40},
+    {n:'圆顶帐篷', kw:['圆顶帐篷'], x:62, y:44},
+    {n:'库房大门控制室', kw:['库房大门'], x:50, y:66},
+    {n:'Sanitar 办公室', kw:['Sanitar'], x:38, y:62}
+  ]},
+  '迷宫': { note:'后期图，Boss「米诺陶」', lm:[
+    {n:'行刑室', kw:['行刑室'], x:44, y:44},
+    {n:'米诺陶', kw:['米诺陶'], x:62, y:58}
+  ]},
+  '码头': { note:'', lm:[{n:'港区', kw:['码头','港'], x:50, y:50}] },
+  '破冰船': { note:'', lm:[{n:'船体', kw:['破冰船','船'], x:50, y:50}] }
+};
+
+const TR = {
+  Prapor:{cn:'普拉普',note:'俄系枪械、弹药、手雷；开局任务最密集'},
+  Therapist:{cn:'医生',note:'医疗、食物、安全箱；早期回血靠她'},
+  Fence:{cn:'栅栏',note:'玩家寄售与 Kappa 发放；声望机制独立'},
+  Skier:{cn:'滑雪者',note:'西系枪械、消音器；欧元结算'},
+  Peacekeeper:{cn:'维和',note:'北约枪械与高级弹；美元结算'},
+  Mechanic:{cn:'机械师',note:'枪械配件与改装；枪匠系列的家'},
+  Ragman:{cn:'布贩',note:'护甲、背包、战术背心'},
+  Jaeger:{cn:'猎人',note:'栓狙与生存物资；给永久技能等级'},
+  Lightkeeper:{cn:'灯塔人',note:'后期特殊任务与奖励'},
+  Arena:{cn:'竞技场裁判',note:'竞技场相关，需先解锁'},
+  BTR:{cn:'BTR 司机',note:'装甲车运输相关支线'}
+};
+const TORDER = ['Prapor','Therapist','Skier','Peacekeeper','Mechanic','Ragman','Jaeger','Fence','Lightkeeper','Arena','BTR'];
+const MAPS = Object.keys(MAPDEF);
+
+/* ---- EN name lookup ---- */
+const norm = s => String(s).replace(/[\s　]/g,'').replace(/[‐-―−]/g,'-').replace(/[，,、。．·"'“”‘’]/g,'');
+const stripPart = s => norm(s).replace(/-(part)?\d+$/i,'');
+const NMAP = {}, NBASE = {};
+for (const k in NAMES){
+  const n = norm(k); if(!(n in NMAP)) NMAP[n] = NAMES[k];
+  const b = stripPart(k); (NBASE[b] = NBASE[b] || []).push(k);
+}
+function enName(cn){
+  if (NAMES[cn]) return NAMES[cn];
+  const n = norm(cn); if (NMAP[n]) return NMAP[n];
+  const cand = NBASE[stripPart(cn)];
+  if (cand && cand.length){
+    const part = (cn.match(/-\s*(\d+)\s*$/)||[])[1];
+    if (part){
+      const hit = cand.find(k => new RegExp('-\\s*(part\\s*)?'+part+'$','i').test(norm(k)));
+      if (hit) return NAMES[hit];
+    }
+    return NAMES[cand[0]];
+  }
+  return '';
+}
+
+/* ---- normalize records ---- */
+const Q = [];
+const seenK = new Set();
+RAW.forEach(r => {
+  const key = r.t + '|' + r.c;
+  if (seenK.has(key)) return;
+  seenK.add(key);
+  const o = [].concat(r.o || []).filter(Boolean);
+  const blob = o.join(' ');
+  const maps = MAPS.filter(m => blob.indexOf(m) >= 0);
+  // landmark hits per map
+  const spots = {};
+  maps.forEach(m => {
+    const hit = MAPDEF[m].lm.filter(l => l.kw.some(k => blob.indexOf(k) >= 0)).map(l => l.n);
+    if (hit.length) spots[m] = hit;
+  });
+  Q.push({ t:r.t, cn:r.c, en:enName(r.c), ll:r.l||'', o:o, r:[].concat(r.r||[]).filter(Boolean),
+           u:r.u||'', maps:maps, spots:spots, id:key });
+});
+
+/* ---- state ---- */
+const KEY = 'eft-quest-guide-v3';
+let S = { done:{}, pick:{}, pins:{} };
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e){}
+if (!S.pick) S.pick = {};
+if (!S.pins) S.pins = {};
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+const F = { q:'', traders:new Set(), maps:new Set(), lls:new Set(), hide:false, pickOnly:false, open:false };
+
+/* ---- chips ---- */
+const tchips = document.getElementById('tchips');
+TORDER.forEach(k => {
+  if (!Q.some(x => x.t === k)) return;
+  const b = document.createElement('button');
+  b.className = 'chip'; b.setAttribute('aria-pressed','false');
+  b.style.setProperty('--tc','var(--t-'+k+')');
+  b.dataset.v = k;
+  b.innerHTML = '<span class="dot"></span>' + k;
+  b.onclick = () => { tog(F.traders,k,b); render(); };
+  tchips.appendChild(b);
+});
+const mchips = document.getElementById('mchips');
+MAPS.forEach(m => {
+  if (!Q.some(x => x.maps.indexOf(m) >= 0)) return;
+  const b = document.createElement('button');
+  b.className='chip'; b.setAttribute('aria-pressed','false'); b.textContent=m; b.dataset.v=m;
+  b.onclick = () => { tog(F.maps,m,b); render(); };
+  mchips.appendChild(b);
+});
+const lchips = document.getElementById('lchips');
+['1','2','3','4'].forEach(l => {
+  const b = document.createElement('button');
+  b.className='chip'; b.setAttribute('aria-pressed','false'); b.textContent='LL'+l; b.dataset.v=l;
+  b.onclick = () => { tog(F.lls,l,b); render(); };
+  lchips.appendChild(b);
+});
+function tog(set,v,btn){
+  if (set.has(v)) { set.delete(v); btn.setAttribute('aria-pressed','false'); }
+  else { set.add(v); btn.setAttribute('aria-pressed','true'); }
+}
+
+/* ---- rows ---- */
+const list = document.getElementById('qlist');
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+document.getElementById('qtotal').textContent = Q.length;
+const byId = {};
+
+Q.forEach(q => {
+  byId[q.id] = q;
+  const el = document.createElement('article');
+  el.className='q'; el.dataset.id=q.id;
+  el.style.setProperty('--tc','var(--t-'+q.t+')');
+  const cls = v => /^XP/.test(v) ? 'xp' : /^(Rub|EUR|USD)/.test(v) ? 'money' : '';
+  el.innerHTML =
+    '<div class="qh">' +
+      '<button class="pin" title="加入跑图规划" aria-label="加入跑图规划">◈</button>' +
+      '<input class="qcheck" type="checkbox" title="标记已完成" aria-label="标记已完成 ' + esc(q.cn) + '">' +
+      '<span class="qname"><b>' + esc(q.cn) + '</b>' + (q.en ? '<em>' + esc(q.en) + '</em>' : '') + '</span>' +
+      '<span class="qtags">' +
+        q.maps.map(m => '<span class="tag map">' + esc(m) + '</span>').join('') +
+        (q.ll ? '<span class="tag ll">LL' + esc(q.ll) + '</span>' : '') +
+        '<span class="tag tr">' + q.t + '</span>' +
+      '</span>' +
+    '</div>' +
+    '<div class="qb">' +
+      (q.o.length
+        ? '<div class="qsec"><h4>任务目标</h4><ol>' + q.o.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol></div>'
+        : '<div class="qsec"><h4>任务目标</h4><p style="font-size:13.5px;color:var(--ink-mute)">该站暂未收录目标详情，点下方原页面查看。</p></div>') +
+      (q.r.length ? '<div class="qsec"><h4>奖励</h4><div class="rw">' + q.r.map(x => '<span class="'+cls(x)+'">' + esc(x) + '</span>').join('') + '</div></div>' : '') +
+      (q.u ? '<div class="src">来源：<a href="https://www.eftarkov.com/news/' + esc(q.u) + '.html" target="_blank" rel="noopener">eftarkov 原页面 ↗</a></div>' : '') +
+    '</div>';
+  const head = el.querySelector('.qh'), cb = el.querySelector('.qcheck'), pin = el.querySelector('.pin');
+  head.addEventListener('click', e => { if (e.target===cb || e.target===pin) return; el.classList.toggle('open'); });
+  cb.addEventListener('change', () => { S.done[q.id]=cb.checked; save(); render(); });
+  pin.addEventListener('click', e => { e.stopPropagation(); S.pick[q.id]=!S.pick[q.id]; if(!S.pick[q.id]) delete S.pick[q.id]; save(); render(); });
+  list.appendChild(el);
+});
+
+/* ---- render ---- */
+const emptyEl = document.getElementById('empty');
+function picked(){ return Q.filter(q => S.pick[q.id]); }
+
+function render(){
+  let shown = 0;
+  const qs = F.q.trim().toLowerCase();
+  Q.forEach(q => {
+    const el = list.querySelector('[data-id="' + CSS.escape(q.id) + '"]');
+    if (!el) return;
+    const done = !!S.done[q.id], pk = !!S.pick[q.id];
+    el.classList.toggle('done', done);
+    el.classList.toggle('pick', pk);
+    el.querySelector('.qcheck').checked = done;
+    if (F.open) el.classList.add('open');
+    let vis = true;
+    if (F.traders.size && !F.traders.has(q.t)) vis = false;
+    if (F.maps.size && !q.maps.some(m => F.maps.has(m))) vis = false;
+    if (F.lls.size && !F.lls.has(q.ll)) vis = false;
+    if (F.hide && done) vis = false;
+    if (F.pickOnly && !pk) vis = false;
+    if (qs){
+      const hay = (q.cn+' '+q.en+' '+q.t+' '+q.o.join(' ')+' '+q.maps.join(' ')).toLowerCase();
+      if (hay.indexOf(qs) < 0) vis = false;
+    }
+    el.classList.toggle('hide', !vis);
+    if (vis) shown++;
+  });
+  emptyEl.style.display = shown ? 'none' : 'block';
+
+  const total = Q.length, dn = Q.filter(q => S.done[q.id]).length;
+  const pct = total ? Math.round(dn/total*100) : 0;
+  document.getElementById('pct').textContent = pct + '%';
+  document.getElementById('segbar').style.width = pct + '%';
+  document.getElementById('counts').textContent = dn + ' / ' + total;
+
+  const tp = document.getElementById('tprog'); tp.innerHTML = '';
+  TORDER.forEach(k => {
+    const all = Q.filter(q => q.t===k); if (!all.length) return;
+    const d = all.filter(q => S.done[q.id]).length;
+    const row = document.createElement('button');
+    row.className='tp-row'; row.style.setProperty('--tc','var(--t-'+k+')');
+    row.innerHTML = '<span><span class="tp-nm">'+k+'</span><span class="tp-bar"><i style="width:'+(d/all.length*100)+'%"></i></span></span><span class="tp-n">'+d+'/'+all.length+'</span>';
+    row.onclick = () => {
+      F.traders.clear(); F.traders.add(k);
+      [...tchips.children].forEach(c => c.setAttribute('aria-pressed', c.dataset.v===k ? 'true':'false'));
+      showTab('quests'); render();
+    };
+    tp.appendChild(row);
+  });
+
+  renderTray();
+  renderPlan();
+  renderChecklist();
+}
+
+/* ---- tray ---- */
+function renderTray(){
+  const pk = picked();
+  document.getElementById('pickN').textContent = pk.length;
+  const badge = document.getElementById('planBadge');
+  badge.textContent = pk.length; badge.dataset.n = pk.length;
+  const tray = document.getElementById('tray');
+  if (!pk.length){
+    tray.innerHTML = '<div class="tray-empty">还没有选任务。到<b>任务库</b>点每行左边的 ◈ 把任务加进来，这里会按地图分组，跑图规划里会在示意图上标出点位。</div>';
+    return;
+  }
+  const byMap = {};
+  pk.forEach(q => { (q.maps.length ? q.maps : ['未指定地图']).forEach(m => { (byMap[m]=byMap[m]||[]).push(q); }); });
+  tray.innerHTML = Object.keys(byMap).sort().map(m =>
+    '<div class="tray-g">' + esc(m) + ' · ' + byMap[m].length + '</div>' +
+    byMap[m].map(q => '<div class="tray-i"><b>'+esc(q.cn)+'</b><button class="tray-x" data-x="'+esc(q.id)+'" title="移出">×</button></div>').join('')
+  ).join('');
+  tray.querySelectorAll('.tray-x').forEach(b => {
+    b.onclick = () => { delete S.pick[b.dataset.x]; save(); render(); };
+  });
+}
+
+/* ---- user map images ----
+   file:// 下 IndexedDB 被浏览器禁用，所以统一走 localStorage：
+   载入时先用 canvas 压缩到能存下的尺寸，再存 data URL。图片只留在本机。 */
+const IMGKEY = m => 'eft-map-img:' + m;
+function lsGet(m){ try { return localStorage.getItem(IMGKEY(m)); } catch(e){ return null; } }
+function lsDel(m){ try { localStorage.removeItem(IMGKEY(m)); } catch(e){} }
+
+/* IndexedDB holds the ORIGINAL file (full resolution, no re-encode).
+   It is unavailable on file:// in Chrome/Firefox, so we fall back to a
+   downscaled data URL in localStorage there. */
+const IDB_NAME = 'eft-maps', IDB_STORE = 'img';
+let _idbOK = null, _db = null;
+function idbOpen(){
+  return new Promise((res, rej) => {
+    let r;
+    try { r = indexedDB.open(IDB_NAME, 1); } catch(e){ return rej(e); }
+    r.onupgradeneeded = () => { try { r.result.createObjectStore(IDB_STORE); } catch(e){} };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error || new Error('idb'));
+    r.onblocked = () => rej(new Error('idb blocked'));
+  });
+}
+async function idb(){
+  if (_db) return _db;
+  if (_idbOK === false) throw new Error('no idb');
+  try { _db = await idbOpen(); _idbOK = true; return _db; }
+  catch(e){ _idbOK = false; throw e; }
+}
+function idbTx(mode, fn){
+  return idb().then(db => new Promise((res, rej) => {
+    const t = db.transaction(IDB_STORE, mode);
+    const rq = fn(t.objectStore(IDB_STORE));
+    t.oncomplete = () => res(rq && rq.result);
+    t.onerror = () => rej(t.error);
+    t.onabort = () => rej(t.error);
+  }));
+}
+const idbPut = (k, v) => idbTx('readwrite', s => s.put(v, k));
+const idbGet = k      => idbTx('readonly',  s => s.get(k));
+const idbDel = k      => idbTx('readwrite', s => s.delete(k));
+
+function shrink(file, maxDim, quality){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = () => rej(new Error('读不出这个文件'));
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = () => rej(new Error('这不是浏览器能显示的图片格式'));
+      im.onload = () => {
+        const s = Math.min(1, maxDim / Math.max(im.width, im.height));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(im.width * s));
+        c.height = Math.max(1, Math.round(im.height * s));
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        let out = '';
+        try { out = c.toDataURL('image/webp', quality); } catch(e){}
+        if (!out || out.indexOf('data:image/webp') !== 0) out = c.toDataURL('image/jpeg', quality);
+        res(out);
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+/* IndexedDB first (original file, full resolution).
+   localStorage fallback keeps shrinking until it fits the ~5MB quota. */
+const IMGMODE = {};                       // map -> 'idb' | 'ls'
+async function imgPut(m, file){
+  delete IMGCACHE[m]; delete IMGASPECT[m];   // force a fresh read of the new image
+  if (objUrls[m]){ URL.revokeObjectURL(objUrls[m]); delete objUrls[m]; }
+  try {
+    await idbPut(m, file);
+    lsDel(m);                             // drop any older low-res copy
+    IMGMODE[m] = 'idb';
+    return { mode:'idb', bytes:file.size };
+  } catch(e){ /* no IndexedDB here — fall through */ }
+
+  const steps = [[3200,.9],[2400,.85],[1700,.8],[1200,.72],[900,.65]];
+  let lastErr = null;
+  for (const [dim, q] of steps){
+    const data = await shrink(file, dim, q);
+    try {
+      localStorage.setItem(IMGKEY(m), data);
+      IMGMODE[m] = 'ls';
+      return { mode:'ls', bytes:data.length, dim:dim };
+    } catch(err){ lastErr = err; lsDel(m); }
+  }
+  throw lastErr || new Error('存不下');
+}
+async function imgDel(m){
+  try { await idbDel(m); } catch(e){}
+  lsDel(m);
+  if (objUrls[m]){ URL.revokeObjectURL(objUrls[m]); delete objUrls[m]; }
+  delete IMGMODE[m]; delete IMGCACHE[m]; delete IMGASPECT[m];
+}
+
+const objUrls = {};
+async function imgSrc(m){
+  try {
+    const blob = await idbGet(m);
+    if (blob){
+      if (objUrls[m]) URL.revokeObjectURL(objUrls[m]);
+      objUrls[m] = URL.createObjectURL(blob);
+      IMGMODE[m] = 'idb';
+      return objUrls[m];
+    }
+  } catch(e){ /* fall back */ }
+  const data = lsGet(m);
+  if (data){ IMGMODE[m] = 'ls'; return data; }
+  return null;
+}
+/* Cache the resolved src + aspect in memory. Re-renders can then emit the <img>
+   synchronously, so the map never blinks out while storage is read back. */
+const IMGCACHE = {}, IMGASPECT = {};
+function mapImgTag(m){
+  return IMGCACHE[m] ? '<img class="usermap" alt="' + esc(m) + ' 地图" src="' + IMGCACHE[m] + '">' : '';
+}
+function afterImgReady(card, m, im){
+  const doFit = () => {
+    if (im.naturalWidth) IMGASPECT[m] = im.naturalWidth / im.naturalHeight;
+    fitCanvas(card, m); applyView(card, m);
+  };
+  if (im.complete && im.naturalWidth) doFit();
+  else im.addEventListener('load', doFit, { once:true });
+}
+function showMapImage(m, stage, src){
+  const holder = stage.querySelector('.mapholder');
+  const card = stage.closest('.work');
+  if (!holder || !card || card.dataset.map !== m) return;   // view moved on
+  IMGCACHE[m] = src;
+  if (!holder.querySelector('img.usermap')){
+    holder.innerHTML = mapImgTag(m);
+  }
+  const im = holder.querySelector('img');
+  if (im) afterImgReady(card, m, im);
+  stage.dataset.hasimg = '1';
+  const rm = card.querySelector('[data-act="rmimg"]');
+  if (rm) rm.style.display = '';
+  const q = card.querySelector('[data-act="imgmode"]');
+  if (q) q.textContent = IMGMODE[m] === 'idb' ? '原图' : '压缩版';
+}
+function loadMapImage(m, stage){
+  const card = stage.closest('.work');
+  const im = stage.querySelector('img.usermap');
+  if (im && card){ afterImgReady(card, m, im); }        // already painted from cache
+  if (IMGCACHE[m] && im) return;                        // nothing more to do
+  imgSrc(m).then(src => { if (src) showMapImage(m, stage, src); }).catch(()=>{});
+}
+
+
+/* ---- zoom / pan (view state kept in memory, per map) ---- */
+const VIEW = {};
+const ZMIN = 0.4, ZMAX = 10;
+function getView(m){ return VIEW[m] || (VIEW[m] = { k:1, tx:0, ty:0 }); }
+function applyView(card, m){
+  const v = getView(m);
+  const cv = card.querySelector('.mcanvas');
+  if (!cv || !v.base) return;
+  // resize instead of scale() so the image is re-rasterised at the zoomed size
+  cv.style.width  = (v.base.w * v.k) + 'px';
+  cv.style.height = (v.base.h * v.k) + 'px';
+  cv.style.left   = (v.base.l + v.tx) + 'px';
+  cv.style.top    = (v.base.t + v.ty) + 'px';
+  const z = card.querySelector('[data-act="zlabel"]');
+  if (z) z.textContent = Math.round(v.k * 100) + '%';
+}
+/* canvas is centred inside the stage at scale 1, preserving the image aspect */
+function fitCanvas(card, m){
+  const stage = card.querySelector('.stage'), cv = card.querySelector('.mcanvas');
+  if (!stage || !cv) return;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  if (!sw || !sh) return;
+  const img = cv.querySelector('img.usermap');
+  const aspect = (img && img.naturalWidth) ? img.naturalWidth / img.naturalHeight
+               : (img && IMGASPECT[m]) ? IMGASPECT[m]        // cached: no layout jump on re-render
+               : 1;
+  let w = sw, h = sw / aspect;
+  if (h > sh){ h = sh; w = sh * aspect; }
+  const v = getView(m);
+  v.base = { w:w, h:h, l:(sw - w) / 2, t:(sh - h) / 2 };   // layout at 100%
+  applyView(card, m);
+}
+/* sxp/syp are stage-local pixel coords */
+function zoomAt(card, m, factor, sxp, syp){
+  const v = getView(m);
+  if (!v.base) return;
+  const nk = Math.min(ZMAX, Math.max(ZMIN, v.k * factor));
+  if (nk === v.k) return;
+  const r = nk / v.k;
+  const ux = sxp - v.base.l, uy = syp - v.base.t;
+  v.tx = ux - r * (ux - v.tx);
+  v.ty = uy - r * (uy - v.ty);
+  v.k = nk;
+  applyView(card, m);
+}
+function refitAll(){
+  document.querySelectorAll('.work').forEach(card => {
+    const m = card.dataset.map;
+    fitCanvas(card, m); applyView(card, m);
+  });
+}
+window.addEventListener('resize', refitAll);
+
+/* ---- planner ---- */
+let PLANMAP = null;   // which map's workspace is open
+let SELTASK = null;   // task that new markers get attached to
+let ARMED = false;    // marker placing mode
+
+/* quests with no map of their own — kill / hand-in / modding jobs that any raid can advance */
+function globalColHtml(noMap){
+  if (!noMap.length) return '';
+  return '<div class="right gcol">' +
+    '<div class="rhd">全局任务<span class="n">' + noMap.length + '</span></div>' +
+    '<div class="tasklist">' +
+      noMap.map(q =>
+        '<div class="gk" data-q="' + esc(q.id) + '" style="--tc:var(--t-' + q.t + ')">' +
+          '<div class="hd"><span style="min-width:0"><span class="nm">' + esc(q.cn) + '</span>' +
+              (q.en ? '<span class="en">' + esc(q.en) + '</span>' : '') + '</span>' +
+            '<button class="tkb ok" data-a="done" title="标记完成并移出规划" style="margin-left:auto">✓</button>' +
+            '<button class="tkb no" data-a="drop" title="移出规划">×</button></div>' +
+          '<div class="meta2">' + q.t + (q.ll ? ' · LL' + q.ll : '') + '</div>' +
+          (q.o.length ? '<ul>' + q.o.slice(0,4).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+                      : '<ul><li style="color:var(--ink-mute)">该站未收录目标详情</li></ul>') +
+          (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u + '.html" target="_blank" rel="noopener">详细攻略 ↗</a>' : '') +
+        '</div>').join('') +
+    '</div>' +
+    '<div class="rft">没有指定地图 —— 多为击杀、上交、改装类，任意一局都能推进。</div>' +
+  '</div>';
+}
+function wireGlobalRows(root){
+  root.querySelectorAll('.gk').forEach(row => {
+    const qid = row.dataset.q;
+    row.querySelector('[data-a="done"]').onclick = e => {
+      e.stopPropagation();
+      S.done[qid] = true; delete S.pick[qid];
+      save(); closePop(); render();
+    };
+    row.querySelector('[data-a="drop"]').onclick = e => {
+      e.stopPropagation();
+      delete S.pick[qid];
+      save(); closePop(); render();
+    };
+  });
+}
+
+function renderPlan(){
+  const pk = picked();
+  const body = document.getElementById('planBody');
+  const sel = document.getElementById('mapsel');
+  if (!pk.length){
+    sel.innerHTML = '';
+    body.innerHTML = '<div class="empty">还没有选任务。<br>到<b>任务库</b>点每行左边的 ◈，选中的任务会按地图分组显示在这里。</div>';
+    return;
+  }
+  const byMap = {};
+  pk.forEach(q => { q.maps.forEach(m => { (byMap[m]=byMap[m]||[]).push(q); }); });
+  const noMap = pk.filter(q => !q.maps.length);
+  const order = MAPS.filter(m => byMap[m]);
+  if (!order.length){
+    sel.innerHTML = '';
+    body.innerHTML = '<div class="work" style="grid-template-columns:1fr">' + globalColHtml(noMap) + '</div>';
+    wireGlobalRows(body);
+    return;
+  }
+  if (order.indexOf(PLANMAP) < 0) PLANMAP = order[0];
+
+  /* map picker */
+  sel.innerHTML = order.map(m => {
+    const np = ((S.pins && S.pins[m]) || []).length;
+    const nt = (MAPDEF[m] && MAPDEF[m].note) ? ' title="' + esc(MAPDEF[m].note) + '"' : '';
+    return '<button class="chip" data-map="' + esc(m) + '"' + nt + ' aria-pressed="' + (m === PLANMAP) + '">' +
+      '<b>' + esc(m) + '</b><span class="n">' + byMap[m].length + ' 任务' +
+      (np ? ' · ' + np + ' 标记' : '') + '</span></button>';
+  }).join('');
+  sel.querySelectorAll('.chip').forEach(b => {
+    b.onclick = () => { PLANMAP = b.dataset.map; SELTASK = null; renderPlan(); };
+  });
+
+  const m = PLANMAP, qs = byMap[m], def = MAPDEF[m];
+  const pins = (S.pins && S.pins[m]) || [];
+  if (!qs.some(q => q.id === SELTASK)) SELTASK = null;
+
+  /* auto-detected landmarks, kept as a hint per task */
+  const spotIdx = {};
+  def.lm.forEach(l => { spotIdx[l.n] = l; });
+
+  const pinsOf = qid => pins.map((p,i) => ({p,i})).filter(o => o.p.qid === qid);
+  const tgtQ = SELTASK ? qs.find(q => q.id === SELTASK) : null;
+  /* markers left behind by tasks that are no longer in the plan */
+  const orphan = pins.map((p,i) => ({p,i})).filter(o => o.p.qid && !S.pick[o.p.qid]);
+
+  body.innerHTML =
+    '<div class="work' + (noMap.length ? ' has-global' : '') + '" data-map="' + esc(m) + '">' +
+      '<div class="left">' +
+        '<div class="mtool">' +
+          '<button class="mbtn" data-act="addimg">载入地图图片</button>' +
+          '<button class="mbtn danger" data-act="rmimg" style="display:none">移除图片</button>' +
+          '<span class="tgt" data-act="imgmode" title="原图=未压缩；压缩版=file:// 下浏览器禁用 IndexedDB 时的降级"></span>' +
+          '<input type="file" accept="image/*" data-act="file" style="display:none">' +
+          '<span class="zoomui">' +
+            '<button class="mbtn zb" data-act="zout" title="缩小">−</button>' +
+            '<span class="zl" data-act="zlabel">100%</span>' +
+            '<button class="mbtn zb" data-act="zin" title="放大">+</button>' +
+            '<button class="mbtn" data-act="zreset" title="回到原始大小">复位</button>' +
+          '</span>' +
+          '<span class="sp"></span>' +
+          '<input class="qmatch" data-act="qmatch" type="search" placeholder="快速匹配任务…">' +
+          '<span class="tgt">标记归属：' + (tgtQ ? '<b>' + esc(tgtQ.cn) + '</b>' : '<span style="color:var(--ink-mute)">未选任务 → 自定义</span>') + '</span>' +
+          '<button class="mbtn" data-act="armpin" aria-pressed="' + (ARMED ? 'true' : 'false') + '">' +
+            (ARMED ? '点击图上放标记' : '开始标点') + '</button>' +
+          '<button class="mbtn danger" data-act="clearpin">清除标记 (' + pins.length + ')</button>' +
+        '</div>' +
+        '<div class="stage' + (ARMED ? ' arm' : '') + '" data-stage="' + esc(m) + '">' +
+          '<div class="mcanvas">' +
+            '<div class="mapholder">' + (IMGCACHE[m] ? mapImgTag(m) : mapSvg(m, def, {})) + '</div>' +
+            pins.map((p,i) => pinHtml(p,i)).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="right">' +
+        '<div class="rhd">本图任务<span class="n">' + qs.length + '</span></div>' +
+        '<div class="tasklist">' +
+          qs.map(q => {
+            const mine = pinsOf(q.id);
+            const spots = (q.spots[m] || []);
+            return '<div class="tk" data-q="' + esc(q.id) + '" aria-selected="' + (q.id === SELTASK) + '" style="--tc:var(--t-' + q.t + ')">' +
+              '<div class="hd"><span style="min-width:0"><span class="nm">' + esc(q.cn) + '</span>' +
+                  (q.en ? '<span class="en">' + esc(q.en) + '</span>' : '') + '</span>' +
+                '<span class="cnt' + (mine.length ? '' : ' zero') + '" style="margin-left:auto">' + mine.length + '</span>' +
+                '<button class="tkb ok" data-a="done" title="标记完成并移出规划">✓</button>' +
+                '<button class="tkb no" data-a="drop" title="移出规划（保留标记）">×</button></div>' +
+              (q.o.length ? '<div class="ob">' + esc(q.o[0].slice(0,64)) + '</div>' : '') +
+              (spots.length ? '<div class="chips">' + spots.map(s => '<span>' + esc(s) + '</span>').join('') + '</div>' : '') +
+              (mine.length ? '<div class="nums">' + mine.map(o => '<span>' + (o.i+1) + '</span>').join('') + '</div>' : '') +
+              '<div class="more">' +
+                (q.ll ? '<div class="mline"><b>信任度</b> LL' + q.ll + '</div>' : '') +
+                (q.o.length > 1 ? '<ul>' + q.o.slice(1,5).map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') +
+                (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u + '.html" target="_blank" rel="noopener">在 eftarkov 看详细攻略 ↗</a>'
+                     : '<span class="mline" style="color:var(--ink-mute)">该站没有这条任务的详情页</span>') +
+              '</div>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        (orphan.length ? '<div class="rft"><b style="color:var(--ink-dim)">' + orphan.length +
+          ' 个标记属于已完成 / 已移出的任务</b> <button class="mbtn" data-act="tidy" style="margin-left:6px">清理</button></div>' : '') +
+      '</div>' +
+      globalColHtml(noMap) +
+    '</div>';
+
+  const card = body.querySelector('.work');
+  const stage = card.querySelector('.stage');
+  const file = card.querySelector('[data-act="file"]');
+  loadMapImage(m, stage);
+  fitCanvas(card, m);
+  applyView(card, m);
+
+  /* task rows: pick the marker target, plus quick done / drop */
+  card.querySelectorAll('.tk').forEach(row => {
+    const qid = row.dataset.q;
+    row.onclick = () => {
+      SELTASK = (SELTASK === qid) ? null : qid;
+      closePop(); renderPlan();
+    };
+    row.querySelector('[data-a="done"]').onclick = e => {
+      e.stopPropagation();
+      S.done[qid] = true; delete S.pick[qid];
+      if (SELTASK === qid) SELTASK = null;
+      save(); closePop(); render();
+    };
+    row.querySelector('[data-a="drop"]').onclick = e => {
+      e.stopPropagation();
+      delete S.pick[qid];
+      if (SELTASK === qid) SELTASK = null;
+      save(); closePop(); render();
+    };
+  });
+  wireGlobalRows(card);
+
+  const tidy = card.querySelector('[data-act="tidy"]');
+  if (tidy) tidy.onclick = () => {
+    if (!confirm('清理这张图上 ' + orphan.length + ' 个属于已完成 / 已移出任务的标记？')) return;
+    const drop = new Set(orphan.map(o => o.i));
+    S.pins[m] = pins.filter((p,i) => !drop.has(i));
+    if (!S.pins[m].length) delete S.pins[m];
+    save(); renderPlan();
+  };
+
+  /* quick match: paste quest text -> select that task (no re-render, keeps focus) */
+  const qm = card.querySelector('[data-act="qmatch"]');
+  if (qm) qm.addEventListener('input', () => {
+    const t = qm.value.trim().toLowerCase();
+    if (!t) return;
+    const hit = qs.find(q => (q.cn + ' ' + q.en + ' ' + q.o.join(' ')).toLowerCase().indexOf(t) >= 0);
+    if (!hit) return;
+    SELTASK = hit.id;
+    card.querySelectorAll('.tk').forEach(r2 => r2.setAttribute('aria-selected', String(r2.dataset.q === SELTASK)));
+    const tg = card.querySelector('.tgt');
+    if (tg) tg.innerHTML = '标记归属：<b>' + esc(hit.cn) + '</b>';
+    card.querySelectorAll('.mkr').forEach(pn => {
+      const pp = (S.pins[m] || [])[+pn.dataset.i];
+      const hot = !!(pp && pp.qid === SELTASK);
+      pn.classList.toggle('hot', hot);
+      pn.classList.toggle('dim', !hot);
+    });
+    const row = card.querySelector('.tk[data-q="' + CSS.escape(hit.id) + '"]');
+    if (row) row.scrollIntoView({ block:'nearest' });
+  });
+
+  const addBtn = card.querySelector('[data-act="addimg"]');
+  addBtn.onclick = () => file.click();
+  file.onchange = () => {
+    const f = file.files && file.files[0]; if (!f) return;
+    const old = addBtn.textContent; addBtn.textContent = '处理中…'; addBtn.disabled = true;
+    imgPut(m, f).then(() => renderPlan())
+      .catch(err => {
+        addBtn.textContent = old; addBtn.disabled = false;
+        alert('这张图存不下：' + (err && err.message ? err.message : '浏览器存储空间不足') +
+              '\n可以先移除其它地图的图片，或换一张尺寸小一些的。');
+      });
+  };
+  card.querySelector('[data-act="rmimg"]').onclick = () => {
+    imgDel(m).then(() => { VIEW[m] = {k:1,tx:0,ty:0}; renderPlan(); });
+  };
+  card.querySelector('[data-act="armpin"]').onclick = () => { ARMED = !ARMED; renderPlan(); };
+  card.querySelector('[data-act="clearpin"]').onclick = () => {
+    if (!pins.length) return;
+    if (!confirm('清除「' + m + '」上的全部 ' + pins.length + ' 个标记？')) return;
+    delete S.pins[m]; save(); renderPlan();
+  };
+
+  const zc = (sel2, f) => { const b = card.querySelector(sel2); if (b) b.onclick = f; };
+  zc('[data-act="zin"]',  () => { const r = stage.getBoundingClientRect(); zoomAt(card, m, 1.25, r.width/2, r.height/2); });
+  zc('[data-act="zout"]', () => { const r = stage.getBoundingClientRect(); zoomAt(card, m, 1/1.25, r.width/2, r.height/2); });
+  zc('[data-act="zreset"]', () => { VIEW[m] = { k:1, tx:0, ty:0 }; fitCanvas(card, m); });
+
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    zoomAt(card, m, e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - r.left, e.clientY - r.top);
+  }, { passive:false });
+
+  /* Pointer capture retargets the follow-up `click` to the stage, so a click on a
+     marker would never reach it. Do the hit-test on pointerdown and act on pointerup. */
+  let dragging = false, sx = 0, sy = 0, stx = 0, sty = 0, moved = 0, downPin = null;
+  stage.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    downPin = e.target.closest('.mkr');
+    dragging = true; moved = 0; sx = e.clientX; sy = e.clientY;
+    const v = getView(m); stx = v.tx; sty = v.ty;
+    stage.classList.add('grabbing');
+    try { stage.setPointerCapture(e.pointerId); } catch(err){}
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+    const v = getView(m); v.tx = stx + dx; v.ty = sty + dy;
+    applyView(card, m);
+  });
+  const endDrag = e => {
+    dragging = false; stage.classList.remove('grabbing');
+    try { stage.releasePointerCapture(e.pointerId); } catch(err){}
+  };
+  stage.addEventListener('pointercancel', e => { endDrag(e); downPin = null; });
+  stage.addEventListener('pointerup', e => {
+    const wasDragging = dragging, pin = downPin;
+    endDrag(e); downPin = null;
+    if (!wasDragging || moved > 5) return;         // that was a pan, not a click
+
+    if (pin){                                      // open its popover
+      openPop(card, m, +pin.dataset.i);
+      return;
+    }
+    closePop();
+    if (!ARMED) return;
+
+    const v = getView(m), r = stage.getBoundingClientRect();
+    if (!v.base) return;
+    const W = v.base.w * v.k, H = v.base.h * v.k;
+    const x = ((e.clientX - r.left) - v.base.l - v.tx) / W * 100;
+    const y = ((e.clientY - r.top)  - v.base.t - v.ty) / H * 100;
+    if (x < 0 || x > 100 || y < 0 || y > 100) return;
+    let label = '', qid = '';
+    if (SELTASK){
+      const q = Q.find(z => z.id === SELTASK);
+      qid = SELTASK; label = q ? q.cn : '';
+    } else {
+      label = prompt('标记名称：', '');
+      if (label === null) return;
+    }
+    S.pins = S.pins || {}; S.pins[m] = S.pins[m] || [];
+    S.pins[m].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:label || '标记', qid:qid });
+    save(); renderPlan();                          // ARMED stays on, so you can keep clicking
+  });
+}
+function pinHtml(p,i){
+  const hot = SELTASK && p.qid === SELTASK;
+  const dim = SELTASK && !hot;
+  const tip = p.note ? (p.t || '标记') + ' — ' + p.note.slice(0, 60) : '点击查看 / 备注 / 删除';
+  return '<div class="mkr' + (hot ? ' hot' : '') + (dim ? ' dim' : '') + (p.note ? ' hasnote' : '') +
+    '" data-i="' + i + '" style="left:' + p.x + '%;top:' + p.y + '%" title="' + esc(tip) + '">' +
+    '<span class="pdot">' + (i+1) + '</span>' +
+    (p.t ? '<span class="ptxt">' + esc(p.t) + '</span>' : '') + '</div>';
+}
+
+/* ---- marker popover ---- */
+function closePop(){ const p = document.querySelector('.pop'); if (p) p.remove(); POPI = null; }
+let POPI = null;                       // index of the marker whose popover is open
+function openPop(card, m, i){
+  closePop();
+  const pins = S.pins[m] || [];
+  const p = pins[i]; if (!p) return;
+  const stage = card.querySelector('.stage');
+  const v = getView(m);
+  const sx = v.base.l + v.tx + (p.x/100) * v.base.w * v.k;
+  const sy = v.base.t + v.ty + (p.y/100) * v.base.h * v.k;
+  const q = p.qid ? Q.find(z => z.id === p.qid) : null;
+
+  const pop = document.createElement('div');
+  pop.className = 'pop';
+  pop.innerHTML =
+    '<h5><i>' + (i+1) + '</i><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+      esc(p.t || '标记') + '</span>' +
+      '<button class="mbtn zb" data-a="close" style="margin-left:auto" title="关闭">×</button></h5>' +
+    '<div class="body">' +
+      (q && q.o.length ? '<div style="font-size:11.5px;color:var(--ink-mute);line-height:1.5">' + esc(q.o[0].slice(0,70)) + '</div>' : '') +
+      '<label class="plab">标记名（图上显示）</label>' +
+      '<input class="pinput" data-a="label" value="' + esc(p.t || '') + '" placeholder="例如：三层宿舍 214">' +
+      '<label class="plab">备注</label>' +
+      '<textarea class="pnote" data-a="note" placeholder="写点进图时想看到的东西：门锁着要钥匙 / 从北边楼梯上 / 这里有狙击位…">' + esc(p.note || '') + '</textarea>' +
+      '<div class="acts">' +
+        '<span class="psaved" data-a="saved"></span>' +
+        '<button class="mbtn danger" data-a="del" style="margin-left:auto">删除标记</button>' +
+      '</div>' +
+    '</div>';
+  stage.appendChild(pop);
+  POPI = i;
+
+  // keep it inside the stage
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  let left = sx + 14, top = sy - 10;
+  if (left + 270 > sw) left = sx - 284;
+  if (left < 4) left = 4;
+  if (top + pop.offsetHeight > sh) top = Math.max(4, sh - pop.offsetHeight - 4);
+  if (top < 4) top = 4;
+  pop.style.left = left + 'px'; pop.style.top = top + 'px';
+
+  const noteEl = pop.querySelector('[data-a="note"]');
+  const labelEl = pop.querySelector('[data-a="label"]');
+  const savedEl = pop.querySelector('[data-a="saved"]');
+  let timer = null;
+  const flash = () => { savedEl.textContent = '已保存'; clearTimeout(flash._t);
+                        flash._t = setTimeout(() => { savedEl.textContent = ''; }, 1200); };
+  const commit = () => {
+    const pp = (S.pins[m] || [])[i]; if (!pp) return;
+    pp.note = noteEl.value.trim();
+    pp.t = labelEl.value.trim() || pp.t;
+    save(); flash();
+    // refresh the marker in place so focus stays in the textarea
+    const el = stage.querySelector('.mkr[data-i="' + i + '"]');
+    if (el){
+      el.classList.toggle('hasnote', !!pp.note);
+      const tx = el.querySelector('.ptxt');
+      if (tx) tx.textContent = pp.t || '';
+      el.title = pp.note ? pp.t + ' — ' + pp.note.slice(0, 60) : '点击查看 / 备注 / 删除';
+    }
+  };
+  const queue = () => { clearTimeout(timer); timer = setTimeout(commit, 350); };
+  noteEl.addEventListener('input', queue);
+  labelEl.addEventListener('input', queue);
+  noteEl.addEventListener('blur', commit);
+  labelEl.addEventListener('blur', commit);
+
+  pop.querySelector('[data-a="close"]').onclick = () => { commit(); closePop(); renderPlan(); };
+  pop.querySelector('[data-a="del"]').onclick = () => {
+    S.pins[m].splice(i, 1);
+    if (!S.pins[m].length) delete S.pins[m];
+    save(); closePop(); renderPlan();
+  };
+  pop.addEventListener('pointerdown', e => e.stopPropagation());
+  pop.addEventListener('wheel', e => e.stopPropagation());
+  setTimeout(() => noteEl.focus(), 0);
+}
+
+/* ---- map viewer: planner-style workspace, view only ---- */
+let VIEWMAP = null;
+const VV = {};                       // per-map view state for this tab only
+function getVV(m){ return VV[m] || (VV[m] = { k:1, tx:0, ty:0 }); }
+
+function applyV(card, m){
+  const v = getVV(m);
+  const cv = card.querySelector('.vcanvas');
+  if (!cv || !v.base) return;
+  cv.style.width  = (v.base.w * v.k) + 'px';
+  cv.style.height = (v.base.h * v.k) + 'px';
+  cv.style.left   = (v.base.l + v.tx) + 'px';
+  cv.style.top    = (v.base.t + v.ty) + 'px';
+  const lbl = document.querySelector('#p-maps [data-v="lbl"]');
+  if (lbl) lbl.textContent = Math.round(v.k * 100) + '%';
+}
+function fitV(card, m){
+  const stage = card.querySelector('.vstage'), cv = card.querySelector('.vcanvas');
+  if (!stage || !cv) return;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  if (!sw || !sh) return;
+  const img = cv.querySelector('img');
+  const aspect = (img && img.naturalWidth) ? img.naturalWidth / img.naturalHeight
+               : (IMGASPECT[m] || 1);
+  let w = sw, h = sw / aspect;
+  if (h > sh){ h = sh; w = sh * aspect; }
+  const v = getVV(m);
+  v.base = { w:w, h:h, l:(sw - w) / 2, t:(sh - h) / 2 };
+  v.k = 1; v.tx = 0; v.ty = 0;
+  applyV(card, m);
+}
+function zoomV(card, m, factor, sxp, syp){
+  const v = getVV(m);
+  if (!v.base) return;
+  const nk = Math.min(12, Math.max(0.2, v.k * factor));
+  if (nk === v.k) return;
+  const r = nk / v.k;
+  const ux = sxp - v.base.l, uy = syp - v.base.t;
+  v.tx = ux - r * (ux - v.tx);
+  v.ty = uy - r * (uy - v.ty);
+  v.k = nk;
+  applyV(card, m);
+}
+
+function renderMaps(){
+  const body = document.getElementById('mapsBody');
+  const sel = document.getElementById('mapsSel');
+  if (!body || !sel) return;
+
+  let loaded = 0;
+  MAPS.forEach(m => { if (IMGCACHE[m]) loaded++; });
+  if (MAPS.indexOf(VIEWMAP) < 0) VIEWMAP = MAPS.find(m => IMGCACHE[m]) || MAPS[0];
+
+  // this tab is purely a map viewer — nothing about quests belongs here
+  sel.innerHTML = MAPS.map(m => {
+    const has = !!IMGCACHE[m];
+    const nt = (MAPDEF[m] && MAPDEF[m].note) ? ' title="' + esc(MAPDEF[m].note) + '"' : '';
+    return '<button class="chip' + (has ? '' : ' noimg') + '" data-map="' + esc(m) + '"' + nt +
+      ' aria-pressed="' + (m === VIEWMAP) + '">' +
+      (has ? '<span class="dotimg"></span>' : '') + '<b>' + esc(m) + '</b></button>';
+  }).join('');
+  sel.querySelectorAll('.chip').forEach(b => {
+    b.onclick = () => { VIEWMAP = b.dataset.map; renderMaps(); };
+  });
+
+  const badge = document.getElementById('mapsBadge');
+  if (badge){ badge.dataset.n = loaded; badge.textContent = loaded ? loaded : ''; }
+
+  const m = VIEWMAP, src = IMGCACHE[m];
+  body.innerHTML =
+    '<div class="vwork" data-map="' + esc(m) + '">' +
+      '<div class="vstage">' +
+        (src ? '<div class="vcanvas"><img alt="' + esc(m) + ' 地图" src="' + src + '"></div>'
+             : '<div class="vnone">「' + esc(m) + '」还没有地图图片<br>' +
+               '把图片放进这个网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(m) + '.webp</b>（jpg / png 也可以），' +
+               '刷新即可自动加载<br>或者点右上角「载入地图」一次全选</div>') +
+      '</div>' +
+    '</div>';
+
+  const card = body.querySelector('.vwork');
+  const stage = card.querySelector('.vstage');
+  if (!src) return;
+
+  const img = card.querySelector('img');
+  const ready = () => {
+    if (img.naturalWidth) IMGASPECT[m] = img.naturalWidth / img.naturalHeight;
+    fitV(card, m);
+  };
+  if (img.complete && img.naturalWidth) ready();
+  else img.addEventListener('load', ready, { once:true });
+
+  const zc = (sel2, f) => { const b = document.querySelector('#p-maps [data-v="' + sel2 + '"]'); if (b) b.onclick = f; };
+  zc('in',  () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1.25, r.width/2, r.height/2); });
+  zc('out', () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1/1.25, r.width/2, r.height/2); });
+  zc('fit', () => fitV(card, m));
+
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    zoomV(card, m, e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - r.left, e.clientY - r.top);
+  }, { passive:false });
+
+  let drag = false, sx = 0, sy = 0, stx = 0, sty = 0;
+  stage.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    drag = true; sx = e.clientX; sy = e.clientY;
+    const v = getVV(m); stx = v.tx; sty = v.ty;
+    stage.classList.add('grabbing');
+    try { stage.setPointerCapture(e.pointerId); } catch(err){}
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const v = getVV(m); v.tx = stx + (e.clientX - sx); v.ty = sty + (e.clientY - sy);
+    applyV(card, m);
+  });
+  const end = e => { drag = false; stage.classList.remove('grabbing');
+    try { stage.releasePointerCapture(e.pointerId); } catch(err){} };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
+}
+function refitMapView(){
+  const card = document.querySelector('#p-maps .vwork');
+  if (card) fitV(card, card.dataset.map);
+}
+/* ---- checklist ---- */
+function renderChecklist(){
+  const body = document.getElementById('listBody');
+  const pk = picked(), dn = Q.filter(q => S.done[q.id]);
+  document.getElementById('listBadge').dataset.n = pk.length;
+  document.getElementById('listBadge').textContent = pk.length ? pk.length : '';
+  if (!pk.length && !dn.length){
+    body.innerHTML = '<div class="empty">还没有勾选任何任务。<br>到<b>任务库</b>用 ◈ 加入规划，或用左边的方框标记完成。</div>';
+    return;
+  }
+  const grp = (title, arr, isDone) => {
+    if (!arr.length) return '';
+    const byMap = {};
+    arr.forEach(q => { (q.maps.length ? q.maps : ['不限地图']).forEach(m => { (byMap[m]=byMap[m]||[]).push(q); }); });
+    const keys = MAPS.filter(m => byMap[m]).concat(byMap['不限地图'] ? ['不限地图'] : []);
+    return '<div class="cl-grp"><h3>' + title + '<span class="cnt">' + arr.length + ' 条</span></h3>' +
+      keys.map(m => byMap[m].map(q =>
+        '<div class="cl-row' + (isDone ? ' done' : '') + '" style="--tc:var(--t-' + q.t + ')">' +
+          '<span class="tr">' + q.t + '</span>' +
+          '<span class="tag map">' + esc(m) + '</span>' +
+          '<span><b class="qjump" data-q="' + esc(q.cn) + '" style="cursor:pointer">' + esc(q.cn) + '</b>' +
+            (q.en ? ' <span style="color:var(--ink-mute);font-size:11.5px">' + esc(q.en) + '</span>' : '') + '</span>' +
+          (q.ll ? '<span class="tag ll">LL' + q.ll + '</span>' : '<span></span>') +
+          (q.o.length ? '<span class="obj">' + esc(q.o[0].slice(0,72)) + '</span>' : '') +
+        '</div>').join('')).join('') +
+    '</div>';
+  };
+  body.innerHTML = grp('◈ 规划清单', pk, false) + grp('☑ 已完成', dn, true);
+  body.querySelectorAll('.qjump').forEach(b => {
+    b.onclick = () => {
+      document.getElementById('q').value = b.dataset.q; F.q = b.dataset.q;
+      F.traders.clear(); F.maps.clear(); F.lls.clear();
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed','false'));
+      showTab('quests'); render();
+    };
+  });
+}
+
+function mapSvg(name, def, idx){
+  let s = '<svg class="mapsvg" viewBox="0 0 100 100" role="img" aria-label="' + esc(name) + ' 示意图">';
+  for (let g = 10; g < 100; g += 10){
+    s += '<line class="grid" x1="'+g+'" y1="2" x2="'+g+'" y2="98"/><line class="grid" x1="2" y1="'+g+'" x2="98" y2="'+g+'"/>';
+  }
+  s += '<rect class="bound" x="2" y="2" width="96" height="96"/>';
+  s += '<text class="compass" x="94" y="9" text-anchor="end">N ▲</text>';
+  def.lm.forEach(l => {
+    const on = !!idx[l.n];
+    s += '<g class="' + (on ? 'on' : '') + '">';
+    if (on) s += '<circle class="ring" cx="'+l.x+'" cy="'+l.y+'" r="4"/>';
+    s += '<circle class="lm" cx="'+l.x+'" cy="'+l.y+'" r="'+(on?2.4:1.3)+'"/>';
+    if (on) s += '<text class="num" x="'+l.x+'" y="'+(l.y+0.85)+'">'+idx[l.n]+'</text>';
+    const anchor = l.x > 70 ? 'end' : 'middle';
+    s += '<text class="lmt" x="'+l.x+'" y="'+(l.y-3.6)+'" text-anchor="'+anchor+'">'+esc(l.n)+'</text>';
+    s += '</g>';
+  });
+  s += '</svg>';
+  return s;
+}
+
+
+/* ---- controls ---- */
+document.getElementById('q').addEventListener('input', e => { F.q=e.target.value; render(); });
+document.getElementById('fHide').addEventListener('change', e => { F.hide=e.target.checked; render(); });
+document.getElementById('fPick').addEventListener('change', e => { F.pickOnly=e.target.checked; render(); });
+document.getElementById('fOpen').addEventListener('change', e => {
+  F.open=e.target.checked;
+  if (!F.open) list.querySelectorAll('.q.open').forEach(x => x.classList.remove('open'));
+  render();
+});
+document.getElementById('reset').onclick = () => {
+  if (confirm('确定清空所有完成进度、已选任务和地图标记吗？（载入的地图图片不会删除）')) {
+    S={done:{},pick:{},pins:{}}; save(); render();
+  }
+};
+document.getElementById('clearPick').onclick = () => { S.pick={}; save(); render(); };
+document.getElementById('goPlan').onclick = () => showTab('plan');
+document.getElementById('clClearPick').onclick = () => {
+  if (!Object.keys(S.pick).length) return;
+  if (confirm('清空规划清单？（已完成的记录不受影响）')) { S.pick={}; save(); render(); }
+};
+document.getElementById('clCopy').onclick = () => {
+  const line = q => '- [' + q.t + '] ' + q.cn + (q.en ? ' / ' + q.en : '') +
+    (q.maps.length ? '  @' + q.maps.join('/') : '') + (q.ll ? '  LL' + q.ll : '');
+  const pk = picked(), dn = Q.filter(q => S.done[q.id]);
+  const txt = ['## 规划清单 (' + pk.length + ')'].concat(pk.map(line))
+    .concat(['', '## 已完成 (' + dn.length + ')']).concat(dn.map(line)).join('\n');
+  const done = () => { const b = document.getElementById('clCopy'); const o = b.textContent;
+    b.textContent = '已复制'; setTimeout(() => { b.textContent = o; }, 1400); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done));
+  } else fallbackCopy(txt, done);
+};
+function fallbackCopy(txt, cb){
+  const ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e){ alert('复制失败，手动选中：\n\n' + txt.slice(0,500)); }
+  document.body.removeChild(ta);
+}
+function showTab(p){
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.p===p?'true':'false'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  // both map surfaces want the full window
+  document.body.classList.toggle('wide', p === 'plan' || p === 'maps');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (p === 'plan') requestAnimationFrame(refitAll);      // panel was hidden: measure now
+  if (p === 'maps'){
+    renderMaps(); preloadMapImages();
+    requestAnimationFrame(refitMapView);
+  }
+}
+
+/* the gallery shows every map at once, so pull each src into the cache */
+let _preloaded = false;
+function preloadMapImages(force){
+  if (_preloaded && !force) return;
+  _preloaded = true;
+  Promise.all(MAPS.map(m => IMGCACHE[m] ? null : imgSrc(m).then(src => { if (src) IMGCACHE[m] = src; }).catch(()=>{})))
+    .then(() => probeLocalMaps())
+    .then(() => { renderMaps(); renderPlan(); });
+}
+
+/* Pick up map images sitting in a folder next to this file — nothing is copied
+   into the page, it just points at them. Anything you loaded by hand wins. */
+const LOCALDIRS = ['maps/', ''];
+const LOCALEXTS = ['webp', 'jpg', 'jpeg', 'png'];
+function tryImg(src){
+  return new Promise(res => {
+    const im = new Image();
+    im.onload = () => res(im.naturalWidth ? src : null);
+    im.onerror = () => res(null);
+    im.src = src;
+  });
+}
+let _probed = false;
+async function probeLocalMaps(force){
+  if (_probed && !force) return;
+  _probed = true;
+  await Promise.all(MAPS.map(async m => {
+    if (IMGCACHE[m]) return;                       // already stored by the user
+    const names = [m].concat((MAPALIAS[m] || []).slice(0, 2));
+    for (const dir of LOCALDIRS){
+      for (const n of names){
+        for (const ext of LOCALEXTS){
+          const src = dir + encodeURIComponent(n) + '.' + ext;
+          const hit = await tryImg(src);
+          if (hit){ IMGCACHE[m] = hit; IMGMODE[m] = 'local'; return; }
+        }
+      }
+    }
+  }));
+}
+document.querySelectorAll('.tab').forEach(t => { t.onclick = () => showTab(t.dataset.p); });
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.querySelector('.pop')){ closePop(); renderPlan(); }
+});
+
+/* ---- import a quest list pasted from the in-game panel ---- */
+function nkey(s){
+  return String(s).replace(/[\s　]/g,'')
+    .replace(/[‐-―−—–]/g,'-')
+    .replace(/[，,。、．·:：;；!！?？"'“”‘’]/g,'')
+    .toLowerCase();
+}
+const nbare = s => nkey(String(s).replace(/[（(][^）)]*[）)]/g,''));
+const MAPWORDS = ['塔科夫街区','中心区','海岸线','立交桥','储备站','破冰船','实验室','街区','海关','森林','工厂','灯塔','迷宫','码头'];
+function cleanLine(s){
+  let t = String(s)
+    .replace(/^[\s\-*•·—]+/,'')
+    .replace(/^\d+[.、)]\s*/,'')
+    .replace(/\d+\s*%/g,'')
+    .replace(/(进行中|已完成|未完成|未开始|可交付|待交付|已领取)[!！]?/g,'')
+    .replace(/\bLL\s*\d\b/gi,'')
+    .trim();
+  return t;
+}
+const IDX_EXACT = {}, IDX_BARE = {};
+Q.forEach(q => {
+  const a = nkey(q.cn); if (!(a in IDX_EXACT)) IDX_EXACT[a] = q;
+  const b = nbare(q.cn); if (!(b in IDX_BARE)) IDX_BARE[b] = q;
+});
+function matchQuest(raw){
+  const line = cleanLine(raw);
+  if (!line) return null;
+  const tries = [line];
+  let stripped = line;
+  MAPWORDS.forEach(w => { stripped = stripped.split(w).join(' '); });
+  stripped = stripped.trim();
+  if (stripped && stripped !== line) tries.push(stripped);
+  for (const t of tries){
+    const a = nkey(t); if (IDX_EXACT[a]) return IDX_EXACT[a];
+    const b = nbare(t); if (IDX_BARE[b]) return IDX_BARE[b];
+  }
+  for (const t of tries){
+    const b = nbare(t);
+    if (b.length < 3) continue;
+    const hits = Q.filter(q => { const c = nbare(q.cn); return c.indexOf(b) >= 0 || b.indexOf(c) >= 0; });
+    if (hits.length === 1) return hits[0];
+    if (hits.length > 1){
+      const exactLen = hits.filter(q => nbare(q.cn).length === b.length);
+      if (exactLen.length === 1) return exactLen[0];
+    }
+  }
+  return null;
+}
+function openImport(){
+  const wrap = document.createElement('div');
+  wrap.className = 'modal';
+  wrap.innerHTML =
+    '<div class="box">' +
+      '<h4>导入任务清单<button class="mbtn zb x" data-a="x">×</button></h4>' +
+      '<div class="bd2">' +
+        '<div style="font-size:12.5px;color:var(--ink-dim);line-height:1.6">' +
+          '一行一个任务名，直接从游戏任务列表照抄即可。行里带地图名、进度百分比、「进行中！」都会自动忽略。' +
+        '</div>' +
+        '<textarea data-a="ta" placeholder="发财计划&#10;直播 - 2&#10;兽医也是医&#10;声东击西 - 2（PVP 赛季）"></textarea>' +
+        '<div data-a="res"></div>' +
+      '</div>' +
+      '<div class="ft">' +
+        '<button class="mbtn" data-a="run">匹配</button>' +
+        '<span class="sp2"></span>' +
+        '<button class="mbtn" data-a="add" disabled>加入规划</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  const ta = wrap.querySelector('[data-a="ta"]');
+  const res = wrap.querySelector('[data-a="res"]');
+  const addBtn = wrap.querySelector('[data-a="add"]');
+  const close = () => wrap.remove();
+  wrap.querySelector('[data-a="x"]').onclick = close;
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  ta.focus();
+
+  let hits = [];
+  const run = () => {
+    const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+    const seenId = new Set(); hits = []; const bad = [];
+    lines.forEach(l => {
+      const q = matchQuest(l);
+      if (q && !seenId.has(q.id)){ seenId.add(q.id); hits.push(q); }
+      else if (!q) bad.push(l);
+    });
+    res.innerHTML =
+      (hits.length ? '<div class="imp-h">匹配到 ' + hits.length + ' 条</div>' +
+        hits.map((q,i) => '<label class="imp-r" style="--tc:var(--t-' + q.t + ')">' +
+          '<input type="checkbox" checked data-i="' + i + '" style="accent-color:var(--brass)">' +
+          '<span><b>' + esc(q.cn) + '</b>' + (q.en ? ' <span style="color:var(--ink-mute);font-size:11.5px">' + esc(q.en) + '</span>' : '') + '</span>' +
+          '<span class="tr">' + q.t + '</span>' +
+          '<span class="tag map">' + (q.maps[0] || '不限') + '</span></label>').join('') : '') +
+      (bad.length ? '<div class="imp-h">没对上 ' + bad.length + ' 行</div><div class="imp-bad">' +
+        bad.map(b => esc(b)).join('<br>') + '</div>' : '') +
+      (!hits.length && !bad.length ? '<div style="font-size:12.5px;color:var(--ink-mute)">先粘贴任务名。</div>' : '');
+    addBtn.disabled = !hits.length;
+  };
+  wrap.querySelector('[data-a="run"]').onclick = run;
+  ta.addEventListener('input', () => { if (ta.value.trim()) run(); });
+  addBtn.onclick = () => {
+    let n = 0;
+    res.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      if (!cb.checked) return;
+      const q = hits[+cb.dataset.i];
+      if (q){ S.pick[q.id] = true; n++; }
+    });
+    save(); close(); render(); showTab('plan');
+    if (n) alert('已加入 ' + n + ' 条任务到跑图规划。');
+  };
+}
+document.getElementById('openImport').onclick = openImport;
+
+/* ---- batch-load map images: pick every file at once, match by filename ---- */
+const MAPALIAS = {
+  '海关':['customs','海关'],
+  '森林':['woods','forest','森林'],
+  '工厂':['factory','工厂'],
+  '海岸线':['shoreline','sanatorium','shore','海岸线','疗养院'],
+  '立交桥':['interchange','立交桥'],
+  '储备站':['reserve','储备站'],
+  '灯塔':['lighthouse','灯塔'],
+  '街区':['streets','street','街区','塔科夫街区'],
+  '中心区':['groundzero','ground_zero','ground-zero','ground zero','gz','中心区'],
+  '实验室':['labs','lab','laboratory','实验室'],
+  '迷宫':['labyrinth','maze','迷宫'],
+  '码头':['terminal','港','码头'],
+  '破冰船':['icebreaker','ice_breaker','破冰船']
+};
+function mapFromFilename(name){
+  const base = String(name).replace(/\.[a-z0-9]+$/i,'').toLowerCase().replace(/[_\-\s]+/g,'');
+  let best = null, bestLen = 0;
+  for (const m in MAPALIAS){
+    for (const a of MAPALIAS[m]){
+      const k = a.toLowerCase().replace(/[_\-\s]+/g,'');
+      if (base.indexOf(k) >= 0 && k.length > bestLen){ best = m; bestLen = k.length; }
+    }
+  }
+  return best;
+}
+(function(){
+  const btn = document.getElementById('bulkMaps');
+  const inp = document.getElementById('bulkMapsFile');
+  const msg = document.getElementById('bulkMsg');
+  if (!btn) return;
+  btn.onclick = () => inp.click();
+  inp.onchange = async () => {
+    const files = [...(inp.files || [])];
+    inp.value = '';
+    if (!files.length) return;
+    const done = [], skip = [];
+    btn.disabled = true;
+    for (let i = 0; i < files.length; i++){
+      const f = files[i];
+      const m = mapFromFilename(f.name);
+      msg.textContent = '处理中 ' + (i+1) + '/' + files.length + '…';
+      if (!m){ skip.push(f.name); continue; }
+      try { await imgPut(m, f); done.push(m); }
+      catch(e){ skip.push(f.name + '（存不下）'); }
+    }
+    btn.disabled = false;
+    msg.innerHTML = '载入 <b style="color:var(--brass)">' + done.length + '</b> 张：' + done.join('、') +
+      (skip.length ? ' ｜ 未识别 ' + skip.length + ' 个：' + skip.map(s => esc(s)).join('、') : '');
+    renderPlan();
+  };
+})();
+
+/* ---- backup / restore: move the whole setup between browsers or machines ---- */
+function blobToDataUrl(b){
+  return new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => res(null); fr.readAsDataURL(b); });
+}
+async function collectImages(){
+  const outMap = {};
+  for (const m of MAPS){
+    try {
+      const blob = await idbGet(m);
+      if (blob){ outMap[m] = await blobToDataUrl(blob); continue; }
+    } catch(e){}
+    const d = lsGet(m); if (d) outMap[m] = d;
+  }
+  return outMap;
+}
+function downloadJson(obj, filename){
+  const blob = new Blob([JSON.stringify(obj)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+function dataUrlToBlob(d){
+  const i = d.indexOf(','); const meta = d.slice(0, i);
+  const bin = atob(d.slice(i + 1));
+  const arr = new Uint8Array(bin.length);
+  for (let k = 0; k < bin.length; k++) arr[k] = bin.charCodeAt(k);
+  const mime = (meta.match(/data:([^;]+)/) || [])[1] || 'image/webp';
+  return new Blob([arr], { type:mime });
+}
+function openBackup(){
+  const wrap = document.createElement('div');
+  wrap.className = 'modal';
+  wrap.innerHTML =
+    '<div class="box">' +
+      '<h4>备份 / 恢复<button class="mbtn zb x" data-a="x">×</button></h4>' +
+      '<div class="bd2">' +
+        '<div style="font-size:12.5px;color:var(--ink-dim);line-height:1.65">' +
+          '把进度、规划清单、地图标记（可选连同地图图片和截图）导出成一个文件。' +
+          '换浏览器、换电脑，或者在本地文件和在线版之间搬家时，导入这个文件就能原样恢复。' +
+        '</div>' +
+        '<div data-a="st" style="font-size:12px;color:var(--ink-mute)"></div>' +
+      '</div>' +
+      '<div class="ft">' +
+        '<button class="mbtn" data-a="expS">导出进度（小）</button>' +
+        '<button class="mbtn" data-a="expL">导出全部（含图片）</button>' +
+        '<span class="sp2"></span>' +
+        '<button class="mbtn" data-a="imp">导入文件…</button>' +
+        '<input type="file" accept="application/json,.json" data-a="impf" style="display:none">' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  const st = wrap.querySelector('[data-a="st"]');
+  const close = () => wrap.remove();
+  wrap.querySelector('[data-a="x"]').onclick = close;
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+
+  wrap.querySelector('[data-a="expS"]').onclick = () => {
+    downloadJson({ v:1, state:S }, 'tarkov-guide-progress.json');
+    st.textContent = '已导出进度（不含图片）。';
+  };
+  wrap.querySelector('[data-a="expL"]').onclick = async () => {
+    st.textContent = '正在打包图片…';
+    const images = await collectImages();
+    downloadJson({ v:1, state:S, images:images }, 'tarkov-guide-full.json');
+    st.textContent = '已导出：地图 ' + Object.keys(images).length + ' 张，标记与备注已含在内。';
+  };
+  const impf = wrap.querySelector('[data-a="impf"]');
+  wrap.querySelector('[data-a="imp"]').onclick = () => impf.click();
+  impf.onchange = () => {
+    const f = impf.files && impf.files[0]; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = async () => {
+      let data;
+      try { data = JSON.parse(fr.result); } catch(e){ st.textContent = '这不是有效的备份文件。'; return; }
+      if (!data || !data.state){ st.textContent = '文件里没有进度数据。'; return; }
+      if (!confirm('导入会覆盖当前的进度、清单和标记，确定吗？')) return;
+      st.textContent = '正在恢复…';
+      S = Object.assign({ done:{}, pick:{}, pins:{} }, data.state);
+      if (!S.pins) S.pins = {};
+      save();
+      let nImg = 0, nShot = 0;
+      for (const m in (data.images || {})){
+        try { await idbPut(m, dataUrlToBlob(data.images[m])); nImg++; }
+        catch(e){ try { localStorage.setItem(IMGKEY(m), data.images[m]); nImg++; } catch(e2){} }
+      }
+      for (const id in (data.shots || {})){
+        try { await idbPut(SHOTKEY(id), dataUrlToBlob(data.shots[id])); nShot++; }
+        catch(e){ try { localStorage.setItem(SHOTKEY(id), data.shots[id]); nShot++; } catch(e2){} }
+      }
+      render();
+      st.textContent = '已恢复：地图 ' + nImg + ' 张，截图 ' + nShot + ' 张。';
+    };
+    fr.readAsText(f);
+  };
+}
+document.getElementById('openBackup').onclick = openBackup;
+
+/* bulk loader on the gallery tab reuses the same filename matcher */
+(function(){
+  const btn = document.getElementById('mapsBulk');
+  const inp = document.getElementById('mapsBulkFile');
+  const msg = document.getElementById('mapsMsg');
+  if (!btn) return;
+  btn.onclick = () => inp.click();
+  inp.onchange = async () => {
+    const files = [...(inp.files || [])]; inp.value = '';
+    if (!files.length) return;
+    const done = [], skip = [];
+    btn.disabled = true;
+    for (let i = 0; i < files.length; i++){
+      const f = files[i], m = mapFromFilename(f.name);
+      msg.textContent = '处理中 ' + (i+1) + '/' + files.length + '…';
+      if (!m){ skip.push(f.name); continue; }
+      try { await imgPut(m, f); const src = await imgSrc(m); if (src) IMGCACHE[m] = src; done.push(m); }
+      catch(e){ skip.push(f.name + '（存不下）'); }
+    }
+    btn.disabled = false;
+    msg.innerHTML = '载入 <b style="color:var(--brass)">' + done.length + '</b> 张：' + done.join('、') +
+      (skip.length ? ' ｜ 未识别 ' + skip.length + ' 个：' + skip.map(s => esc(s)).join('、') : '');
+    renderMaps();
+  };
+})();
+
+document.getElementById('openHelp').onclick = () => {
+  const wrap = document.createElement('div');
+  wrap.className = 'modal';
+  wrap.innerHTML =
+    '<div class="box"><h4>使用说明<button class="mbtn zb x" data-a="x">×</button></h4>' +
+    '<div class="bd2" style="font-size:13px;line-height:1.75;color:var(--ink-dim)">' +
+      '<div><b style="color:var(--ink)">加任务</b>：左上角搜索任务名 / 目标关键词，回车即加入；或用<b>「导入任务」</b>把游戏任务列表整段贴进来批量匹配。</div>' +
+      '<div><b style="color:var(--ink)">换地图</b>：默认是按相对方位手绘的分区图（<b>不是游戏内真实坐标</b>）。用<b>「载入地图」</b>一次全选你自己的地图图片，按文件名自动对号入座。图片只存在这台机器的浏览器里。</div>' +
+      '<div><b style="color:var(--ink)">标记</b>：右侧点一个任务 → 点<b>「开始标点」</b> → 在图上连续点，可以给同一个任务放多个标记。点标记本身会打开小窗，可以改名、写<b>文字备注</b>或删除。</div>' +
+      '<div><b style="color:var(--ink)">地图操作</b>：滚轮缩放（以光标为锚点）、按住拖动平移、「复位」回到原始大小。切换标签页不会丢失缩放位置。</div>' +
+      '<div><b style="color:var(--ink)">看攻略</b>：右侧任务栏点开任务，底部有<b>「在 eftarkov 看详细攻略」</b>链接，那里有带标点的截图。</div>' +
+      '<div><b style="color:var(--ink)">搬家</b>：<b>「备份」</b>可以把进度、标记、地图图片导出成一个文件，换浏览器或换电脑时导入即可。</div>' +
+    '</div><div class="ft"><span class="sp2"></span><button class="mbtn" data-a="ok">知道了</button></div></div>';
+  document.body.appendChild(wrap);
+  const close = () => wrap.remove();
+  wrap.querySelector('[data-a="x"]').onclick = close;
+  wrap.querySelector('[data-a="ok"]').onclick = close;
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+};
+
+/* ---- search a quest and add it to the plan, right from the planner ---- */
+(function(){
+  const box = document.getElementById('planAdd');
+  const res = document.getElementById('planAddRes');
+  const hide = () => { res.classList.remove('on'); res.innerHTML = ''; };
+  const run = () => {
+    const t = box.value.trim().toLowerCase();
+    if (!t){ hide(); return; }
+    const hits = Q.filter(q => !S.pick[q.id] &&
+      (q.cn + ' ' + q.en + ' ' + q.t + ' ' + q.maps.join(' ') + ' ' + q.o.join(' ')).toLowerCase().indexOf(t) >= 0
+    ).slice(0, 14);
+    res.innerHTML = hits.length
+      ? hits.map(q => '<button data-q="' + esc(q.id) + '" style="--tc:var(--t-' + q.t + ')">' +
+          '<span class="tr">' + q.t + '</span>' +
+          '<span style="min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+            esc(q.cn) + (S.done[q.id] ? ' <span style="color:var(--done);font-size:11px">已完成</span>' : '') + '</span>' +
+            (q.en ? '<span class="en">' + esc(q.en) + '</span>' : '') + '</span>' +
+          '<span class="tag map">' + (q.maps[0] || '不限') + '</span></button>').join('')
+      : '<div class="none">没有匹配的任务（已在规划里的不再显示）</div>';
+    res.classList.add('on');
+    res.querySelectorAll('button').forEach(b => {
+      b.onclick = () => {
+        const q = Q.find(z => z.id === b.dataset.q);
+        if (!q) return;
+        S.pick[q.id] = true;
+        if (q.maps.length) PLANMAP = q.maps[0];
+        save(); box.value = ''; hide(); render(); showTab('plan');
+      };
+    });
+  };
+  box.addEventListener('input', run);
+  box.addEventListener('focus', () => { if (box.value.trim()) run(); });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.addwrap')) hide();
+  });
+  box.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ hide(); box.blur(); }
+    if (e.key === 'Enter'){ const first = res.querySelector('button'); if (first) first.click(); }
+  });
+})();
+
+
+render();
+preloadMapImages();   // storage first, then whatever sits in ./maps next to this file
+</script>
