@@ -1,4 +1,5 @@
 <title>逃离塔科夫 · 赛季服任务引导</title>
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
 <style>
 /* Minimal-tech palette: deep blue-black ground, one cyan accent, cool neutrals.
    Every colour is a token — components never hardcode. */
@@ -547,6 +548,8 @@ body.wide #p-maps.on .vwork{flex:1; min-height:0}
             <button class="mbtn zb" data-v="in" title="放大">+</button>
             <button class="mbtn" data-v="fit">适应</button>
           </span>
+          <a class="mbtn" id="mapsSrcLink" target="_blank" rel="noopener"
+             style="text-decoration:none" title="在 eftarkov 打开这张地图的原页面">原站地图 ↗</a>
           <button class="mbtn" id="mapsBulk" title="一次全选所有地图图片，按文件名自动对号入座">载入地图</button>
           <input type="file" id="mapsBulkFile" accept="image/*" multiple style="display:none">
         </span>
@@ -1480,6 +1483,12 @@ function openPop(card, m, i){
 }
 
 /* ---- map viewer: planner-style workspace, view only ---- */
+/* eftarkov's own page for each map — we link there instead of rehosting their images */
+const MAPPAGE = {
+  '中心区':177, '工厂':178, '海关':179, '森林':180, '海岸线':181, '立交桥':182,
+  '储备站':183, '灯塔':184, '街区':185, '实验室':186, '迷宫':187, '码头':265, '破冰船':272
+};
+const mapPageUrl = m => MAPPAGE[m] ? 'https://www.eftarkov.com/news/web_' + MAPPAGE[m] + '.html' : null;
 let VIEWMAP = null;
 const VV = {};                       // per-map view state for this tab only
 function getVV(m){ return VV[m] || (VV[m] = { k:1, tx:0, ty:0 }); }
@@ -1548,13 +1557,23 @@ function renderMaps(){
   if (badge){ badge.dataset.n = loaded; badge.textContent = loaded ? loaded : ''; }
 
   const m = VIEWMAP, src = IMGCACHE[m];
+  const srcLink = document.getElementById('mapsSrcLink');
+  if (srcLink){
+    const u = mapPageUrl(m);
+    if (u){ srcLink.href = u; srcLink.style.display = ''; }
+    else srcLink.style.display = 'none';
+  }
   body.innerHTML =
     '<div class="vwork" data-map="' + esc(m) + '">' +
       '<div class="vstage">' +
         (src ? '<div class="vcanvas"><img alt="' + esc(m) + ' 地图" src="' + src + '"></div>'
-             : '<div class="vnone">「' + esc(m) + '」还没有地图图片<br>' +
-               '把图片放进这个网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(m) + '.webp</b>（jpg / png 也可以），' +
-               '刷新即可自动加载<br>或者点右上角「载入地图」一次全选</div>') +
+             : '<div class="vnone"><div>' +
+               '<div style="font-size:15px;color:var(--ink);margin-bottom:10px">「' + esc(m) + '」还没有地图图片</div>' +
+               (mapPageUrl(m) ? '<a class="mbtn" style="display:inline-block;text-decoration:none;padding:7px 14px" href="' +
+                  mapPageUrl(m) + '" target="_blank" rel="noopener">在 eftarkov 看这张地图 ↗</a><br><br>' : '') +
+               '想在这里直接看：点右上角<b>「载入地图」</b>选一张本地图片（只存在你自己的浏览器里），<br>' +
+               '或把图片放进网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(m) + '.webp</b>（jpg / png 也可以）' +
+               '</div></div>') +
       '</div>' +
     '</div>';
 

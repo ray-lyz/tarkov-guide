@@ -1,7 +1,1 @@
-# 地图图片不入库：第三方作品（带 eftarkov 水印），公开仓库等于对外分发。
-# 本地放进 maps/ 即可自动加载。
-maps/
-*.webp
-*.jpg
-*.jpeg
-*.png
+# nothing excluded
