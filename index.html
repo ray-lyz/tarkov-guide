@@ -369,6 +369,39 @@ tbody tr:last-child td{border-bottom:0}
 .mkr.hot .pdot{background:var(--rust); color:var(--on-accent)}
 .mkr.hot .pdot::after{border-top-color:var(--rust)}
 .mkr.hot .ptxt{border-left-color:var(--rust); border-color:var(--rust)}
+/* key markers read blue so they never get confused with quest markers */
+.mkr.key .pdot{background:var(--steel); font-size:10px}
+.mkr.key .pdot::after{border-top-color:var(--steel)}
+.mkr.key .ptxt{border-left-color:var(--steel); border-color:var(--steel)}
+.mkr.key.hot .pdot{background:var(--rust)}
+.mkr.key.hot .pdot::after{border-top-color:var(--rust)}
+/* right panel task/key switch */
+.rtabs{gap:0; padding:0}
+.rtab{flex:1; background:none; border:0; border-bottom:2px solid transparent; color:var(--ink-dim);
+      font-family:var(--font-body); font-size:12.5px; padding:8px 6px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px}
+.rtab i{font-style:normal; font-family:var(--font-data); font-size:10.5px; color:var(--ink-mute)}
+.rtab:hover{color:var(--ink)}
+.rtab[aria-pressed="true"]{color:var(--brass); border-bottom-color:var(--brass)}
+.rtab[aria-pressed="true"] i{color:var(--brass-dim)}
+/* key checklist */
+#keyMarkWrap .vstage{height:clamp(420px,calc(100vh - 300px),1200px)}
+#keyMarkWrap .vstage.arm{cursor:crosshair}
+#keyMarkWrap .work{border:1px solid var(--line-soft); background:var(--panel)}
+.keypane{overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:5px; flex:1; min-height:0}
+.kp-sum{font-size:11.5px; color:var(--ink-mute); line-height:1.6; padding:2px 2px 4px}
+.kp-sum b{color:var(--brass)}
+.kp{border:1px solid var(--line-soft); border-left:3px solid var(--steel); background:var(--sunk);
+    padding:6px 8px; cursor:pointer}
+.kp:hover{background:var(--raise)}
+.kp[aria-selected="true"]{background:color-mix(in srgb,var(--steel) 16%,var(--sunk)); border-color:var(--steel)}
+.kp .hd{display:flex; align-items:center; gap:7px}
+.kp .nm{font-size:12.5px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.kp .cnt{flex:0 0 auto; font-family:var(--font-data); font-size:10.5px; color:var(--steel);
+         border:1px solid color-mix(in srgb,var(--steel) 50%,transparent); padding:0 5px}
+.kp .cnt.zero{color:var(--ink-mute); border-color:var(--line)}
+.kp-meta{font-size:10.5px; color:var(--ink-mute); margin-top:3px; display:flex; gap:6px; align-items:center}
+.kp-ok{margin-left:auto; color:var(--done)}
 /* task row quick actions */
 .tkb{width:20px; height:20px; flex:0 0 auto; padding:0; line-height:1; font-size:12px;
      background:transparent; border:1px solid var(--line); color:var(--ink-mute); cursor:pointer}
@@ -593,7 +626,12 @@ body.wide #p-maps.on .vwork{flex:1; min-height:0}
         统计自各任务详情页标注的钥匙需求。<b>必备</b>＝任务明确要求；<b>可能需要</b>＝视打法而定；
         <b>未标注</b>＝任务提到但没写必备与否（多为上交类）。按<b>能解锁的任务数</b>排序，越靠前越值得优先搞到。
       </div>
-      <div class="filters">
+      <div class="frow" style="gap:6px">
+        <button class="mbtn" id="kmList" aria-pressed="true">钥匙清单</button>
+        <button class="mbtn" id="kmMark" aria-pressed="false">在地图上标注</button>
+      </div>
+      <div id="keyMarkWrap" style="display:none"></div>
+      <div class="filters" id="keyFilters">
         <div class="frow"><input class="search" id="keySearch" type="search" placeholder="搜索钥匙名或任务名…"></div>
         <div class="frow"><span class="flbl">地图</span><div class="frow" id="keyMapChips" style="gap:6px"></div></div>
         <div class="frow" style="gap:14px">
@@ -1151,7 +1189,33 @@ window.addEventListener('resize', refitAll);
 /* ---- planner ---- */
 let PLANMAP = null;   // which map's workspace is open
 let SELTASK = null;   // task that new markers get attached to
+let SELKEY = null;    // key that new markers get attached to (mutually exclusive with SELTASK)
+let RPANE = 'task';   // right panel: task list or key list
 let ARMED = false;    // marker placing mode
+
+/* the key checklist for one map: pick a key, then click the map to mark its door */
+function keyPaneHtml(mapKeys, pins){
+  if (!mapKeys.length){
+    return '<div class="keypane"><div class="tray-empty">这张图没有任务钥匙。</div></div>';
+  }
+  const marked = id => pins.map((p,i) => ({p,i})).filter(o => o.p.kid === id);
+  const done = mapKeys.filter(k => marked(k.id).length).length;
+  return '<div class="keypane">' +
+    '<div class="kp-sum">已标 <b>' + done + '</b> / ' + mapKeys.length +
+      ' · 点一把钥匙，再点「开始标点」在图上标出它开的门</div>' +
+    mapKeys.map(k => {
+      const mine = marked(k.id);
+      const must = k.quests.filter(q => q.r === 1).length;
+      return '<div class="kp" data-k="' + esc(k.id) + '" aria-selected="' + (k.id === SELKEY) + '">' +
+        '<div class="hd"><span class="nm">' + esc(k.n) + '</span>' +
+          (mine.length ? '<span class="cnt" style="margin-left:auto">' + mine.length + '</span>'
+                       : '<span class="cnt zero" style="margin-left:auto">0</span>') + '</div>' +
+        '<div class="kp-meta">' + k.quests.length + ' 个任务' + (must ? ' · 必备 ' + must : '') +
+          (mine.length ? '<span class="kp-ok">已标记</span>' : '') + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
 
 /* quests with no map of their own — kill / hand-in / modding jobs that any raid can advance */
 function globalColHtml(noMap){
@@ -1252,7 +1316,8 @@ function renderPlan(){
           '</span>' +
           '<span class="sp"></span>' +
           '<input class="qmatch" data-act="qmatch" type="search" placeholder="快速匹配任务…">' +
-          '<span class="tgt">标记归属：' + (tgtQ ? '<b>' + esc(tgtQ.cn) + '</b>' : '<span style="color:var(--ink-mute)">未选任务 → 自定义</span>') + '</span>' +
+          '<span class="tgt">标记归属：' + (tgtQ ? '<b>' + esc(tgtQ.cn) + '</b>'
+            : '<span style="color:var(--ink-mute)">未选任务 → 自定义</span>') + '</span>' +
           '<button class="mbtn" data-act="armpin" aria-pressed="' + (ARMED ? 'true' : 'false') + '">' +
             (ARMED ? '点击图上放标记' : '开始标点') + '</button>' +
           '<button class="mbtn danger" data-act="clearpin">清除标记 (' + pins.length + ')</button>' +
@@ -1306,6 +1371,7 @@ function renderPlan(){
     const qid = row.dataset.q;
     row.onclick = () => {
       SELTASK = (SELTASK === qid) ? null : qid;
+      if (SELTASK) SELKEY = null;
       closePop(); renderPlan();
     };
     row.querySelector('[data-a="done"]').onclick = e => {
@@ -1427,7 +1493,7 @@ function renderPlan(){
     const x = ((e.clientX - r.left) - v.base.l - v.tx) / W * 100;
     const y = ((e.clientY - r.top)  - v.base.t - v.ty) / H * 100;
     if (x < 0 || x > 100 || y < 0 || y > 100) return;
-    let label = '', qid = '';
+    let label = '', qid = '', kid = '';
     if (SELTASK){
       const q = Q.find(z => z.id === SELTASK);
       qid = SELTASK; label = q ? q.cn : '';
@@ -1436,17 +1502,20 @@ function renderPlan(){
       if (label === null) return;
     }
     S.pins = S.pins || {}; S.pins[m] = S.pins[m] || [];
-    S.pins[m].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:label || '标记', qid:qid });
+    S.pins[m].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:label || '标记', qid:qid, kid:kid });
     save(); renderPlan();                          // ARMED stays on, so you can keep clicking
   });
 }
 function pinHtml(p,i){
-  const hot = SELTASK && p.qid === SELTASK;
-  const dim = SELTASK && !hot;
+  const sel = SELKEY || SELTASK;
+  const hot = !!sel && (SELKEY ? p.kid === SELKEY : p.qid === SELTASK);
+  const dim = !!sel && !hot;
+  const isKey = !!p.kid;
   const tip = p.note ? (p.t || '标记') + ' — ' + p.note.slice(0, 60) : '点击查看 / 备注 / 删除';
   return '<div class="mkr' + (hot ? ' hot' : '') + (dim ? ' dim' : '') + (p.note ? ' hasnote' : '') +
+    (isKey ? ' key' : '') +
     '" data-i="' + i + '" style="left:' + p.x + '%;top:' + p.y + '%" title="' + esc(tip) + '">' +
-    '<span class="pdot">' + (i+1) + '</span>' +
+    '<span class="pdot">' + (isKey ? '🔑' : (i+1)) + '</span>' +
     (p.t ? '<span class="ptxt">' + esc(p.t) + '</span>' : '') + '</div>';
 }
 
@@ -1548,7 +1617,8 @@ function applyV(card, m){
   cv.style.height = (v.base.h * v.k) + 'px';
   cv.style.left   = (v.base.l + v.tx) + 'px';
   cv.style.top    = (v.base.t + v.ty) + 'px';
-  const lbl = document.querySelector('#p-maps [data-v="lbl"]');
+  const panel = card.closest('.panel') || document;
+  const lbl = panel.querySelector('[data-v="lbl"]');
   if (lbl) lbl.textContent = Math.round(v.k * 100) + '%';
 }
 function fitV(card, m){
@@ -1788,6 +1858,157 @@ function renderKeys(){
   });
 }
 
+/* ---- mark key locations on a map ---- */
+let KMODE = 'list';      // list | mark
+let KMAP = null;         // map being marked
+let KARMED = false;
+const keyMapsList = () => MAPS.filter(m => KEYIDX.some(k => keyMapsOf(k.id).indexOf(m) >= 0));
+
+function renderKeyMark(){
+  const wrap = document.getElementById('keyMarkWrap');
+  if (!wrap) return;
+  const maps = keyMapsList();
+  if (maps.indexOf(KMAP) < 0) KMAP = maps[0];
+  const m = KMAP;
+  const mapKeys = KEYIDX.filter(k => keyMapsOf(k.id).indexOf(m) >= 0);
+  if (SELKEY && !mapKeys.some(k => k.id === SELKEY)) SELKEY = null;
+  const pins = (S.pins && S.pins[m]) || [];
+  const tgtK = SELKEY ? mapKeys.find(k => k.id === SELKEY) : null;
+  const keyPins = pins.map((p,i) => ({p,i})).filter(o => o.p.kid);
+
+  wrap.innerHTML =
+    '<div class="frow planbar" style="margin-bottom:5px">' +
+      '<div class="mapsel">' + maps.map(mm =>
+        '<button class="chip" data-m="' + esc(mm) + '" aria-pressed="' + (mm === KMAP) + '"><b>' + esc(mm) + '</b>' +
+        '<span class="n">' + KEYIDX.filter(k => keyMapsOf(k.id).indexOf(mm) >= 0).length + '</span></button>').join('') +
+      '</div>' +
+      '<span class="planbar-r">' +
+        '<span class="zoomui">' +
+          '<button class="mbtn zb" data-v="out">−</button>' +
+          '<span class="zl" data-v="lbl">100%</span>' +
+          '<button class="mbtn zb" data-v="in">+</button>' +
+          '<button class="mbtn" data-v="fit">适应</button>' +
+        '</span>' +
+        '<span class="tgt">标记：' + (tgtK ? '<b style="color:var(--steel)">' + esc(tgtK.n) + '</b>'
+          : '<span style="color:var(--ink-mute)">先在右侧选一把钥匙</span>') + '</span>' +
+        '<button class="mbtn" data-a="arm" aria-pressed="' + (KARMED ? 'true' : 'false') + '"' +
+          (tgtK ? '' : ' disabled') + '>' + (KARMED ? '点击图上标注' : '开始标点') + '</button>' +
+        '<button class="mbtn danger" data-a="clear">清除钥匙标记 (' + keyPins.length + ')</button>' +
+        '<button class="mbtn" data-a="img">载入地图</button>' +
+        '<input type="file" accept="image/*" data-a="file" style="display:none">' +
+      '</span>' +
+    '</div>' +
+    '<div class="work" data-map="' + esc(m) + '" style="grid-template-columns:minmax(0,1fr) 268px">' +
+      '<div class="left">' +
+        '<div class="vstage' + (KARMED ? ' arm' : '') + '">' +
+          '<div class="vcanvas">' +
+            (IMGCACHE[m] ? '<img alt="' + esc(m) + '" src="' + IMGCACHE[m] + '">'
+                         : '<div class="mapholder">' + mapSvg(m, MAPDEF[m], {}) + '</div>') +
+            pins.map((p,i) => pinHtml(p,i)).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="right">' +
+        '<div class="rhd">' + esc(m) + ' 钥匙<span class="n">' + mapKeys.length + '</span></div>' +
+        keyPaneHtml(mapKeys, pins) +
+      '</div>' +
+    '</div>';
+
+  const card = wrap.querySelector('.work');
+  const stage = card.querySelector('.vstage');
+  const img = card.querySelector('img');
+  const ready = () => {
+    if (img && img.naturalWidth) IMGASPECT[m] = img.naturalWidth / img.naturalHeight;
+    fitV(card, m);
+  };
+  if (img){ if (img.complete && img.naturalWidth) ready(); else img.addEventListener('load', ready, { once:true }); }
+  else fitV(card, m);
+
+  wrap.querySelectorAll('.mapsel .chip').forEach(b => {
+    b.onclick = () => { KMAP = b.dataset.m; SELKEY = null; KARMED = false; renderKeyMark(); };
+  });
+  wrap.querySelectorAll('.kp').forEach(row => {
+    row.onclick = () => {
+      SELKEY = (SELKEY === row.dataset.k) ? null : row.dataset.k;
+      if (!SELKEY) KARMED = false;
+      renderKeyMark();
+    };
+  });
+  const q = s => wrap.querySelector(s);
+  q('[data-a="arm"]').onclick = () => { KARMED = !KARMED; renderKeyMark(); };
+  q('[data-a="clear"]').onclick = () => {
+    if (!keyPins.length) return;
+    if (!confirm('清除「' + m + '」上的 ' + keyPins.length + ' 个钥匙标记？（任务标记不受影响）')) return;
+    S.pins[m] = pins.filter(p => !p.kid);
+    if (!S.pins[m].length) delete S.pins[m];
+    save(); renderKeyMark();
+  };
+  const file = q('[data-a="file"]');
+  q('[data-a="img"]').onclick = () => file.click();
+  file.onchange = () => {
+    const f = file.files && file.files[0]; if (!f) return;
+    imgPut(m, f).then(() => imgSrc(m)).then(src => { if (src) IMGCACHE[m] = src; renderKeyMark(); })
+      .catch(err => alert('这张图存不下：' + (err && err.message ? err.message : '存储空间不足')));
+  };
+  const zc = (n, f) => { const b = q('[data-v="' + n + '"]'); if (b) b.onclick = f; };
+  zc('in',  () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1.25, r.width/2, r.height/2); });
+  zc('out', () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1/1.25, r.width/2, r.height/2); });
+  zc('fit', () => fitV(card, m));
+
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    zoomV(card, m, e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - r.left, e.clientY - r.top);
+  }, { passive:false });
+
+  let drag = false, sx = 0, sy = 0, stx = 0, sty = 0, moved = 0, downPin = null;
+  stage.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    downPin = e.target.closest('.mkr');
+    drag = true; moved = 0; sx = e.clientX; sy = e.clientY;
+    const v = getVV(m); stx = v.tx; sty = v.ty;
+    stage.classList.add('grabbing');
+    try { stage.setPointerCapture(e.pointerId); } catch(err){}
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+    const v = getVV(m); v.tx = stx + dx; v.ty = sty + dy;
+    applyV(card, m);
+  });
+  const endDrag = e => { drag = false; stage.classList.remove('grabbing');
+    try { stage.releasePointerCapture(e.pointerId); } catch(err){} };
+  stage.addEventListener('pointercancel', e => { endDrag(e); downPin = null; });
+  stage.addEventListener('pointerup', e => {
+    const wasDrag = drag, hit = downPin;
+    endDrag(e); downPin = null;
+    if (!wasDrag || moved > 5) return;
+    if (hit){                                   // click a marker to remove it
+      const i = +hit.dataset.i;
+      if (S.pins[m] && S.pins[m][i] !== undefined){
+        if (confirm('删除这个标记？')){
+          S.pins[m].splice(i,1);
+          if (!S.pins[m].length) delete S.pins[m];
+          save(); renderKeyMark();
+        }
+      }
+      return;
+    }
+    if (!KARMED || !SELKEY) return;
+    const v = getVV(m); if (!v.base) return;
+    const r = stage.getBoundingClientRect();
+    const W = v.base.w * v.k, H = v.base.h * v.k;
+    const x = ((e.clientX - r.left) - v.base.l - v.tx) / W * 100;
+    const y = ((e.clientY - r.top)  - v.base.t - v.ty) / H * 100;
+    if (x < 0 || x > 100 || y < 0 || y > 100) return;
+    const k = KEYIDX.find(z => z.id === SELKEY);
+    S.pins = S.pins || {}; S.pins[m] = S.pins[m] || [];
+    S.pins[m].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:k ? k.n : '钥匙', qid:'', kid:SELKEY });
+    save(); renderKeyMark();                    // stays armed so you can keep marking
+  });
+}
+
 /* ---- checklist ---- */
 function renderChecklist(){
   const body = document.getElementById('listBody');
@@ -1899,7 +2120,9 @@ function showTab(p){
     renderMaps(); preloadMapImages();
     requestAnimationFrame(refitMapView);
   }
-  if (p === 'keys') renderKeys();
+  if (p === 'keys'){
+    if (KMODE === 'mark') requestAnimationFrame(renderKeyMark); else renderKeys();
+  }
 }
 
 /* the gallery shows every map at once, so pull each src into the cache */
@@ -2247,6 +2470,19 @@ document.getElementById('openBackup').onclick = openBackup;
   s.addEventListener('input', () => { KF.q = s.value; renderKeys(); });
   r.addEventListener('change', () => { KF.reqOnly = r.checked; renderKeys(); });
   p.addEventListener('change', () => { KF.pickOnly = p.checked; renderKeys(); });
+
+  const bl = document.getElementById('kmList'), bm = document.getElementById('kmMark');
+  const apply = () => {
+    const mark = KMODE === 'mark';
+    bl.setAttribute('aria-pressed', String(!mark));
+    bm.setAttribute('aria-pressed', String(mark));
+    document.getElementById('keyFilters').style.display = mark ? 'none' : '';
+    document.getElementById('keysBody').style.display   = mark ? 'none' : '';
+    document.getElementById('keyMarkWrap').style.display = mark ? '' : 'none';
+    if (mark) renderKeyMark(); else renderKeys();
+  };
+  bl.onclick = () => { KMODE = 'list'; apply(); };
+  bm.onclick = () => { KMODE = 'mark'; apply(); };
 })();
 
 document.getElementById('openHelp').onclick = () => {
