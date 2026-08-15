@@ -402,6 +402,14 @@ tbody tr:last-child td{border-bottom:0}
 .kp .cnt.zero{color:var(--ink-mute); border-color:var(--line)}
 .kp-meta{font-size:10.5px; color:var(--ink-mute); margin-top:3px; display:flex; gap:6px; align-items:center}
 .kp-ok{margin-left:auto; color:var(--done)}
+/* the quests that need this key, revealed when the key is selected */
+.kp-more{display:none}
+.kp[aria-selected="true"] .kp-more{display:block; margin-top:6px; padding-top:6px; border-top:1px solid var(--line-soft)}
+.kp-q{display:grid; grid-template-columns:auto 1fr auto auto; gap:5px; align-items:center; padding:3px 0}
+.kp-q .kb{font-size:9.5px; padding:1px 4px}
+.kp-q .qn3{font-size:11.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink)}
+.kp-q .tr{font-family:var(--font-display); font-stretch:condensed; font-size:9.5px; letter-spacing:.05em; color:var(--tc)}
+.kp-q .srclink{font-size:11px; border-bottom:0; margin:0}
 /* task row quick actions */
 .tkb{width:20px; height:20px; flex:0 0 auto; padding:0; line-height:1; font-size:12px;
      background:transparent; border:1px solid var(--line); color:var(--ink-mute); cursor:pointer}
@@ -1212,6 +1220,16 @@ function keyPaneHtml(mapKeys, pins){
                        : '<span class="cnt zero" style="margin-left:auto">0</span>') + '</div>' +
         '<div class="kp-meta">' + k.quests.length + ' 个任务' + (must ? ' · 必备 ' + must : '') +
           (mine.length ? '<span class="kp-ok">已标记</span>' : '') + '</div>' +
+        '<div class="kp-more">' +
+          k.quests.map(q =>
+            '<div class="kp-q" style="--tc:var(--t-' + q.t + ')">' +
+              '<span class="kb ' + (q.r === 1 ? 'must' : q.r === 0 ? 'maybe' : '') + '">' +
+                (q.r === 1 ? '必备' : q.r === 0 ? '可能' : '未标') + '</span>' +
+              '<span class="qn3" title="' + esc(q.c) + '">' + esc(q.c) + '</span>' +
+              '<span class="tr">' + q.t + '</span>' +
+              (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u + '.html" target="_blank" rel="noopener" title="在 eftarkov 看攻略">↗</a>' : '') +
+            '</div>').join('') +
+        '</div>' +
       '</div>';
     }).join('') +
   '</div>';
@@ -1934,7 +1952,8 @@ function renderKeyMark(){
     b.onclick = () => { KMAP = b.dataset.m; SELKEY = null; KARMED = false; renderKeyMark(); };
   });
   wrap.querySelectorAll('.kp').forEach(row => {
-    row.onclick = () => {
+    row.onclick = e => {
+      if (e.target.closest('a')) return;          // let the source link through
       SELKEY = (SELKEY === row.dataset.k) ? null : row.dataset.k;
       if (!SELKEY) KARMED = false;
       renderKeyMark();
