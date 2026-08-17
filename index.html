@@ -510,6 +510,59 @@ tbody tr:last-child td{border-bottom:0}
 body.wide #p-maps.on{flex:1; min-height:520px; display:flex; flex-direction:column; gap:4px}
 body.wide #p-maps.on #mapsBody{flex:1; min-height:0; display:flex; flex-direction:column}
 body.wide #p-maps.on .vwork{flex:1; min-height:0}
+/* key marking gets the same full-window treatment as the planner */
+.modebar{gap:6px; align-items:center; flex-wrap:wrap}
+.chip.mode{padding:6px 14px}
+body.wide #p-keys.on{flex:1; min-height:0; display:flex; flex-direction:column; gap:4px}
+body.wide #p-keys.on #keyMarkWrap{flex:1; min-height:0; display:flex; flex-direction:column}
+body.wide #p-keys.on #keyMarkWrap .work{flex:1; min-height:0}
+body.wide #p-keys.on .work .left,body.wide #p-keys.on .work .right{min-height:0}
+body.wide #p-keys.on .vstage{flex:1; height:auto; min-height:360px}
+/* paged key list: one screenful at a time, never a scrollbar */
+body.wide #p-keys.on #keyListWrap{flex:1; min-height:0; display:flex; flex-direction:column; gap:4px}
+body.wide #p-keys.on #keysBody{flex:1; min-height:120px; overflow:hidden}
+/* a definite body height is what lets the flex chain shrink instead of spilling */
+body.wide{height:100%}
+.keybar{gap:10px; align-items:center; flex-wrap:wrap}
+.keybar .kq{flex:1 1 210px; min-width:160px; max-width:340px}
+.kchk{display:flex; gap:6px; align-items:center; font-size:12.5px; cursor:pointer; white-space:nowrap}
+.kchk input{accent-color:var(--brass)}
+.klegend{display:flex; gap:4px; align-items:center; font-size:11.5px; color:var(--ink-mute); white-space:nowrap}
+.klegend .ndot{margin-left:7px}
+#keyStat{font-size:11.5px; color:var(--ink-mute); margin-left:auto; white-space:nowrap;
+         font-family:var(--font-data)}
+#keyMapChips{gap:5px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; flex:0 0 auto}
+#keyMapChips .chip{padding:4px 9px; font-size:12px; flex:0 0 auto}
+/* keep these three in sync with KCOL / KROW / KGAP in the script */
+.kgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+       grid-auto-rows:30px; gap:4px; align-content:start}
+.kcard{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:7px;
+       background:var(--panel); border:1px solid var(--line-soft); border-left:3px solid var(--steel);
+       padding:0 8px; cursor:pointer; overflow:hidden; text-align:left}
+.kcard.qk{border-left-color:var(--brass)}
+.kcard.req{background:color-mix(in srgb,var(--brass) 8%,var(--panel))}
+.kcard:hover{background:var(--raise); border-color:var(--line)}
+.kcard .mp{font-family:var(--font-display); font-stretch:condensed; font-size:9.5px; letter-spacing:.06em;
+           color:var(--ink-mute); border:1px solid var(--line); padding:1px 4px; white-space:nowrap}
+.kcard .nm{font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.kcard .rt{font-family:var(--font-data); font-size:11px; color:var(--brass); white-space:nowrap}
+.kcard.nq .rt{color:var(--ink-mute)}
+.kcard .mk{color:var(--done); font-size:11px}
+.pager{display:flex; align-items:center; justify-content:center; gap:10px; padding:1px 0; flex:0 0 auto}
+.pager .pg{font-family:var(--font-data); font-size:12px; color:var(--ink-dim); min-width:74px; text-align:center}
+.pager .mbtn[disabled]{opacity:.35; cursor:default}
+.pager .hint{font-size:11px; color:var(--ink-mute); margin-left:6px}
+/* key detail: opens over the grid instead of pushing rows around */
+.kdet .box{width:min(560px,100%)}
+.kdet .kd-h{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.kdet .kd-maps{display:flex; gap:4px}
+.kdet .bd2{gap:6px}
+.kp-oth{color:var(--steel)}
+/* outdoor / indoor sheet switch */
+.laysw .mbtn{display:inline-flex; align-items:center; gap:5px}
+.laysw .dotimg{width:6px; height:6px; border-radius:50%; background:var(--done); flex:0 0 auto}
+.laysw .mbtn[aria-pressed="true"] .dotimg{background:var(--on-accent)}
+.laysw .mbtn.empty{opacity:.62}
 .vwork{border:1px solid var(--line-soft); background:var(--panel); display:flex; flex-direction:column}
 .vstage{position:relative; flex:1; min-height:360px; background:var(--sunk); overflow:hidden;
         touch-action:none; user-select:none; cursor:grab}
@@ -646,6 +699,7 @@ body.wide #p-maps.on .vwork{flex:1; min-height:0}
       <div class="frow planbar">
         <div class="mapsel" id="mapsSel"></div>
         <span class="planbar-r">
+          <span id="mapsLay"></span>
           <span class="zoomui">
             <button class="mbtn zb" data-v="out" title="缩小">−</button>
             <span class="zl" data-v="lbl">100%</span>
@@ -663,26 +717,24 @@ body.wide #p-maps.on .vwork{flex:1; min-height:0}
     </section>
 
     <section class="panel" id="p-keys">
-      <div class="note">
-        统计自各任务详情页标注的钥匙需求。<b>必备</b>＝任务明确要求；<b>可能需要</b>＝视打法而定；
-        <b>未标注</b>＝任务提到但没写必备与否（多为上交类）。按<b>能解锁的任务数</b>排序，越靠前越值得优先搞到。
-      </div>
-      <div class="frow" style="gap:6px">
-        <button class="mbtn" id="kmList" aria-pressed="true">钥匙清单</button>
-        <button class="mbtn" id="kmMark" aria-pressed="false">在地图上标注</button>
+      <div class="frow modebar" id="keyModeBar">
+        <button class="chip mode" id="kmList" aria-pressed="true"><b>钥匙清单</b></button>
+        <button class="chip mode" id="kmMark" aria-pressed="false"><b>在地图上标注</b></button>
       </div>
       <div id="keyMarkWrap" style="display:none"></div>
-      <div class="filters" id="keyFilters">
-        <div class="frow"><input class="search" id="keySearch" type="search" placeholder="搜索钥匙名或任务名…"></div>
-        <div class="frow"><span class="flbl">地图</span><div class="frow" id="keyMapChips" style="gap:6px"></div></div>
-        <div class="frow" style="gap:14px">
-          <label style="display:flex;gap:7px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="keyQuestOnly" style="accent-color:var(--brass)">只看任务钥匙</label>
-          <label style="display:flex;gap:7px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="keyReqOnly" style="accent-color:var(--brass)">只看必备</label>
-          <label style="display:flex;gap:7px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" id="keyPickOnly" style="accent-color:var(--brass)">只看我规划里的任务</label>
-          <span id="keyStat" style="font-size:12px;color:var(--ink-mute);margin-left:auto"></span>
+      <div id="keyListWrap">
+        <div class="frow keybar">
+          <input class="search kq" id="keySearch" type="search" placeholder="搜索钥匙名或任务名…">
+          <label class="kchk"><input type="checkbox" id="keyQuestOnly">只看任务钥匙</label>
+          <label class="kchk"><input type="checkbox" id="keyReqOnly">只看必备</label>
+          <label class="kchk"><input type="checkbox" id="keyPickOnly">只看规划里的</label>
+          <span class="klegend"><span class="qdot"></span>任务钥匙<span class="ndot"></span>非任务</span>
+          <span id="keyStat"></span>
         </div>
+        <div class="frow mapsel" id="keyMapChips"></div>
+        <div id="keysBody"></div>
+        <div class="pager" id="keyPager"></div>
       </div>
-      <div id="keysBody"></div>
     </section>
 
     <section class="panel" id="p-list">
@@ -1139,6 +1191,22 @@ async function imgSrc(m){
 /* Cache the resolved src + aspect in memory. Re-renders can then emit the <img>
    synchronously, so the map never blinks out while storage is read back. */
 const IMGCACHE = {}, IMGASPECT = {};
+
+/* ---- map sheets: every map has an outdoor sheet and an indoor sheet ----
+   The outdoor sheet keeps the bare map name as its key, so every image, marker
+   and view state saved before sheets existed still resolves to it unchanged. */
+const LAYERS = ['', 'in'];
+const LAYNAME  = { '':'室外 / 全图', 'in':'室内' };
+const LAYSHORT = { '':'室外', 'in':'室内' };
+const LK = (m, l) => (l ? m + ' · 室内' : m);
+/* data-l, not data-v: the zoom buttons already own data-v="in" */
+const laySwHtml = (m, cur) => '<span class="mtsw laysw">' + LAYERS.map(l =>
+  '<button class="mbtn' + (IMGCACHE[LK(m,l)] ? '' : ' empty') + '" data-a="lay" data-l="' + l +
+  '" aria-pressed="' + (l === cur) + '" title="' + esc(m + ' 的' + LAYNAME[l] + '图') + '">' +
+  (IMGCACHE[LK(m,l)] ? '<span class="dotimg"></span>' : '') + LAYSHORT[l] + '</button>').join('') + '</span>';
+/* what to call the file if you want it picked up automatically */
+const layFileHint = (m, l) => m + (l ? '-室内' : '') + '.webp';
+
 function mapImgTag(m){
   return IMGCACHE[m] ? '<img class="usermap" alt="' + esc(m) + ' 地图" src="' + IMGCACHE[m] + '">' : '';
 }
@@ -1279,12 +1347,14 @@ let RPANE = 'task';   // right panel: task list or key list
 let ARMED = false;    // marker placing mode
 
 /* the key checklist for one map: pick a key, then click the map to mark its door */
-function keyPaneHtml(mapKeys, pins){
+function keyPaneHtml(mapKeys, pins, otherPins, otherName){
   if (!mapKeys.length){
     return '<div class="keypane"><div class="tray-empty">这张图暂无钥匙数据。</div></div>';
   }
-  const marked = id => pins.map((p,i) => ({p,i})).filter(o => o.p.kid === id);
-  const done = mapKeys.filter(k => marked(k.id).length).length;
+  const other = otherPins || [];
+  const marked = id => pins.filter(p => p.kid === id);
+  const onOther = id => other.filter(p => p.kid === id).length;
+  const done = mapKeys.filter(k => marked(k.id).length || onOther(k.id)).length;
   const nQ = mapKeys.filter(k => k.isQ).length;
   return '<div class="keypane">' +
     '<div class="kp-sum">已标 <b>' + done + '</b> / ' + mapKeys.length +
@@ -1293,12 +1363,14 @@ function keyPaneHtml(mapKeys, pins){
       '<br>标记：🔑 = 这把钥匙开的门　✦ = 钥匙的固定刷新点</div>' +
     mapKeys.map(k => {
       const mine = marked(k.id);
+      const oth = onOther(k.id);
       const must = k.quests.filter(q => q.r === 1).length;
       return '<div class="kp' + (k.isQ ? ' qk' : '') + '" data-k="' + esc(k.id) + '" aria-selected="' + (k.id === SELKEY) + '">' +
         '<div class="hd"><span class="nm">' + esc(k.n) + '</span>' +
           (mine.length ? '<span class="cnt" style="margin-left:auto">' + mine.length + '</span>'
                        : '<span class="cnt zero" style="margin-left:auto">0</span>') + '</div>' +
         '<div class="kp-meta">' + (k.isQ ? k.quests.length + ' 个任务' + (must ? ' · 必备 ' + must : '') : '非任务钥匙') +
+          (oth ? '<span class="kp-oth">' + esc(otherName || '另一张') + ' ' + oth + '</span>' : '') +
           (mine.length ? '<span class="kp-ok">已标记</span>' : '') + '</div>' +
         '<div class="kp-more">' +
           '<a class="srclink kp-keylink" href="https://www.eftarkov.com/news/id/' + esc(k.id) +
@@ -1780,6 +1852,7 @@ const MAPPAGE = {
 };
 const mapPageUrl = m => MAPPAGE[m] ? 'https://www.eftarkov.com/news/web_' + MAPPAGE[m] + '.html' : null;
 let VIEWMAP = null;
+let VIEWLAY = '';                    // which sheet the viewer is showing
 const VV = {};                       // per-map view state for this tab only
 function getVV(m){ return VV[m] || (VV[m] = { k:1, tx:0, ty:0 }); }
 
@@ -1829,12 +1902,12 @@ function renderMaps(){
   if (!body || !sel) return;
 
   let loaded = 0;
-  MAPS.forEach(m => { if (IMGCACHE[m]) loaded++; });
+  MAPS.forEach(m => LAYERS.forEach(l => { if (IMGCACHE[LK(m,l)]) loaded++; }));
   if (MAPS.indexOf(VIEWMAP) < 0) VIEWMAP = MAPS.find(m => IMGCACHE[m]) || MAPS[0];
 
   // this tab is purely a map viewer — nothing about quests belongs here
   sel.innerHTML = MAPS.map(m => {
-    const has = !!IMGCACHE[m];
+    const has = LAYERS.some(l => IMGCACHE[LK(m,l)]);
     const nt = (MAPDEF[m] && MAPDEF[m].note) ? ' title="' + esc(MAPDEF[m].note) + '"' : '';
     return '<button class="chip' + (has ? '' : ' noimg') + '" data-map="' + esc(m) + '"' + nt +
       ' aria-pressed="' + (m === VIEWMAP) + '">' +
@@ -1847,10 +1920,18 @@ function renderMaps(){
   const badge = document.getElementById('mapsBadge');
   if (badge){ badge.dataset.n = loaded; badge.textContent = loaded ? loaded : ''; }
 
-  const m = VIEWMAP, src = IMGCACHE[m];
+  const laybox = document.getElementById('mapsLay');
+  if (laybox){
+    laybox.innerHTML = laySwHtml(VIEWMAP, VIEWLAY);
+    laybox.querySelectorAll('[data-a="lay"]').forEach(b => {
+      b.onclick = () => { VIEWLAY = b.dataset.l; renderMaps(); };
+    });
+  }
+
+  const m = LK(VIEWMAP, VIEWLAY), src = IMGCACHE[m];
   const srcLink = document.getElementById('mapsSrcLink');
   if (srcLink){
-    const u = mapPageUrl(m);
+    const u = mapPageUrl(VIEWMAP);
     if (u){ srcLink.href = u; srcLink.style.display = ''; }
     else srcLink.style.display = 'none';
   }
@@ -1859,11 +1940,14 @@ function renderMaps(){
       '<div class="vstage">' +
         (src ? '<div class="vcanvas"><img alt="' + esc(m) + ' 地图" src="' + src + '"></div>'
              : '<div class="vnone"><div>' +
-               '<div style="font-size:15px;color:var(--ink);margin-bottom:10px">「' + esc(m) + '」还没有地图图片</div>' +
-               (mapPageUrl(m) ? '<a class="mbtn" style="display:inline-block;text-decoration:none;padding:7px 14px" href="' +
-                  mapPageUrl(m) + '" target="_blank" rel="noopener">在 eftarkov 看这张地图 ↗</a><br><br>' : '') +
+               '<div style="font-size:15px;color:var(--ink);margin-bottom:10px">「' + esc(VIEWMAP) + '」的' +
+                 esc(LAYNAME[VIEWLAY]) + '图还没有</div>' +
+               (mapPageUrl(VIEWMAP) ? '<a class="mbtn" style="display:inline-block;text-decoration:none;padding:7px 14px" href="' +
+                  mapPageUrl(VIEWMAP) + '" target="_blank" rel="noopener">在 eftarkov 看这张地图 ↗</a><br><br>' : '') +
                '想在这里直接看：点右上角<b>「载入地图」</b>选一张本地图片（只存在你自己的浏览器里），<br>' +
-               '或把图片放进网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(m) + '.webp</b>（jpg / png 也可以）' +
+               '或把图片放进网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(layFileHint(VIEWMAP, VIEWLAY)) +
+               '</b>（jpg / png 也可以）' +
+               (VIEWLAY ? '<br><span style="font-size:11.5px">室内图指疗养院、宿舍这类单独出图的室内场景。</span>' : '') +
                '</div></div>') +
       '</div>' +
     '</div>';
@@ -1954,6 +2038,7 @@ const KEYIDX = (() => {
     a.n.localeCompare(b.n));
 })();
 const KF = { q:'', reqOnly:false, pickOnly:false, questOnly:false, map:'' };
+let KPAGE = 0;                              // key list is paged, never scrolled
 const pickedNames = () => new Set(Q.filter(x => S.pick[x.id]).map(x => x.cn));
 const keyMapsOf = id => KEYMAP[id] && KEYMAP[id].length ? KEYMAP[id] : [OTHERMAP];
 
@@ -1985,83 +2070,170 @@ function renderKeys(){
     return { k:b.k, qs, isQ:b.isQ, maps:b.maps, planN: qs.filter(q => inPlan.has(q.c)).length };
   }).filter(Boolean);
 
-  /* group by map — a key that opens doors on two maps shows up under both */
-  const groups = {};
-  rows.forEach(r => r.maps.forEach(m => { (groups[m] = groups[m] || []).push(r); }));
-  Object.keys(groups).forEach(m => groups[m].sort((a,b) =>
-    (b.isQ - a.isQ) || (b.qs.length - a.qs.length) || a.k.n.localeCompare(b.k.n)));
-  const order = MAPS.filter(m => groups[m]).concat(groups[OTHERMAP] ? [OTHERMAP] : []);
-  const shown = KF.map ? order.filter(m => m === KF.map) : order;
+  /* one card per key — a key that works on two maps carries both map tags */
+  rows.sort((a,b) => (b.isQ - a.isQ) || (b.qs.length - a.qs.length) || a.k.n.localeCompare(b.k.n));
+  const counts = {};
+  rows.forEach(r => r.maps.forEach(m => { counts[m] = (counts[m] || 0) + 1; }));
+  const order = MAPS.filter(m => counts[m]).concat(counts[OTHERMAP] ? [OTHERMAP] : []);
+  if (KF.map && !counts[KF.map]) KF.map = '';
+  const view = KF.map ? rows.filter(r => r.maps.indexOf(KF.map) >= 0) : rows;
 
   const chips = document.getElementById('keyMapChips');
   if (chips){
-    chips.innerHTML = '<button class="chip" data-m="" aria-pressed="' + (!KF.map) + '">全部</button>' +
+    chips.innerHTML = '<button class="chip" data-m="" aria-pressed="' + (!KF.map) +
+        '">全部<span class="n">' + rows.length + '</span></button>' +
       order.map(m => '<button class="chip" data-m="' + esc(m) + '" aria-pressed="' + (KF.map === m) + '">' +
-        esc(m) + '<span class="n">' + groups[m].length + '</span></button>').join('');
+        esc(m) + '<span class="n">' + counts[m] + '</span></button>').join('');
     chips.querySelectorAll('.chip').forEach(b => {
-      b.onclick = () => { KF.map = b.dataset.m; renderKeys(); };
+      b.onclick = () => { KF.map = b.dataset.m; KPAGE = 0; renderKeys(); };
     });
   }
 
   const badge = document.getElementById('keysBadge');
   if (badge){ badge.dataset.n = base.length; badge.textContent = base.length; }
   const stat = document.getElementById('keyStat');
-  if (stat) stat.textContent = '共 ' + base.length + ' 把（任务钥匙 ' + base.filter(b => b.isQ).length +
-    '） · 当前显示 ' + rows.length + ' 把';
+  const pager = document.getElementById('keyPager');
 
-  if (!rows.length){
+  if (!view.length){
     body.innerHTML = '<div class="empty">没有符合条件的钥匙。</div>';
+    if (pager) pager.innerHTML = '';
+    if (stat) stat.textContent = '共 ' + base.length + ' 把 · 筛出 0';
     return;
   }
-  body.innerHTML = shown.map(m =>
-    '<div class="kgrp"><h3>' + esc(m) +
-      '<span class="cnt">' + groups[m].length + ' 把 · ' +
-      groups[m].reduce((s,r) => s + r.qs.length, 0) + ' 条任务需求</span></h3>' +
-    '<div class="klist">' + groups[m].map((r, i) => {
-    const must = r.qs.filter(q => q.r === 1).length;
-    const maybe = r.qs.filter(q => q.r === 0).length;
-    const none = r.qs.filter(q => q.r === -1).length;
-    return '<article class="krow' + (r.isQ ? ' qkey' : ' nkey') + (must ? ' req' : '') + '" data-i="' + i + '">' +
-      '<div class="kh">' +
-        '<span class="krank">' + (i+1) + '</span>' +
-        '<span class="kname">' + esc(r.k.n) + '</span>' +
-        '<span class="kbadges">' +
-          (must ? '<span class="kb must">必备 ' + must + '</span>' : '') +
-          (maybe ? '<span class="kb maybe">可能 ' + maybe + '</span>' : '') +
-          (none ? '<span class="kb">未标注 ' + none + '</span>' : '') +
-          (r.planN ? '<span class="kb plan">规划中 ' + r.planN + '</span>' : '') +
-        '</span>' +
-        '<span class="ktot">' + (r.isQ ? r.qs.length + ' 任务' : '非任务') + '</span>' +
-      '</div>' +
-      '<div class="kb-body">' +
-        '<a class="srclink" style="display:block;margin-bottom:6px" href="https://www.eftarkov.com/news/id/' +
-          esc(r.k.id) + '.html" target="_blank" rel="noopener">钥匙详情 · 刷新点 ↗</a>' +
-        (r.isQ ? '' : '<div class="kp-none">没有任务需要这把钥匙，纯捞金 / 开门用</div>') +
-        r.qs.map(q =>
-          '<div class="kq' + (inPlan.has(q.c) ? ' inplan' : '') + '" style="--tc:var(--t-' + q.t + ')">' +
-            '<span class="tr">' + q.t + '</span>' +
-            '<span class="kb ' + (q.r === 1 ? 'must' : q.r === 0 ? 'maybe' : '') + '">' +
-              (q.r === 1 ? '必备' : q.r === 0 ? '可能' : '未标注') + '</span>' +
-            '<span class="qn2" data-q="' + esc(q.c) + '">' + esc(q.c) + '</span>' +
-            (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u + '.html" target="_blank" rel="noopener">攻略 ↗</a>' : '<span></span>') +
-          '</div>').join('') +
-      '</div>' +
-    '</article>';
-  }).join('') + '</div></div>').join('');
 
-  body.querySelectorAll('.krow').forEach(row => {
-    row.querySelector('.kh').onclick = () => row.classList.toggle('open');
+  /* Fill exactly one screenful and spill the rest onto the next page. The first
+     estimate can be off while the surrounding chrome settles, so lay it out and
+     shed a row at a time until nothing is clipped. */
+  const marks = keyMarkCounts();
+  const cardHtml = r => {
+    const must = r.qs.filter(q => q.r === 1).length;
+    const mp = KF.map ? '' : (r.maps[0] + (r.maps.length > 1 ? '+' + (r.maps.length - 1) : ''));
+    const n = marks[r.k.id] || 0;
+    return '<button class="kcard' + (r.isQ ? ' qk' : ' nq') + (must ? ' req' : '') +
+      '" data-k="' + esc(r.k.id) + '" title="' + esc(r.k.n + ' · ' + r.maps.join('、') +
+        (r.isQ ? ' · ' + r.qs.length + ' 个任务' : ' · 非任务钥匙')) + '">' +
+      (mp ? '<span class="mp">' + esc(mp) + '</span>' : '<span></span>') +
+      '<span class="nm">' + esc(r.k.n) + '</span>' +
+      '<span class="rt">' + (n ? '<span class="mk">◈' + n + '</span> ' : '') +
+        (r.isQ ? (must ? '必' + must + '/' : '') + r.qs.length : '—') + '</span>' +
+    '</button>';
+  };
+
+  let per = keyPageSize(body), pages = 1, from = 0, slice = view;
+  for (let guard = 0; guard < 8; guard++){
+    pages = Math.max(1, Math.ceil(view.length / per));
+    KPAGE = Math.min(Math.max(0, KPAGE), pages - 1);
+    from = KPAGE * per;
+    slice = view.slice(from, from + per);
+    body.innerHTML = '<div class="kgrid">' + slice.map(cardHtml).join('') + '</div>';
+    if (body.scrollHeight <= body.clientHeight || slice.length <= 1) break;
+    per = Math.max(1, per - keyCols(body));        // one row too many — drop it and re-lay
+  }
+
+  if (stat) stat.textContent = '共 ' + base.length + ' 把 · 筛出 ' + view.length +
+    ' · 本页 ' + (from + 1) + '–' + (from + slice.length);
+
+  if (pager){
+    pager.innerHTML = pages > 1
+      ? '<button class="mbtn" data-p="prev"' + (KPAGE ? '' : ' disabled') + '>‹ 上一页</button>' +
+        '<span class="pg">' + (KPAGE + 1) + ' / ' + pages + '</span>' +
+        '<button class="mbtn" data-p="next"' + (KPAGE < pages - 1 ? '' : ' disabled') + '>下一页 ›</button>' +
+        '<span class="hint">← → 翻页 · 点钥匙看需要它的任务</span>'
+      : '<span class="hint">点钥匙看需要它的任务</span>';
+    const pb = s => pager.querySelector('[data-p="' + s + '"]');
+    if (pb('prev')) pb('prev').onclick = () => { KPAGE--; renderKeys(); };
+    if (pb('next')) pb('next').onclick = () => { KPAGE++; renderKeys(); };
+  }
+
+  body.querySelectorAll('.kcard').forEach(c => { c.onclick = () => openKeyDetail(c.dataset.k); });
+
+  /* the tab badge and the filter bar can still settle a frame later — check once
+     the layout is final, and re-page if that left a row clipped */
+  if (!KRECHECK) requestAnimationFrame(() => {
+    const bb = document.getElementById('keysBody');
+    if (!bb || bb.scrollHeight <= bb.clientHeight + 1) return;
+    if (KMODE !== 'list' || !document.getElementById('p-keys').classList.contains('on')) return;
+    KRECHECK = true; renderKeys(); KRECHECK = false;
   });
-  body.querySelectorAll('.qn2').forEach(el => {
-    el.onclick = e => {
-      e.stopPropagation();
-      document.getElementById('q').value = el.dataset.q;
-      F.q = el.dataset.q;
-      F.traders.clear(); F.maps.clear(); F.lls.clear();
-      document.querySelectorAll('#p-quests .chip').forEach(c => c.setAttribute('aria-pressed','false'));
-      showTab('quests'); render();
-    };
+}
+let KRECHECK = false;
+
+/* how many cards fit in the box as it stands right now — mirrors .kgrid in the CSS */
+const KCOL = 268, KROW = 30, KGAP = 4;
+const keyCols = box => Math.max(1, Math.floor((box.clientWidth + KGAP) / (KCOL + KGAP)));
+function keyPageSize(box){
+  if (!box.clientWidth || !box.clientHeight) return 48;
+  return keyCols(box) * Math.max(1, Math.floor((box.clientHeight + KGAP) / (KROW + KGAP)));
+}
+/* markers you placed for each key, across every map and both sheets */
+function keyMarkCounts(){
+  const o = {};
+  Object.keys(S.pins || {}).forEach(k => (S.pins[k] || []).forEach(p => {
+    if (p.kid) o[p.kid] = (o[p.kid] || 0) + 1;
+  }));
+  return o;
+}
+function jumpToQuest(cn){
+  document.getElementById('q').value = cn;
+  F.q = cn;
+  F.traders.clear(); F.maps.clear(); F.lls.clear();
+  document.querySelectorAll('#p-quests .chip').forEach(c => c.setAttribute('aria-pressed','false'));
+  showTab('quests'); render();
+  const row = [...document.querySelectorAll('.q:not(.hide)')][0];
+  if (row) row.classList.add('open');
+}
+/* the quests behind one key — opens over the grid so the page never grows */
+function openKeyDetail(id){
+  const a = KEYBYID[id], qk = questKeyById(id);
+  const name = (a && a.n) || (qk && qk.n) || '钥匙';
+  const maps = (a && a.m && a.m.length) ? a.m : (qk ? keyMapsOf(id) : [OTHERMAP]);
+  const qs = qk ? qk.quests : [];
+  const inPlan = pickedNames();
+  const n = keyMarkCounts()[id] || 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'modal kdet';
+  wrap.innerHTML =
+    '<div class="box"><h4><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' +
+      esc(name) + '</span>' +
+      '<span class="kb' + (qk ? ' must' : '') + '">' + (qk ? '任务钥匙' : '非任务钥匙') + '</span>' +
+      '<button class="mbtn zb x" data-a="x" title="关闭">×</button></h4>' +
+    '<div class="bd2">' +
+      '<div class="kd-h"><span style="font-size:11.5px;color:var(--ink-mute)">地图</span>' +
+        maps.map(m => '<span class="tag map">' + esc(m) + '</span>').join('') +
+        (n ? '<span class="kb plan">已标 ' + n + ' 处</span>' : '') + '</div>' +
+      '<a class="srclink" href="https://www.eftarkov.com/news/id/' + esc(id) +
+        '.html" target="_blank" rel="noopener">钥匙详情 · 刷新点 ↗</a>' +
+      (qs.length
+        ? qs.map(q =>
+            '<div class="kq' + (inPlan.has(q.c) ? ' inplan' : '') + '" style="--tc:var(--t-' + q.t + ')">' +
+              '<span class="tr">' + q.t + '</span>' +
+              '<span class="kb ' + (q.r === 1 ? 'must' : q.r === 0 ? 'maybe' : '') + '">' +
+                (q.r === 1 ? '必备' : q.r === 0 ? '可能' : '未标注') + '</span>' +
+              '<span class="qn2" data-q="' + esc(q.c) + '" title="跳到任务详情">' + esc(q.c) + '</span>' +
+              (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u +
+                '.html" target="_blank" rel="noopener">攻略 ↗</a>' : '<span></span>') +
+            '</div>').join('')
+        : '<div class="kp-none">没有任务需要这把钥匙，纯捞金 / 开门用。</div>') +
+      '<div class="frow" style="gap:6px">' +
+        '<button class="mbtn" data-a="mark">在地图上标注这把钥匙</button>' +
+      '</div>' +
+    '</div></div>';
+  document.body.appendChild(wrap);
+
+  const close = () => wrap.remove();
+  wrap.querySelector('[data-a="x"]').onclick = close;
+  wrap.onclick = e => { if (e.target === wrap) close(); };
+  wrap.querySelectorAll('.qn2').forEach(el => {
+    el.onclick = () => { close(); jumpToQuest(el.dataset.q); };
   });
+  wrap.querySelector('[data-a="mark"]').onclick = () => {
+    close();
+    const m = maps.find(x => keyMapsList().indexOf(x) >= 0);
+    if (!m){ alert('这把钥匙没有对应的地图，没法在图上标注。'); return; }
+    KMAP = m; SELKEY = id; KARMED = false; KMODE = 'mark';
+    document.getElementById('kmMark').click();
+  };
 }
 
 /* ---- mark key locations on a map ---- */
@@ -2069,6 +2241,7 @@ let KMODE = 'list';      // list | mark
 let KMAP = null;         // map being marked
 let KARMED = false;
 let KMTYPE = 'door';     // what the next marker means: the door, or the key's spawn
+let KLAYER = '';         // which sheet of the map you are looking at: '' outdoor, 'in' indoor
 const keyMapsList = () => MAPS.filter(m => ALLKEYS.some(k => (k.m || []).indexOf(m) >= 0));
 
 function renderKeyMark(){
@@ -2077,19 +2250,24 @@ function renderKeyMark(){
   const maps = keyMapsList();
   if (maps.indexOf(KMAP) < 0) KMAP = maps[0];
   const m = KMAP;
+  const mk = LK(m, KLAYER);                  // image / view / marker key for this sheet
+  const other = LK(m, KLAYER ? '' : 'in');
   const mapKeys = keysOfMap(m);
   if (SELKEY && !mapKeys.some(k => k.id === SELKEY)) SELKEY = null;
-  const pins = (S.pins && S.pins[m]) || [];
+  const pins = (S.pins && S.pins[mk]) || [];
+  const otherPins = (S.pins && S.pins[other]) || [];
   const tgtK = SELKEY ? mapKeys.find(k => k.id === SELKEY) : null;
   const keyPins = pins.map((p,i) => ({p,i})).filter(o => o.p.kid);
+  const src = IMGCACHE[mk];
 
   wrap.innerHTML =
-    '<div class="frow planbar" style="margin-bottom:5px">' +
+    '<div class="frow planbar" style="margin-bottom:4px">' +
       '<div class="mapsel">' + maps.map(mm =>
         '<button class="chip" data-m="' + esc(mm) + '" aria-pressed="' + (mm === KMAP) + '"><b>' + esc(mm) + '</b>' +
         '<span class="n">' + ALLKEYS.filter(k => (k.m || []).indexOf(mm) >= 0).length + '</span></button>').join('') +
       '</div>' +
       '<span class="planbar-r">' +
+        laySwHtml(m, KLAYER) +
         '<span class="zoomui">' +
           '<button class="mbtn zb" data-v="out">−</button>' +
           '<span class="zl" data-v="lbl">100%</span>' +
@@ -2103,25 +2281,32 @@ function renderKeyMark(){
           '<button class="mbtn" data-a="mt" data-v="spawn" aria-pressed="' + (KMTYPE === 'spawn') + '" title="这把钥匙的固定刷新点">✦ 刷点</button>' +
         '</span>' +
         '<button class="mbtn" data-a="arm" aria-pressed="' + (KARMED ? 'true' : 'false') + '"' +
-          (tgtK ? '' : ' disabled') + '>' + (KARMED ? '点击图上标注' : '开始标点') + '</button>' +
-        '<button class="mbtn danger" data-a="clear">清除钥匙标记 (' + keyPins.length + ')</button>' +
-        '<button class="mbtn" data-a="img">载入地图</button>' +
+          (tgtK && src ? '' : ' disabled') + '>' + (KARMED ? '点击图上标注' : '开始标点') + '</button>' +
+        '<button class="mbtn danger" data-a="clear">清除本图标记 (' + keyPins.length + ')</button>' +
+        '<button class="mbtn" data-a="img">载入' + LAYSHORT[KLAYER] + '图</button>' +
         '<input type="file" accept="image/*" data-a="file" style="display:none">' +
       '</span>' +
     '</div>' +
-    '<div class="work" data-map="' + esc(m) + '" style="grid-template-columns:minmax(0,1fr) 268px">' +
+    '<div class="work" data-map="' + esc(mk) + '" style="grid-template-columns:minmax(0,1fr) 268px">' +
       '<div class="left">' +
         '<div class="vstage' + (KARMED ? ' arm' : '') + '">' +
-          '<div class="vcanvas">' +
-            (IMGCACHE[m] ? '<img alt="' + esc(m) + '" src="' + IMGCACHE[m] + '">'
-                         : '<div class="mapholder">' + mapSvg(m, MAPDEF[m], {}) + '</div>') +
-            keyPins.map(o => pinHtml(o.p, o.i)).join('') +   /* key markers only */
-          '</div>' +
+          (src
+            ? '<div class="vcanvas"><img alt="' + esc(m + ' ' + LAYSHORT[KLAYER]) + '" src="' + src + '">' +
+                keyPins.map(o => pinHtml(o.p, o.i)).join('') +      /* key markers only */
+              '</div>'
+            : '<div class="vnone"><div>' +
+                '<div style="font-size:15px;color:var(--ink);margin-bottom:10px">「' + esc(m) + '」的' +
+                  esc(LAYNAME[KLAYER]) + '图还没有</div>' +
+                '点右上角<b>「载入' + LAYSHORT[KLAYER] + '图」</b>选一张本地图片（只存在你自己的浏览器里），<br>' +
+                '或把图片放进网页旁边的 <b>maps</b> 文件夹并命名为 <b>' + esc(layFileHint(m, KLAYER)) +
+                '</b>（jpg / png 也可以）' +
+                (KLAYER ? '<br><span style="font-size:11.5px">室内图指疗养院、宿舍这类单独出图的室内场景，标记与室外图各自独立。</span>' : '') +
+              '</div></div>') +
         '</div>' +
       '</div>' +
       '<div class="right">' +
         '<div class="rhd">' + esc(m) + ' 全部钥匙<span class="n">' + mapKeys.length + '</span></div>' +
-        keyPaneHtml(mapKeys, pins) +
+        keyPaneHtml(mapKeys, pins, otherPins, LAYSHORT[KLAYER ? '' : 'in']) +
       '</div>' +
     '</div>';
 
@@ -2129,14 +2314,16 @@ function renderKeyMark(){
   const stage = card.querySelector('.vstage');
   const img = card.querySelector('img');
   const ready = () => {
-    if (img && img.naturalWidth) IMGASPECT[m] = img.naturalWidth / img.naturalHeight;
-    fitV(card, m);
+    if (img && img.naturalWidth) IMGASPECT[mk] = img.naturalWidth / img.naturalHeight;
+    fitV(card, mk);
   };
   if (img){ if (img.complete && img.naturalWidth) ready(); else img.addEventListener('load', ready, { once:true }); }
-  else fitV(card, m);
 
   wrap.querySelectorAll('.mapsel .chip').forEach(b => {
     b.onclick = () => { KMAP = b.dataset.m; SELKEY = null; KARMED = false; renderKeyMark(); };
+  });
+  wrap.querySelectorAll('[data-a="lay"]').forEach(b => {
+    b.onclick = () => { KLAYER = b.dataset.l; KARMED = false; renderKeyMark(); };
   });
   wrap.querySelectorAll('.kp').forEach(row => {
     row.onclick = e => {
@@ -2148,16 +2335,7 @@ function renderKeyMark(){
     };
   });
   wrap.querySelectorAll('.qjump2').forEach(el => {
-    el.onclick = e => {
-      e.stopPropagation();
-      document.getElementById('q').value = el.dataset.q;
-      F.q = el.dataset.q;
-      F.traders.clear(); F.maps.clear(); F.lls.clear();
-      document.querySelectorAll('#p-quests .chip').forEach(c => c.setAttribute('aria-pressed','false'));
-      showTab('quests'); render();
-      const row = [...document.querySelectorAll('.q:not(.hide)')][0];
-      if (row) row.classList.add('open');         // land on the detail, already expanded
-    };
+    el.onclick = e => { e.stopPropagation(); jumpToQuest(el.dataset.q); };
   });
   const q = s => wrap.querySelector(s);
   q('[data-a="arm"]').onclick = () => { KARMED = !KARMED; renderKeyMark(); };
@@ -2166,27 +2344,29 @@ function renderKeyMark(){
   });
   q('[data-a="clear"]').onclick = () => {
     if (!keyPins.length) return;
-    if (!confirm('清除「' + m + '」上的 ' + keyPins.length + ' 个钥匙标记？（任务标记不受影响）')) return;
-    S.pins[m] = pins.filter(p => !p.kid);
-    if (!S.pins[m].length) delete S.pins[m];
+    if (!confirm('清除「' + m + ' · ' + LAYSHORT[KLAYER] + '」上的 ' + keyPins.length +
+                 ' 个钥匙标记？（任务标记和另一张图不受影响）')) return;
+    S.pins[mk] = pins.filter(p => !p.kid);
+    if (!S.pins[mk].length) delete S.pins[mk];
     save(); renderKeyMark();
   };
   const file = q('[data-a="file"]');
   q('[data-a="img"]').onclick = () => file.click();
   file.onchange = () => {
     const f = file.files && file.files[0]; if (!f) return;
-    imgPut(m, f).then(() => imgSrc(m)).then(src => { if (src) IMGCACHE[m] = src; renderKeyMark(); })
+    imgPut(mk, f).then(() => imgSrc(mk)).then(s => { if (s) IMGCACHE[mk] = s; renderKeyMark(); })
       .catch(err => alert('这张图存不下：' + (err && err.message ? err.message : '存储空间不足')));
   };
   const zc = (n, f) => { const b = q('[data-v="' + n + '"]'); if (b) b.onclick = f; };
-  zc('in',  () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1.25, r.width/2, r.height/2); });
-  zc('out', () => { const r = stage.getBoundingClientRect(); zoomV(card, m, 1/1.25, r.width/2, r.height/2); });
-  zc('fit', () => fitV(card, m));
+  zc('in',  () => { const r = stage.getBoundingClientRect(); zoomV(card, mk, 1.25, r.width/2, r.height/2); });
+  zc('out', () => { const r = stage.getBoundingClientRect(); zoomV(card, mk, 1/1.25, r.width/2, r.height/2); });
+  zc('fit', () => fitV(card, mk));
+  if (!src) return;                        // nothing to pan, zoom or mark on yet
 
   stage.addEventListener('wheel', e => {
     e.preventDefault();
     const r = stage.getBoundingClientRect();
-    zoomV(card, m, e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - r.left, e.clientY - r.top);
+    zoomV(card, mk, e.deltaY < 0 ? 1.15 : 1/1.15, e.clientX - r.left, e.clientY - r.top);
   }, { passive:false });
 
   let drag = false, sx = 0, sy = 0, stx = 0, sty = 0, moved = 0, downPin = null;
@@ -2194,7 +2374,7 @@ function renderKeyMark(){
     if (e.button !== 0) return;
     downPin = e.target.closest('.mkr');
     drag = true; moved = 0; sx = e.clientX; sy = e.clientY;
-    const v = getVV(m); stx = v.tx; sty = v.ty;
+    const v = getVV(mk); stx = v.tx; sty = v.ty;
     stage.classList.add('grabbing');
     try { stage.setPointerCapture(e.pointerId); } catch(err){}
   });
@@ -2202,8 +2382,8 @@ function renderKeyMark(){
     if (!drag) return;
     const dx = e.clientX - sx, dy = e.clientY - sy;
     moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
-    const v = getVV(m); v.tx = stx + dx; v.ty = sty + dy;
-    applyV(card, m);
+    const v = getVV(mk); v.tx = stx + dx; v.ty = sty + dy;
+    applyV(card, mk);
   });
   const endDrag = e => { drag = false; stage.classList.remove('grabbing');
     try { stage.releasePointerCapture(e.pointerId); } catch(err){} };
@@ -2213,21 +2393,21 @@ function renderKeyMark(){
     endDrag(e); downPin = null;
     if (!wasDrag || moved > 5) return;
     if (hit){                                   // open it: rename / note / image / delete
-      openPop(card, m, +hit.dataset.i,
+      openPop(card, mk, +hit.dataset.i,
         { getV:getVV, stageSel:'.vstage', rerender:renderKeyMark });
       return;
     }
     closePop();
     if (!KARMED || !SELKEY) return;
-    const v = getVV(m); if (!v.base) return;
+    const v = getVV(mk); if (!v.base) return;
     const r = stage.getBoundingClientRect();
     const W = v.base.w * v.k, H = v.base.h * v.k;
     const x = ((e.clientX - r.left) - v.base.l - v.tx) / W * 100;
     const y = ((e.clientY - r.top)  - v.base.t - v.ty) / H * 100;
     if (x < 0 || x > 100 || y < 0 || y > 100) return;
     const k = KEYBYID[SELKEY];
-    S.pins = S.pins || {}; S.pins[m] = S.pins[m] || [];
-    S.pins[m].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:k ? k.n : '钥匙',
+    S.pins = S.pins || {}; S.pins[mk] = S.pins[mk] || [];
+    S.pins[mk].push({ x:+x.toFixed(2), y:+y.toFixed(2), t:k ? k.n : '钥匙',
                      qid:'', kid:SELKEY, mt:KMTYPE });
     save(); renderKeyMark();                    // stays armed so you can keep marking
   });
@@ -2337,7 +2517,7 @@ function showTab(p){
   document.querySelectorAll('.panel').forEach(x => x.classList.remove('on'));
   document.getElementById('p-'+p).classList.add('on');
   // both map surfaces want the full window
-  document.body.classList.toggle('wide', p === 'plan' || p === 'maps');
+  document.body.classList.toggle('wide', p === 'plan' || p === 'maps' || p === 'keys');
   window.scrollTo({top:0,behavior:'smooth'});
   if (p === 'plan') requestAnimationFrame(refitAll);      // panel was hidden: measure now
   if (p === 'maps'){
@@ -2345,7 +2525,10 @@ function showTab(p){
     requestAnimationFrame(refitMapView);
   }
   if (p === 'keys'){
-    if (KMODE === 'mark') requestAnimationFrame(renderKeyMark); else renderKeys();
+    preloadMapImages();
+    /* render straight away — rAF is throttled in a background tab and the panel
+       would sit empty until the tab is focused */
+    if (KMODE === 'mark') renderKeyMark(); else renderKeys();
   }
 }
 
@@ -2354,9 +2537,14 @@ let _preloaded = false;
 function preloadMapImages(force){
   if (_preloaded && !force) return;
   _preloaded = true;
-  Promise.all(MAPS.map(m => IMGCACHE[m] ? null : imgSrc(m).then(src => { if (src) IMGCACHE[m] = src; }).catch(()=>{})))
+  const jobs = [];
+  MAPS.forEach(m => LAYERS.forEach(l => {
+    const k = LK(m, l);
+    if (!IMGCACHE[k]) jobs.push(imgSrc(k).then(src => { if (src) IMGCACHE[k] = src; }).catch(()=>{}));
+  }));
+  Promise.all(jobs)
     .then(() => probeLocalMaps())
-    .then(() => { renderMaps(); renderPlan(); });
+    .then(() => { renderMaps(); renderPlan(); if (KMODE === 'mark') renderKeyMark(); });
 }
 
 /* Pick up map images sitting in a folder next to this file — nothing is copied
@@ -2371,28 +2559,39 @@ function tryImg(src){
     im.src = src;
   });
 }
+/* filename suffixes that mark a file as the indoor sheet of a map.
+   Keep this list short — every combination costs one 404 on first load. */
+const LAYSUFFIX = { '':[''], 'in':['-室内','_室内','-indoor'] };
+const LAYDIRS   = { '':LOCALDIRS, 'in':['maps/'] };
 let _probed = false;
 async function probeLocalMaps(force){
   if (_probed && !force) return;
   _probed = true;
-  await Promise.all(MAPS.map(async m => {
-    if (IMGCACHE[m]) return;                       // already stored by the user
-    const names = [m].concat((MAPALIAS[m] || []).slice(0, 2));
-    for (const dir of LOCALDIRS){
+  const jobs = [];
+  MAPS.forEach(m => LAYERS.forEach(l => jobs.push((async () => {
+    const key = LK(m, l);
+    if (IMGCACHE[key]) return;                     // already stored by the user
+    const names = l ? [m] : [m].concat((MAPALIAS[m] || []).slice(0, 2));
+    for (const dir of LAYDIRS[l]){
       for (const n of names){
-        for (const ext of LOCALEXTS){
-          const src = dir + encodeURIComponent(n) + '.' + ext;
-          const hit = await tryImg(src);
-          if (hit){ IMGCACHE[m] = hit; IMGMODE[m] = 'local'; return; }
+        for (const sfx of LAYSUFFIX[l]){
+          for (const ext of LOCALEXTS){
+            const src = dir + encodeURIComponent(n + sfx) + '.' + ext;
+            const hit = await tryImg(src);
+            if (hit){ IMGCACHE[key] = hit; IMGMODE[key] = 'local'; return; }
+          }
         }
       }
     }
-  }));
+  })())));
+  await Promise.all(jobs);
 }
 document.querySelectorAll('.tab').forEach(t => { t.onclick = () => showTab(t.dataset.p); });
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
+  const modal = document.querySelector('.modal');
+  if (modal){ modal.remove(); return; }
   if (document.querySelector('.pop')){ closePop(); renderPlan(); }
 });
 
@@ -2524,8 +2723,11 @@ const MAPALIAS = {
   '码头':['terminal','港','码头'],
   '破冰船':['icebreaker','ice_breaker','破冰船']
 };
+/* a filename carrying 室内 / indoor lands on that map's indoor sheet */
+const INDOOR_RE = /室内|indoor|inside|interior/i;
 function mapFromFilename(name){
-  const base = String(name).replace(/\.[a-z0-9]+$/i,'').toLowerCase().replace(/[_\-\s]+/g,'');
+  const raw = String(name).replace(/\.[a-z0-9]+$/i,'');
+  const base = raw.toLowerCase().replace(/[_\-\s]+/g,'');
   let best = null, bestLen = 0;
   for (const m in MAPALIAS){
     for (const a of MAPALIAS[m]){
@@ -2533,7 +2735,7 @@ function mapFromFilename(name){
       if (base.indexOf(k) >= 0 && k.length > bestLen){ best = m; bestLen = k.length; }
     }
   }
-  return best;
+  return best ? LK(best, INDOOR_RE.test(raw) ? 'in' : '') : null;
 }
 (function(){
   const btn = document.getElementById('bulkMaps');
@@ -2568,7 +2770,9 @@ function blobToDataUrl(b){
 }
 async function collectImages(){
   const outMap = {};
-  for (const m of MAPS){
+  const keys = [];
+  MAPS.forEach(m => LAYERS.forEach(l => keys.push(LK(m, l))));
+  for (const m of keys){
     try {
       const blob = await idbGet(m);
       if (blob){ outMap[m] = await blobToDataUrl(blob); continue; }
@@ -2692,23 +2896,42 @@ document.getElementById('openBackup').onclick = openBackup;
   const p = document.getElementById('keyPickOnly');
   const o = document.getElementById('keyQuestOnly');
   if (!s) return;
-  s.addEventListener('input', () => { KF.q = s.value; renderKeys(); });
-  r.addEventListener('change', () => { KF.reqOnly = r.checked; renderKeys(); });
-  p.addEventListener('change', () => { KF.pickOnly = p.checked; renderKeys(); });
-  o.addEventListener('change', () => { KF.questOnly = o.checked; renderKeys(); });
+  s.addEventListener('input', () => { KF.q = s.value; KPAGE = 0; renderKeys(); });
+  r.addEventListener('change', () => { KF.reqOnly = r.checked; KPAGE = 0; renderKeys(); });
+  p.addEventListener('change', () => { KF.pickOnly = p.checked; KPAGE = 0; renderKeys(); });
+  o.addEventListener('change', () => { KF.questOnly = o.checked; KPAGE = 0; renderKeys(); });
 
   const bl = document.getElementById('kmList'), bm = document.getElementById('kmMark');
   const apply = () => {
     const mark = KMODE === 'mark';
     bl.setAttribute('aria-pressed', String(!mark));
     bm.setAttribute('aria-pressed', String(mark));
-    document.getElementById('keyFilters').style.display = mark ? 'none' : '';
-    document.getElementById('keysBody').style.display   = mark ? 'none' : '';
+    document.getElementById('keyListWrap').style.display = mark ? 'none' : '';
     document.getElementById('keyMarkWrap').style.display = mark ? '' : 'none';
     if (mark) renderKeyMark(); else renderKeys();
   };
   bl.onclick = () => { KMODE = 'list'; apply(); };
   bm.onclick = () => { KMODE = 'mark'; apply(); };
+
+  const onKeys = () => document.getElementById('p-keys').classList.contains('on');
+  /* ← → flip pages, as long as you are not typing in the search box */
+  document.addEventListener('keydown', e => {
+    if (!onKeys() || KMODE !== 'list') return;
+    if (document.querySelector('.modal')) return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    if (e.key === 'ArrowRight'){ KPAGE++; renderKeys(); }
+    else if (e.key === 'ArrowLeft'){ KPAGE--; renderKeys(); }
+  });
+  /* the page size depends on the window, so re-page when it changes */
+  let rt = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      if (!onKeys()) return;
+      if (KMODE === 'list') renderKeys(); else renderKeyMark();
+    }, 160);
+  });
 })();
 
 document.getElementById('openHelp').onclick = () => {
