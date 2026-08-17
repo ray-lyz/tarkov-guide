@@ -410,6 +410,9 @@ tbody tr:last-child td{border-bottom:0}
 .kp-q .qn3{font-size:11.5px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink)}
 .kp-q .tr{font-family:var(--font-display); font-stretch:condensed; font-size:9.5px; letter-spacing:.05em; color:var(--tc)}
 .kp-q .srclink{font-size:11px; border-bottom:0; margin:0}
+.kp-q .qjump2{cursor:pointer; border-bottom:1px dotted var(--brass-dim)}
+.kp-q .qjump2:hover{color:var(--brass); border-bottom-color:var(--brass)}
+.kp-keylink{display:block; margin:0 0 5px; font-size:11px}
 /* task row quick actions */
 .tkb{width:20px; height:20px; flex:0 0 auto; padding:0; line-height:1; font-size:12px;
      background:transparent; border:1px solid var(--line); color:var(--ink-mute); cursor:pointer}
@@ -421,6 +424,13 @@ tbody tr:last-child td{border-bottom:0}
 .pop h5{margin:0; font-size:12.5px; padding:8px 10px; border-bottom:1px solid var(--line-soft); background:var(--sunk); display:flex; gap:7px; align-items:center}
 .pop h5 i{font-style:normal; font-family:var(--font-data); font-size:10.5px; background:var(--brass); color:var(--ground); width:17px; height:17px; display:grid; place-items:center; flex:0 0 auto}
 .pop .body{padding:9px 10px; display:flex; flex-direction:column; gap:5px}
+.pop .shot{background:var(--sunk); border:1px solid var(--line-soft); min-height:56px; display:grid; place-items:center}
+.pop .shot img{display:block; width:100%; height:auto; cursor:zoom-in}
+.pop .shot .none{font-size:11px; color:var(--ink-mute); padding:12px 6px; text-align:center; line-height:1.6}
+.lightbox{position:fixed; inset:0; z-index:90; background:var(--scrim); display:grid; place-items:center;
+          padding:24px; cursor:zoom-out}
+.lightbox img{max-width:100%; max-height:100%; display:block}
+.mkr.hasshot .pdot{outline:1.5px solid var(--ink); outline-offset:2px}
 .pop .acts{display:flex; gap:6px; align-items:center; margin-top:3px}
 .plab{font-family:var(--font-display); font-stretch:condensed; text-transform:uppercase; letter-spacing:.11em;
       font-size:9.5px; color:var(--brass-dim); margin-top:3px}
@@ -1141,6 +1151,49 @@ function loadMapImage(m, stage){
 }
 
 
+/* ---- per-marker screenshots: same storage strategy as the map images ---- */
+const SHOTKEY = id => 'eft-shot:' + id;
+const shotUrls = {};
+function lsDel2(k){ try { localStorage.removeItem(k); } catch(e){} }
+async function shotPut(id, file){
+  try { await idbPut(SHOTKEY(id), file); lsDel2(SHOTKEY(id)); return 'idb'; } catch(e){}
+  const steps = [[1600,.82],[1200,.75],[900,.68]];
+  let lastErr = null;
+  for (const [dim, q] of steps){
+    const data = await shrink(file, dim, q);
+    try { localStorage.setItem(SHOTKEY(id), data); return 'ls'; }
+    catch(err){ lastErr = err; lsDel2(SHOTKEY(id)); }
+  }
+  throw lastErr || new Error('存不下');
+}
+async function shotSrc(id){
+  try {
+    const blob = await idbGet(SHOTKEY(id));
+    if (blob){
+      if (shotUrls[id]) URL.revokeObjectURL(shotUrls[id]);
+      shotUrls[id] = URL.createObjectURL(blob);
+      return shotUrls[id];
+    }
+  } catch(e){}
+  try { return localStorage.getItem(SHOTKEY(id)); } catch(e){ return null; }
+}
+async function shotDel(id){
+  try { await idbDel(SHOTKEY(id)); } catch(e){}
+  lsDel2(SHOTKEY(id));
+  if (shotUrls[id]){ URL.revokeObjectURL(shotUrls[id]); delete shotUrls[id]; }
+}
+function nextSid(){ S.sidSeq = (S.sidSeq || 0) + 1; return 's' + S.sidSeq; }
+function lightbox(src){
+  const d = document.createElement('div');
+  d.className = 'lightbox';
+  d.innerHTML = '<img alt="标记图片" src="' + src + '">';
+  const close = () => { d.remove(); document.removeEventListener('keydown', esc); };
+  function esc(ev){ if (ev.key === 'Escape') close(); }
+  d.onclick = close;
+  document.addEventListener('keydown', esc);
+  document.body.appendChild(d);
+}
+
 /* ---- zoom / pan (view state kept in memory, per map) ---- */
 const VIEW = {};
 const ZMIN = 0.4, ZMAX = 10;
@@ -1221,11 +1274,13 @@ function keyPaneHtml(mapKeys, pins){
         '<div class="kp-meta">' + k.quests.length + ' 个任务' + (must ? ' · 必备 ' + must : '') +
           (mine.length ? '<span class="kp-ok">已标记</span>' : '') + '</div>' +
         '<div class="kp-more">' +
+          '<a class="srclink kp-keylink" href="https://www.eftarkov.com/news/id/' + esc(k.id) +
+            '.html" target="_blank" rel="noopener">钥匙详情 · 刷新点 ↗</a>' +
           k.quests.map(q =>
             '<div class="kp-q" style="--tc:var(--t-' + q.t + ')">' +
               '<span class="kb ' + (q.r === 1 ? 'must' : q.r === 0 ? 'maybe' : '') + '">' +
                 (q.r === 1 ? '必备' : q.r === 0 ? '可能' : '未标') + '</span>' +
-              '<span class="qn3" title="' + esc(q.c) + '">' + esc(q.c) + '</span>' +
+              '<span class="qn3 qjump2" data-q="' + esc(q.c) + '" title="点击查看任务详情">' + esc(q.c) + '</span>' +
               '<span class="tr">' + q.t + '</span>' +
               (q.u ? '<a class="srclink" href="https://www.eftarkov.com/news/' + q.u + '.html" target="_blank" rel="noopener" title="在 eftarkov 看攻略">↗</a>' : '') +
             '</div>').join('') +
@@ -1537,7 +1592,7 @@ function pinHtml(p, i, no){
   const isKey = !!p.kid;
   const tip = p.note ? (p.t || '标记') + ' — ' + p.note.slice(0, 60) : '点击查看 / 备注 / 删除';
   return '<div class="mkr' + (hot ? ' hot' : '') + (dim ? ' dim' : '') + (p.note ? ' hasnote' : '') +
-    (isKey ? ' key' : '') +
+    (p.sid ? ' hasshot' : '') + (isKey ? ' key' : '') +
     '" data-i="' + i + '" style="left:' + p.x + '%;top:' + p.y + '%" title="' + esc(tip) + '">' +
     '<span class="pdot">' + (isKey ? '🔑' : (no === undefined ? i+1 : no)) + '</span>' +
     (p.t ? '<span class="ptxt">' + esc(p.t) + '</span>' : '') + '</div>';
@@ -1546,12 +1601,15 @@ function pinHtml(p, i, no){
 /* ---- marker popover ---- */
 function closePop(){ const p = document.querySelector('.pop'); if (p) p.remove(); POPI = null; }
 let POPI = null;                       // index of the marker whose popover is open
-function openPop(card, m, i){
+function openPop(card, m, i, opt){
   closePop();
+  opt = opt || {};
+  const getV = opt.getV || getView;
+  const rerender = opt.rerender || renderPlan;
   const pins = S.pins[m] || [];
   const p = pins[i]; if (!p) return;
-  const stage = card.querySelector('.stage');
-  const v = getView(m);
+  const stage = card.querySelector(opt.stageSel || '.stage');
+  const v = getV(m);
   const sx = v.base.l + v.tx + (p.x/100) * v.base.w * v.k;
   const sy = v.base.t + v.ty + (p.y/100) * v.base.h * v.k;
   const q = p.qid ? Q.find(z => z.id === p.qid) : null;
@@ -1568,10 +1626,15 @@ function openPop(card, m, i){
       '<input class="pinput" data-a="label" value="' + esc(p.t || '') + '" placeholder="例如：三层宿舍 214">' +
       '<label class="plab">备注</label>' +
       '<textarea class="pnote" data-a="note" placeholder="写点进图时想看到的东西：门锁着要钥匙 / 从北边楼梯上 / 这里有狙击位…">' + esc(p.note || '') + '</textarea>' +
+      '<label class="plab">图片</label>' +
+      '<div class="shot" data-a="shot"><div class="none">还没有图片<br>点下面的按钮选一张</div></div>' +
       '<div class="acts">' +
+        '<button class="mbtn" data-a="pick">选择图片</button>' +
+        '<button class="mbtn danger" data-a="rmshot" style="display:none">移除图片</button>' +
         '<span class="psaved" data-a="saved"></span>' +
         '<button class="mbtn danger" data-a="del" style="margin-left:auto">删除标记</button>' +
       '</div>' +
+      '<input type="file" accept="image/*" data-a="file" style="display:none">' +
     '</div>';
   stage.appendChild(pop);
   POPI = i;
@@ -1611,11 +1674,46 @@ function openPop(card, m, i){
   noteEl.addEventListener('blur', commit);
   labelEl.addEventListener('blur', commit);
 
-  pop.querySelector('[data-a="close"]').onclick = () => { commit(); closePop(); renderPlan(); };
+  /* image: stored per marker, same fallback chain as the map images */
+  const shotBox = pop.querySelector('[data-a="shot"]');
+  const rmShot = pop.querySelector('[data-a="rmshot"]');
+  const file = pop.querySelector('[data-a="file"]');
+  const showShot = src => {
+    shotBox.innerHTML = '<img alt="标记图片" src="' + src + '">';
+    shotBox.querySelector('img').onclick = () => lightbox(src);
+    rmShot.style.display = '';
+  };
+  if (p.sid) shotSrc(p.sid).then(src => { if (src && POPI === i) showShot(src); });
+  pop.querySelector('[data-a="pick"]').onclick = () => file.click();
+  file.onchange = () => {
+    const f = file.files && file.files[0]; if (!f) return;
+    const pp = (S.pins[m] || [])[i]; if (!pp) return;
+    const sid = pp.sid || nextSid();
+    shotBox.innerHTML = '<div class="none">处理中…</div>';
+    shotPut(sid, f)
+      .then(() => shotSrc(sid))
+      .then(src => { pp.sid = sid; save(); if (src) showShot(src);
+        const el = stage.querySelector('.mkr[data-i="' + i + '"]');
+        if (el) el.classList.add('hasshot'); })
+      .catch(err => { shotBox.innerHTML = '<div class="none">存不下：' +
+        esc(err && err.message ? err.message : '空间不足') + '</div>'; });
+  };
+  rmShot.onclick = () => {
+    const pp = (S.pins[m] || [])[i]; if (!pp || !pp.sid) return;
+    shotDel(pp.sid); delete pp.sid; save();
+    shotBox.innerHTML = '<div class="none">还没有图片<br>点下面的按钮选一张</div>';
+    rmShot.style.display = 'none';
+    const el = stage.querySelector('.mkr[data-i="' + i + '"]');
+    if (el) el.classList.remove('hasshot');
+  };
+
+  pop.querySelector('[data-a="close"]').onclick = () => { commit(); closePop(); rerender(); };
   pop.querySelector('[data-a="del"]').onclick = () => {
+    const pp = (S.pins[m] || [])[i];
+    if (pp && pp.sid) shotDel(pp.sid);
     S.pins[m].splice(i, 1);
     if (!S.pins[m].length) delete S.pins[m];
-    save(); closePop(); renderPlan();
+    save(); closePop(); rerender();
   };
   pop.addEventListener('pointerdown', e => e.stopPropagation());
   pop.addEventListener('wheel', e => e.stopPropagation());
@@ -1953,10 +2051,23 @@ function renderKeyMark(){
   });
   wrap.querySelectorAll('.kp').forEach(row => {
     row.onclick = e => {
-      if (e.target.closest('a')) return;          // let the source link through
+      if (e.target.closest('a')) return;          // let the source links through
+      if (e.target.closest('.qjump2')) return;    // handled below
       SELKEY = (SELKEY === row.dataset.k) ? null : row.dataset.k;
       if (!SELKEY) KARMED = false;
       renderKeyMark();
+    };
+  });
+  wrap.querySelectorAll('.qjump2').forEach(el => {
+    el.onclick = e => {
+      e.stopPropagation();
+      document.getElementById('q').value = el.dataset.q;
+      F.q = el.dataset.q;
+      F.traders.clear(); F.maps.clear(); F.lls.clear();
+      document.querySelectorAll('#p-quests .chip').forEach(c => c.setAttribute('aria-pressed','false'));
+      showTab('quests'); render();
+      const row = [...document.querySelectorAll('.q:not(.hide)')][0];
+      if (row) row.classList.add('open');         // land on the detail, already expanded
     };
   });
   const q = s => wrap.querySelector(s);
@@ -2009,17 +2120,12 @@ function renderKeyMark(){
     const wasDrag = drag, hit = downPin;
     endDrag(e); downPin = null;
     if (!wasDrag || moved > 5) return;
-    if (hit){                                   // click a marker to remove it
-      const i = +hit.dataset.i;
-      if (S.pins[m] && S.pins[m][i] !== undefined){
-        if (confirm('删除这个标记？')){
-          S.pins[m].splice(i,1);
-          if (!S.pins[m].length) delete S.pins[m];
-          save(); renderKeyMark();
-        }
-      }
+    if (hit){                                   // open it: rename / note / image / delete
+      openPop(card, m, +hit.dataset.i,
+        { getV:getVV, stageSel:'.vstage', rerender:renderKeyMark });
       return;
     }
+    closePop();
     if (!KARMED || !SELKEY) return;
     const v = getVV(m); if (!v.base) return;
     const r = stage.getBoundingClientRect();
