@@ -411,6 +411,17 @@ tbody tr:last-child td{border-bottom:0}
 .keypane{overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:5px; flex:1; min-height:0}
 .kp-sum{font-size:11.5px; color:var(--ink-mute); line-height:1.6; padding:2px 2px 4px}
 .kp-sum b{color:var(--brass)}
+.kp-filter{display:flex; gap:6px; align-items:center; margin-top:4px; cursor:pointer; color:var(--ink-dim)}
+.kp-filter input{accent-color:var(--brass)}
+/* tick a key once you actually have it */
+.kp-ck{accent-color:var(--done); width:14px; height:14px; flex:0 0 auto; cursor:pointer; margin:0}
+.kp.own{background:color-mix(in srgb,var(--done) 10%,var(--sunk))}
+.kp.own .nm{color:var(--done); text-decoration:line-through; text-decoration-color:color-mix(in srgb,var(--done) 55%,transparent)}
+.kp.own[aria-selected="true"]{background:color-mix(in srgb,var(--done) 20%,var(--sunk))}
+.kcard .have{color:var(--done); font-size:11px; margin-right:2px}
+.kcard.own .nm{color:var(--done)}
+.kdet .kd-own{display:flex; gap:7px; align-items:center; font-size:12.5px; cursor:pointer}
+.kdet .kd-own input{accent-color:var(--done); width:14px; height:14px}
 .kp{border:1px solid var(--line-soft); border-left:3px solid var(--steel); background:var(--sunk);
     padding:6px 8px; cursor:pointer}
 .kp:hover{background:var(--raise)}
@@ -726,6 +737,7 @@ body.wide{height:100%}
         <div class="frow keybar">
           <input class="search kq" id="keySearch" type="search" placeholder="搜索钥匙名或任务名…">
           <label class="kchk"><input type="checkbox" id="keyQuestOnly">只看任务钥匙</label>
+          <label class="kchk"><input type="checkbox" id="keyNeedOnly">只看还没有的</label>
           <label class="kchk"><input type="checkbox" id="keyReqOnly">只看必备</label>
           <label class="kchk"><input type="checkbox" id="keyPickOnly">只看规划里的</label>
           <span class="klegend"><span class="qdot"></span>任务钥匙<span class="ndot"></span>非任务</span>
@@ -923,10 +935,11 @@ RAW.forEach(r => {
 
 /* ---- state ---- */
 const KEY = 'eft-quest-guide-v3';
-let S = { done:{}, pick:{}, pins:{} };
+let S = { done:{}, pick:{}, pins:{}, keys:{} };
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(S, JSON.parse(raw)); } catch(e){}
 if (!S.pick) S.pick = {};
 if (!S.pins) S.pins = {};
+if (!S.keys) S.keys = {};              // key id -> 1 once you actually have that key
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
 const F = { q:'', traders:new Set(), maps:new Set(), lls:new Set(), hide:false, pickOnly:false, open:false };
 
@@ -1347,6 +1360,13 @@ let RPANE = 'task';   // right panel: task list or key list
 let ARMED = false;    // marker placing mode
 
 /* the key checklist for one map: pick a key, then click the map to mark its door */
+/* keys you already own — ticked in the map panel, shown everywhere else */
+const hasKey = id => !!S.keys[id];
+function setKey(id, on){
+  if (on) S.keys[id] = 1; else delete S.keys[id];
+  save();
+}
+let KPQ = false;                       // right panel: only quest keys
 function keyPaneHtml(mapKeys, pins, otherPins, otherName){
   if (!mapKeys.length){
     return '<div class="keypane"><div class="tray-empty">这张图暂无钥匙数据。</div></div>';
@@ -1356,17 +1376,28 @@ function keyPaneHtml(mapKeys, pins, otherPins, otherName){
   const onOther = id => other.filter(p => p.kid === id).length;
   const done = mapKeys.filter(k => marked(k.id).length || onOther(k.id)).length;
   const nQ = mapKeys.filter(k => k.isQ).length;
+  const shown = KPQ ? mapKeys.filter(k => k.isQ) : mapKeys;
+  const owned = mapKeys.filter(k => hasKey(k.id)).length;
   return '<div class="keypane">' +
     '<div class="kp-sum">已标 <b>' + done + '</b> / ' + mapKeys.length +
+      ' · 已有 <b>' + owned + '</b>' +
       ' · <span class="qdot"></span>任务钥匙 ' + nQ +
       ' · <span class="ndot"></span>其它 ' + (mapKeys.length - nQ) +
-      '<br>标记：🔑 = 这把钥匙开的门　✦ = 钥匙的固定刷新点</div>' +
-    mapKeys.map(k => {
+      '<br>标记：🔑 = 这把钥匙开的门　✦ = 钥匙的固定刷新点' +
+      '<label class="kp-filter"><input type="checkbox" data-a="kpq"' + (KPQ ? ' checked' : '') +
+        '>只看任务钥匙</label></div>' +
+    (shown.length ? '' : '<div class="tray-empty">这张图没有任务钥匙。</div>') +
+    shown.map(k => {
       const mine = marked(k.id);
       const oth = onOther(k.id);
       const must = k.quests.filter(q => q.r === 1).length;
-      return '<div class="kp' + (k.isQ ? ' qk' : '') + '" data-k="' + esc(k.id) + '" aria-selected="' + (k.id === SELKEY) + '">' +
-        '<div class="hd"><span class="nm">' + esc(k.n) + '</span>' +
+      const own = hasKey(k.id);
+      return '<div class="kp' + (k.isQ ? ' qk' : '') + (own ? ' own' : '') +
+        '" data-k="' + esc(k.id) + '" aria-selected="' + (k.id === SELKEY) + '">' +
+        '<div class="hd">' +
+          '<input type="checkbox" class="kp-ck" data-own="' + esc(k.id) + '"' + (own ? ' checked' : '') +
+            ' title="勾上表示你已经有这把钥匙了">' +
+          '<span class="nm">' + esc(k.n) + '</span>' +
           (mine.length ? '<span class="cnt" style="margin-left:auto">' + mine.length + '</span>'
                        : '<span class="cnt zero" style="margin-left:auto">0</span>') + '</div>' +
         '<div class="kp-meta">' + (k.isQ ? k.quests.length + ' 个任务' + (must ? ' · 必备 ' + must : '') : '非任务钥匙') +
@@ -2037,7 +2068,7 @@ const KEYIDX = (() => {
     b.quests.filter(q => q.r === 1).length - a.quests.filter(q => q.r === 1).length ||
     a.n.localeCompare(b.n));
 })();
-const KF = { q:'', reqOnly:false, pickOnly:false, questOnly:false, map:'' };
+const KF = { q:'', reqOnly:false, pickOnly:false, questOnly:false, needOnly:false, map:'' };
 let KPAGE = 0;                              // key list is paged, never scrolled
 const pickedNames = () => new Set(Q.filter(x => S.pick[x.id]).map(x => x.cn));
 const keyMapsOf = id => KEYMAP[id] && KEYMAP[id].length ? KEYMAP[id] : [OTHERMAP];
@@ -2061,6 +2092,7 @@ function renderKeys(){
   const rows = base.map(b => {
     let qs = b.quests;
     if (KF.questOnly && !b.isQ) return null;
+    if (KF.needOnly && hasKey(b.k.id)) return null;
     if (KF.reqOnly){ if (!b.isQ) return null; qs = qs.filter(q => q.r === 1); if (!qs.length) return null; }
     if (KF.pickOnly){ if (!b.isQ) return null; qs = qs.filter(q => inPlan.has(q.c)); if (!qs.length) return null; }
     if (term){
@@ -2109,12 +2141,14 @@ function renderKeys(){
     const must = r.qs.filter(q => q.r === 1).length;
     const mp = KF.map ? '' : (r.maps[0] + (r.maps.length > 1 ? '+' + (r.maps.length - 1) : ''));
     const n = marks[r.k.id] || 0;
-    return '<button class="kcard' + (r.isQ ? ' qk' : ' nq') + (must ? ' req' : '') +
+    const own = hasKey(r.k.id);
+    return '<button class="kcard' + (r.isQ ? ' qk' : ' nq') + (must ? ' req' : '') + (own ? ' own' : '') +
       '" data-k="' + esc(r.k.id) + '" title="' + esc(r.k.n + ' · ' + r.maps.join('、') +
-        (r.isQ ? ' · ' + r.qs.length + ' 个任务' : ' · 非任务钥匙')) + '">' +
+        (r.isQ ? ' · ' + r.qs.length + ' 个任务' : ' · 非任务钥匙') + (own ? ' · 已拥有' : '')) + '">' +
       (mp ? '<span class="mp">' + esc(mp) + '</span>' : '<span></span>') +
       '<span class="nm">' + esc(r.k.n) + '</span>' +
-      '<span class="rt">' + (n ? '<span class="mk">◈' + n + '</span> ' : '') +
+      '<span class="rt">' + (own ? '<span class="have">✓</span>' : '') +
+        (n ? '<span class="mk">◈' + n + '</span> ' : '') +
         (r.isQ ? (must ? '必' + must + '/' : '') + r.qs.length : '—') + '</span>' +
     '</button>';
   };
@@ -2130,8 +2164,8 @@ function renderKeys(){
     per = Math.max(1, per - keyCols(body));        // one row too many — drop it and re-lay
   }
 
-  if (stat) stat.textContent = '共 ' + base.length + ' 把 · 筛出 ' + view.length +
-    ' · 本页 ' + (from + 1) + '–' + (from + slice.length);
+  if (stat) stat.textContent = '共 ' + base.length + ' 把 · 已有 ' + Object.keys(S.keys).length +
+    ' · 筛出 ' + view.length + ' · 本页 ' + (from + 1) + '–' + (from + slice.length);
 
   if (pager){
     pager.innerHTML = pages > 1
@@ -2202,6 +2236,8 @@ function openKeyDetail(id){
       '<div class="kd-h"><span style="font-size:11.5px;color:var(--ink-mute)">地图</span>' +
         maps.map(m => '<span class="tag map">' + esc(m) + '</span>').join('') +
         (n ? '<span class="kb plan">已标 ' + n + ' 处</span>' : '') + '</div>' +
+      '<label class="kd-own"><input type="checkbox" data-a="own"' + (hasKey(id) ? ' checked' : '') +
+        '>我已经有这把钥匙了</label>' +
       '<a class="srclink" href="https://www.eftarkov.com/news/id/' + esc(id) +
         '.html" target="_blank" rel="noopener">钥匙详情 · 刷新点 ↗</a>' +
       (qs.length
@@ -2224,6 +2260,7 @@ function openKeyDetail(id){
   const close = () => wrap.remove();
   wrap.querySelector('[data-a="x"]').onclick = close;
   wrap.onclick = e => { if (e.target === wrap) close(); };
+  wrap.querySelector('[data-a="own"]').onchange = e => { setKey(id, e.target.checked); renderKeys(); };
   wrap.querySelectorAll('.qn2').forEach(el => {
     el.onclick = () => { close(); jumpToQuest(el.dataset.q); };
   });
@@ -2305,7 +2342,8 @@ function renderKeyMark(){
         '</div>' +
       '</div>' +
       '<div class="right">' +
-        '<div class="rhd">' + esc(m) + ' 全部钥匙<span class="n">' + mapKeys.length + '</span></div>' +
+        '<div class="rhd">' + esc(m) + (KPQ ? ' 任务钥匙' : ' 全部钥匙') + '<span class="n">' +
+          (KPQ ? mapKeys.filter(k => k.isQ).length : mapKeys.length) + '</span></div>' +
         keyPaneHtml(mapKeys, pins, otherPins, LAYSHORT[KLAYER ? '' : 'in']) +
       '</div>' +
     '</div>';
@@ -2329,11 +2367,23 @@ function renderKeyMark(){
     row.onclick = e => {
       if (e.target.closest('a')) return;          // let the source links through
       if (e.target.closest('.qjump2')) return;    // handled below
+      if (e.target.closest('.kp-ck')) return;     // ticking "I have it" is not a selection
       SELKEY = (SELKEY === row.dataset.k) ? null : row.dataset.k;
       if (!SELKEY) KARMED = false;
       renderKeyMark();
     };
   });
+  wrap.querySelectorAll('.kp-ck').forEach(cb => {
+    cb.onclick = e => e.stopPropagation();
+    cb.onchange = () => {
+      setKey(cb.dataset.own, cb.checked);
+      cb.closest('.kp').classList.toggle('own', cb.checked);
+      const sum = wrap.querySelector('.kp-sum b:nth-of-type(2)');
+      if (sum) sum.textContent = mapKeys.filter(k => hasKey(k.id)).length;
+    };
+  });
+  const kpq = wrap.querySelector('[data-a="kpq"]');
+  if (kpq) kpq.onchange = () => { KPQ = kpq.checked; renderKeyMark(); };
   wrap.querySelectorAll('.qjump2').forEach(el => {
     el.onclick = e => { e.stopPropagation(); jumpToQuest(el.dataset.q); };
   });
@@ -2844,8 +2894,9 @@ function openBackup(){
       if (!data || !data.state){ st.textContent = '文件里没有进度数据。'; return; }
       if (!confirm('导入会覆盖当前的进度、清单和标记，确定吗？')) return;
       st.textContent = '正在恢复…';
-      S = Object.assign({ done:{}, pick:{}, pins:{} }, data.state);
+      S = Object.assign({ done:{}, pick:{}, pins:{}, keys:{} }, data.state);
       if (!S.pins) S.pins = {};
+      if (!S.keys) S.keys = {};
       save();
       let nImg = 0, nShot = 0;
       for (const m in (data.images || {})){
@@ -2895,7 +2946,9 @@ document.getElementById('openBackup').onclick = openBackup;
   const r = document.getElementById('keyReqOnly');
   const p = document.getElementById('keyPickOnly');
   const o = document.getElementById('keyQuestOnly');
+  const nd = document.getElementById('keyNeedOnly');
   if (!s) return;
+  nd.addEventListener('change', () => { KF.needOnly = nd.checked; KPAGE = 0; renderKeys(); });
   s.addEventListener('input', () => { KF.q = s.value; KPAGE = 0; renderKeys(); });
   r.addEventListener('change', () => { KF.reqOnly = r.checked; KPAGE = 0; renderKeys(); });
   p.addEventListener('change', () => { KF.pickOnly = p.checked; KPAGE = 0; renderKeys(); });
